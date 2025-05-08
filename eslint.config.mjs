@@ -28,7 +28,11 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-floating-promises": "warn",
-      "@typescript-eslint/no-unsafe-argument": "warn",
+
+      // class 혹은 function 의 arguments 에 접근할 때,
+      // 충분히 사용할 때 주의하여 사용할 수 있으므로 `off` 하도록 한다.
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
     },
   },
 );
