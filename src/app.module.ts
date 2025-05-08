@@ -1,9 +1,10 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule } from "@nestjs/config";
-import { DailyTodoModule } from "./daily-todo/daily-todo.module";
-import { RoutineModule } from "./routine/routine.module";
-import { CategoryModule } from "./category/category.module";
+import { DailyTodoModule } from "./hb-backend-api/daily-todo/daily-todo.module";
+import { RoutineModule } from "./hb-backend-api/routine/routine.module";
+import { CategoryModule } from "./hb-backend-api/category/category.module";
+import { AuthModule } from "./hb-backend-api/auth/auth.module";
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CategoryModule } from "./category/category.module";
     DailyTodoModule,
     RoutineModule,
     CategoryModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
