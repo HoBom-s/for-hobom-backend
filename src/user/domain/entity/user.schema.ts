@@ -4,7 +4,7 @@ import { UserEntity } from "./user.entity";
 
 export const UserSchema = SchemaFactory.createForClass(UserEntity);
 
-type UserDocument = UserEntity & Document;
+export type UserDocument = UserEntity & Document;
 
 UserSchema.pre<UserDocument>("save", async function (next) {
   if (!this.isModified("password")) {

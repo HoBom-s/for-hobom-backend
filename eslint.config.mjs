@@ -33,6 +33,14 @@ export default tseslint.config(
       // 충분히 사용할 때 주의하여 사용할 수 있으므로 `off` 하도록 한다.
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
+
+      // 제네릭을 리턴해야 하는 경우가 충분히 존재할 수 있으므로
+      // 해당 옵션은 `off` 하도록 한다.
+      "@typescript-eslint/no-unsafe-return": "off",
+
+      // 데코레이터를 사용할때 그다지 도움이 되지 않는 옵션이므로
+      // 해당 옵션은 `off` 하도록 한다.
+      "@typescript-eslint/no-unsafe-call": "off",
     },
   },
 );
