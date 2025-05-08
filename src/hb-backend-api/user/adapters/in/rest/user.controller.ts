@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Inject, Param, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  UseGuards,
+} from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { CreateUserUseCase } from "../../../application/ports/in/create-user.use-case";
 import { ResponseEntity } from "../../../../../shared/response/response.entity";
@@ -6,6 +14,7 @@ import { CreateUserDto } from "../dto/create-user.dto";
 import { CreateUserCommand } from "../../../application/command/create-user.command";
 import { GetUserUseCase } from "../../../application/ports/in/get-user.use-case";
 import { GetUserDto } from "../dto/get-user.dto";
+import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
 
 @Controller(`${EndPointPrefixConstant}/user`)
 export class UserController {
@@ -16,6 +25,7 @@ export class UserController {
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get(":id")
   public async findById(
     @Param("id") id: string,

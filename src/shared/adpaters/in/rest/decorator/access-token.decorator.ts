@@ -1,10 +1,24 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import { Request } from "express";
+import { JwtAuthPayloadModel } from "src/hb-backend-api/auth/domain/model/jwt-auth-payload.model";
 
-export const AccessToken = createParamDecorator(
-  (_: unknown, ctx: ExecutionContext): string | undefined => {
+interface TokenUserInformation {
+  nickname: string;
+  accessToken: string;
+}
+
+export const NicknameAndAccessToken = createParamDecorator(
+  (_: unknown, ctx: ExecutionContext): TokenUserInformation | undefined => {
     const request = ctx.switchToHttp().getRequest<Request>();
+    const result = request.user as JwtAuthPayloadModel;
 
-    return request.cookies?.accessToken;
+    if (request.cookies?.accessToken == null) {
+      return undefined;
+    }
+
+    return {
+      nickname: result.sub,
+      accessToken: String(request.cookies?.accessToken),
+    };
   },
 );
