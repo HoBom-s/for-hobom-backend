@@ -1,23 +1,17 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { UserQueryPort } from "../../../application/ports/out/user-query.port";
-import {
-  UserEntity,
-  UserEntitySchema,
-} from "../../../domain/entity/user.entity";
-import { UserDocument } from "../../../domain/entity/user.schema";
+import { UserEntitySchema } from "../../../domain/entity/user.entity";
+import { UserRepository } from "../../../domain/repositories/user.repository";
 
 @Injectable()
 export class UserQueryAdapter implements UserQueryPort {
   constructor(
-    @InjectModel(UserEntity.name)
-    private readonly userModel: Model<UserDocument>,
+    @Inject("UserRepository")
+    private readonly userRepository: UserRepository,
   ) {}
 
   public async findById(id: string): Promise<UserEntitySchema> {
-    const foundUser = await this.userModel.findById(id).lean().exec();
-
+    const foundUser = await this.userRepository.findById(id);
     if (foundUser == null) {
       throw new NotFoundException(`해당 유저를 찾을 수 없어요. ${id}`);
     }
@@ -28,13 +22,7 @@ export class UserQueryAdapter implements UserQueryPort {
   }
 
   public async findByNickname(nickname: string): Promise<UserEntitySchema> {
-    const foundUser = await this.userModel
-      .findOne({
-        nickname,
-      })
-      .lean()
-      .exec();
-
+    const foundUser = await this.userRepository.findByNickname(nickname);
     if (foundUser == null) {
       throw new NotFoundException(`해당 유저를 찾을 수 없어요. ${nickname}`);
     }

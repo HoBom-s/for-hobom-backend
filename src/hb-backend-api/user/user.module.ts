@@ -7,6 +7,7 @@ import { CreateUserService } from "./application/use-cases/create-user.service";
 import { UserController } from "./adapters/in/rest/user.controller";
 import { UserQueryAdapter } from "./adapters/out/query/user-query.adapter";
 import { GetUserService } from "./application/use-cases/get-user.service";
+import { UserRepositoryImpl } from "./infra/repositories/user.repository.impl";
 
 @Module({
   imports: [
@@ -19,6 +20,10 @@ import { GetUserService } from "./application/use-cases/get-user.service";
   ],
   controllers: [UserController],
   providers: [
+    {
+      provide: "UserRepository",
+      useClass: UserRepositoryImpl,
+    },
     {
       provide: "UserPersistencePort",
       useClass: UserPersistenceAdapter,
@@ -38,6 +43,7 @@ import { GetUserService } from "./application/use-cases/get-user.service";
   ],
   exports: [
     MongooseModule,
+    "UserRepository",
     "UserPersistencePort",
     "UserQueryPort",
     "CreateUserUseCase",

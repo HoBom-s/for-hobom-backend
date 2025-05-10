@@ -47,7 +47,9 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
       });
 
       return newAccessToken;
-    } catch (e) {
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {
       return null;
     }
   }

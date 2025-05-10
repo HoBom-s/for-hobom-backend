@@ -24,4 +24,6 @@ async function bootstrap() {
   });
 }
 
-bootstrap();
+bootstrap()
+  .then(() => console.log(`HoBom NestJS Server On ! 🐻🦊`))
+  .catch((error) => console.error(error));
