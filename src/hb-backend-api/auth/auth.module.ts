@@ -15,6 +15,7 @@ import { UserModule } from "../user/user.module";
 import { RefreshTokenAuthService } from "./application/use-cases/refresh-token-auth.service";
 import { JwtAuthGuard } from "../../shared/adpaters/in/rest/guard/jwt-auth.guard";
 import { JwtStrategy } from "../../shared/adpaters/in/rest/strategy/jwt.strategy";
+import { AuthRepositoryImpl } from "./infra/repositories/auth.repository.impl";
 
 @Module({
   imports: [
@@ -52,6 +53,10 @@ import { JwtStrategy } from "../../shared/adpaters/in/rest/strategy/jwt.strategy
       useClass: JwtAuthAdapter,
     },
     {
+      provide: "AuthRepository",
+      useClass: AuthRepositoryImpl,
+    },
+    {
       provide: "AuthPersistencePort",
       useClass: AuthPersistenceAdapter,
     },
@@ -73,6 +78,7 @@ import { JwtStrategy } from "../../shared/adpaters/in/rest/strategy/jwt.strategy
     JwtModule,
     MongooseModule,
     "JwtAuthPort",
+    "AuthRepository",
     "AuthPersistencePort",
     "AuthQueryPort",
     "LoginAuthUseCase",

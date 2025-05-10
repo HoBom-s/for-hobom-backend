@@ -1,31 +1,17 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Inject, Injectable } from "@nestjs/common";
 import { AuthQueryPort } from "../../../application/ports/out/auth-query.port";
-import {
-  AuthEntity,
-  AuthEntitySchema,
-} from "../../../domain/entity/auth.entity";
-import { AuthDocument } from "../../../domain/entity/auth.schema";
+import { AuthEntitySchema } from "../../../domain/entity/auth.entity";
+import { AuthRepository } from "../../../domain/repositories/auth.repository";
 
 @Injectable()
 export class AuthQueryAdapter implements AuthQueryPort {
   constructor(
-    @InjectModel(AuthEntity.name)
-    private readonly authModel: Model<AuthDocument>,
+    @Inject("AuthRepository")
+    private readonly authRepository: AuthRepository,
   ) {}
 
   public async findByRefreshToken(token: string): Promise<AuthEntitySchema> {
-    const foundAuth = await this.authModel
-      .findOne({
-        refreshToken: token,
-      })
-      .lean()
-      .exec();
-    if (foundAuth == null) {
-      throw new NotFoundException("사용자의 토큰을 찾을 수 없어요.");
-    }
-
+    const foundAuth = await this.authRepository.findByRefreshToken(token);
     const { nickname, refreshToken, expiresAt } = foundAuth;
 
     return new AuthEntitySchema(nickname, refreshToken, expiresAt);
