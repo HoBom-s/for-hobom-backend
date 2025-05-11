@@ -3,6 +3,8 @@ name: JIRA Ticket Validation
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
+    branches:
+      - develop # Target branch, we cannot check develop to main.
 
 jobs:
   jira-ticket-check:

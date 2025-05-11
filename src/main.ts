@@ -1,11 +1,21 @@
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import * as cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";
 import { ResponseWrapInterceptor } from "./shared/adpaters/in/rest/interceptors/wrapeed-response.interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle("HoBom Backend API Document 🐻🦊")
+    .setDescription("HoBom System")
+    .setVersion("1.0")
+    .addTag("HoBom")
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api-docs", app, documentFactory);
 
   app.use(cookieParser());
   app.useGlobalPipes(

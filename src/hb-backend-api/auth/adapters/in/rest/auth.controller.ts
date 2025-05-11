@@ -7,6 +7,7 @@ import {
   Res,
   UseInterceptors,
 } from "@nestjs/common";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Request, Response } from "express";
 import { LoginAuthUseCase } from "../../../application/ports/in/login-auth.use-case";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
@@ -19,6 +20,7 @@ import { CookiesInterceptor } from "../../../../../shared/adpaters/in/rest/inter
 import { DIToken } from "../../../../../shared/di/token.di";
 import { RefreshToken } from "../../../domain/vo/refresh-token.vo";
 
+@ApiTags("Auth")
 @Controller(`${EndPointPrefixConstant}/auth`)
 export class AuthController {
   private ACCESS_TOKEN = "accessToken";
@@ -33,6 +35,7 @@ export class AuthController {
     private readonly refreshTokenUseCase: RefreshAuthTokenUseCase,
   ) {}
 
+  @ApiOperation({ description: "사용자 로그인" })
   @Post("/login")
   @UseInterceptors(CookiesInterceptor)
   public async login(
@@ -47,6 +50,7 @@ export class AuthController {
     );
   }
 
+  @ApiOperation({ description: "리프래시 토큰 갱신" })
   @Post("/refresh")
   public async refresh(
     @Req() request: Request,
