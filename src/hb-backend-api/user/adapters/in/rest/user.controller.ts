@@ -15,20 +15,23 @@ import { CreateUserCommand } from "../../../application/command/create-user.comm
 import { GetUserUseCase } from "../../../application/ports/in/get-user.use-case";
 import { GetUserDto } from "../dto/get-user.dto";
 import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { DIToken } from "../../../../../shared/di/token.di";
+import { UserId } from "../../../domain/vo/user-id.vo";
+import { ParseUserIdPipe } from "../pipe/user-id.pipe";
 
 @Controller(`${EndPointPrefixConstant}/user`)
 export class UserController {
   constructor(
-    @Inject("CreateUserUseCase")
+    @Inject(DIToken.UserModule.CreateUserUseCase)
     private readonly createUserUseCase: CreateUserUseCase,
-    @Inject("GetUserUseCase")
+    @Inject(DIToken.UserModule.GetUserUseCase)
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard)
   @Get(":id")
   public async findById(
-    @Param("id") id: string,
+    @Param("id", ParseUserIdPipe) id: UserId,
   ): Promise<ResponseEntity<GetUserDto>> {
     const foundUser = await this.getUserUseCase.invoke(id);
 

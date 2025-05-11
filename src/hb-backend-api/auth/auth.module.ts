@@ -16,6 +16,7 @@ import { RefreshTokenAuthService } from "./application/use-cases/refresh-token-a
 import { JwtAuthGuard } from "../../shared/adpaters/in/rest/guard/jwt-auth.guard";
 import { JwtStrategy } from "../../shared/adpaters/in/rest/strategy/jwt.strategy";
 import { AuthRepositoryImpl } from "./infra/repositories/auth.repository.impl";
+import { DIToken } from "../../shared/di/token.di";
 
 @Module({
   imports: [
@@ -49,27 +50,27 @@ import { AuthRepositoryImpl } from "./infra/repositories/auth.repository.impl";
       useClass: JwtAuthGuard,
     },
     {
-      provide: "JwtAuthPort",
+      provide: DIToken.AuthModule.JwtAuthPort,
       useClass: JwtAuthAdapter,
     },
     {
-      provide: "AuthRepository",
+      provide: DIToken.AuthModule.AuthRepository,
       useClass: AuthRepositoryImpl,
     },
     {
-      provide: "AuthPersistencePort",
+      provide: DIToken.AuthModule.AuthPersistencePort,
       useClass: AuthPersistenceAdapter,
     },
     {
-      provide: "AuthQueryPort",
+      provide: DIToken.AuthModule.AuthQueryPort,
       useClass: AuthQueryAdapter,
     },
     {
-      provide: "LoginAuthUseCase",
+      provide: DIToken.AuthModule.LoginAuthUseCase,
       useClass: LoginAuthService,
     },
     {
-      provide: "RefreshAuthTokenUseCase",
+      provide: DIToken.AuthModule.RefreshAuthTokenUseCase,
       useClass: RefreshTokenAuthService,
     },
   ],
@@ -77,12 +78,12 @@ import { AuthRepositoryImpl } from "./infra/repositories/auth.repository.impl";
   exports: [
     JwtModule,
     MongooseModule,
-    "JwtAuthPort",
-    "AuthRepository",
-    "AuthPersistencePort",
-    "AuthQueryPort",
-    "LoginAuthUseCase",
-    "RefreshAuthTokenUseCase",
+    DIToken.AuthModule.JwtAuthPort,
+    DIToken.AuthModule.AuthRepository,
+    DIToken.AuthModule.AuthPersistencePort,
+    DIToken.AuthModule.AuthQueryPort,
+    DIToken.AuthModule.LoginAuthUseCase,
+    DIToken.AuthModule.RefreshAuthTokenUseCase,
   ],
 })
 export class AuthModule {}

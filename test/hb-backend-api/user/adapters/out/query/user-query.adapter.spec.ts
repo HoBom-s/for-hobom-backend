@@ -1,9 +1,12 @@
 import { NotFoundException } from "@nestjs/common";
+import { Types } from "mongoose";
 import { UserQueryAdapter } from "../../../../../../src/hb-backend-api/user/adapters/out/query/user-query.adapter";
 import { UserEntitySchema } from "../../../../../../src/hb-backend-api/user/domain/entity/user.entity";
 import { UserRepository } from "../../../../../../src/hb-backend-api/user/domain/repositories/user.repository";
 import { createMockUser } from "../../../../../factories/user.factory";
 import { createMockUserRepository } from "../../../../../mocks/user.repository.mock";
+import { UserId } from "../../../../../../src/hb-backend-api/user/domain/vo/user-id.vo";
+import { UserNickname } from "../../../../../../src/hb-backend-api/user/domain/vo/user-nickname.vo";
 
 describe("UserQueryAdapter", () => {
   let userRepository: jest.Mocked<UserRepository>;
@@ -20,9 +23,10 @@ describe("UserQueryAdapter", () => {
 
       userRepository.findById.mockResolvedValue(foundUser);
 
-      const result = await userQueryAdapter.findById("id-123");
+      const userId = new UserId(new Types.ObjectId());
+      const result = await userQueryAdapter.findById(userId);
 
-      expect(userRepository.findById).toHaveBeenCalledWith("id-123");
+      expect(userRepository.findById).toHaveBeenCalledWith(userId);
       expect(result).toBeInstanceOf(UserEntitySchema);
       expect(result).toMatchObject({
         username: "Robin Yeon",
@@ -35,7 +39,8 @@ describe("UserQueryAdapter", () => {
     it("should throw NotFoundException when user is not found", async () => {
       userRepository.findById.mockResolvedValue(null as any);
 
-      await expect(userQueryAdapter.findById("not-found-id")).rejects.toThrow(
+      const userId = new UserId(new Types.ObjectId());
+      await expect(userQueryAdapter.findById(userId)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -47,9 +52,10 @@ describe("UserQueryAdapter", () => {
 
       userRepository.findByNickname.mockResolvedValue(foundUser);
 
-      const result = await userQueryAdapter.findByNickname("Robin");
+      const userNickname = UserNickname.fromString("Robin");
+      const result = await userQueryAdapter.findByNickname(userNickname);
 
-      expect(userRepository.findByNickname).toHaveBeenCalledWith("Robin");
+      expect(userRepository.findByNickname).toHaveBeenCalledWith(userNickname);
       expect(result).toBeInstanceOf(UserEntitySchema);
       expect(result).toMatchObject({
         username: "Robin Yeon",
@@ -62,8 +68,9 @@ describe("UserQueryAdapter", () => {
     it("should throw NotFoundException when user is not found", async () => {
       userRepository.findByNickname.mockResolvedValue(null as any);
 
+      const userNickname = UserNickname.fromString("not-found-nickname");
       await expect(
-        userQueryAdapter.findByNickname("not-found-nickname"),
+        userQueryAdapter.findByNickname(userNickname),
       ).rejects.toThrow(NotFoundException);
     });
   });

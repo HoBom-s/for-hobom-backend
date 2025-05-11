@@ -8,20 +8,24 @@ import { JwtAuthPort } from "../ports/out/jwt-auth.port";
 import { UserEntitySchema } from "../../../user/domain/entity/user.entity";
 import { AuthPersistencePort } from "../ports/out/auth-persistence.port";
 import { AuthEntitySchema } from "../../domain/entity/auth.entity";
+import { DIToken } from "../../../../shared/di/token.di";
+import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
 
 @Injectable()
 export class LoginAuthService implements LoginAuthUseCase {
   constructor(
-    @Inject("UserQueryPort")
+    @Inject(DIToken.UserModule.UserQueryPort)
     private readonly userQueryPort: UserQueryPort,
-    @Inject("AuthPersistencePort")
+    @Inject(DIToken.AuthModule.AuthPersistencePort)
     private readonly authPersistencePort: AuthPersistencePort,
-    @Inject("JwtAuthPort")
+    @Inject(DIToken.AuthModule.JwtAuthPort)
     private readonly jwtAuthPort: JwtAuthPort,
   ) {}
 
   public async invoke(command: LoginAuthCommand): Promise<LoginAuthResult> {
-    const foundUser = await this.findUserByNickname(command.getNickname);
+    const foundUser = await this.findUserByNickname(
+      UserNickname.fromString(command.getNickname),
+    );
     const isVerified = await this.comparePassword(
       command.getPassword,
       foundUser.getPassword,
@@ -40,7 +44,7 @@ export class LoginAuthService implements LoginAuthUseCase {
   }
 
   private async findUserByNickname(
-    nickname: string,
+    nickname: UserNickname,
   ): Promise<UserEntitySchema> {
     return await this.userQueryPort.findByNickname(nickname);
   }

@@ -5,19 +5,22 @@ import { JwtAuthPort } from "../ports/out/jwt-auth.port";
 import { AuthQueryPort } from "../ports/out/auth-query.port";
 import { AuthPersistencePort } from "../ports/out/auth-persistence.port";
 import { LoginAuthResult } from "../result/login-auth.result";
+import { DIToken } from "../../../../shared/di/token.di";
+import { RefreshToken } from "../../domain/vo/refresh-token.vo";
+import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
 
 @Injectable()
 export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
   constructor(
-    @Inject("JwtAuthPort")
+    @Inject(DIToken.AuthModule.JwtAuthPort)
     private readonly jwtAuthPort: JwtAuthPort,
-    @Inject("AuthQueryPort")
+    @Inject(DIToken.AuthModule.AuthQueryPort)
     private readonly authQueryPort: AuthQueryPort,
-    @Inject("AuthPersistencePort")
+    @Inject(DIToken.AuthModule.AuthPersistencePort)
     private readonly authPersistencePort: AuthPersistencePort,
   ) {}
 
-  public async invoke(refreshToken: string): Promise<LoginAuthResult> {
+  public async invoke(refreshToken: RefreshToken): Promise<LoginAuthResult> {
     try {
       const payload = this.jwtAuthPort.verifyRefreshToken(refreshToken);
 
@@ -31,7 +34,7 @@ export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
         sub: payload.sub,
       });
 
-      return LoginAuthResult.of(newAccessToken, refreshToken);
+      return LoginAuthResult.of(newAccessToken, refreshToken.raw);
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         // 리프래시 토큰 만료
@@ -45,8 +48,8 @@ export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
         const newRefreshToken = this.jwtAuthPort.signRefreshToken(newPayload);
 
         await this.authPersistencePort.updateRefreshToken(
-          decoded.sub,
-          newRefreshToken,
+          UserNickname.fromString(decoded.sub),
+          RefreshToken.fromString(newRefreshToken),
         );
 
         return LoginAuthResult.of(newAccessToken, newRefreshToken);

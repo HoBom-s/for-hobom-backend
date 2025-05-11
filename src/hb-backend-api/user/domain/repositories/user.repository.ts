@@ -1,9 +1,12 @@
-import { UserEntity, UserEntitySchema } from "../entity/user.entity";
+import { UserCreateEntitySchema } from "../entity/user.entity";
+import { UserId } from "../vo/user-id.vo";
+import { UserNickname } from "../vo/user-nickname.vo";
+import { UserDocument } from "../entity/user.schema";
 
 export interface UserRepository {
-  save(user: UserEntitySchema): Promise<void>;
+  save(user: UserCreateEntitySchema): Promise<void>;
 
-  findById(id: string): Promise<UserEntity>;
+  findById(id: UserId): Promise<UserDocument>;
 
-  findByNickname(nickname: string): Promise<UserEntity>;
+  findByNickname(nickname: UserNickname): Promise<UserDocument>;
 }

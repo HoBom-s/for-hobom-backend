@@ -1,5 +1,5 @@
-import { UserEntitySchema } from "../../../domain/entity/user.entity";
+import { UserCreateEntitySchema } from "../../../domain/entity/user.entity";
 
 export interface UserPersistencePort {
-  save(user: UserEntitySchema): Promise<void>;
+  save(user: UserCreateEntitySchema): Promise<void>;
 }

@@ -1,5 +1,6 @@
 import { AuthEntitySchema } from "../../../domain/entity/auth.entity";
+import { RefreshToken } from "../../../domain/vo/refresh-token.vo";
 
 export interface AuthQueryPort {
-  findByRefreshToken(token: string): Promise<AuthEntitySchema>;
+  findByRefreshToken(token: RefreshToken): Promise<AuthEntitySchema>;
 }

@@ -2,11 +2,14 @@ import { Inject, Injectable } from "@nestjs/common";
 import { AuthEntitySchema } from "src/hb-backend-api/auth/domain/entity/auth.entity";
 import { AuthPersistencePort } from "../../../application/ports/out/auth-persistence.port";
 import { AuthRepository } from "../../../domain/repositories/auth.repository";
+import { DIToken } from "../../../../../shared/di/token.di";
+import { RefreshToken } from "../../../domain/vo/refresh-token.vo";
+import { UserNickname } from "../../../../user/domain/vo/user-nickname.vo";
 
 @Injectable()
 export class AuthPersistenceAdapter implements AuthPersistencePort {
   constructor(
-    @Inject("AuthRepository")
+    @Inject(DIToken.AuthModule.AuthRepository)
     private readonly authRepository: AuthRepository,
   ) {}
 
@@ -17,13 +20,13 @@ export class AuthPersistenceAdapter implements AuthPersistencePort {
   }
 
   public async updateRefreshToken(
-    nickname: string,
-    newRefreshToken: string,
+    nickname: UserNickname,
+    newRefreshToken: RefreshToken,
   ): Promise<void> {
     await this.authRepository.updateRefreshToken(nickname, newRefreshToken);
   }
 
-  public async revokeToken(token: string): Promise<void> {
+  public async revokeToken(token: RefreshToken): Promise<void> {
     await this.authRepository.revokeToken(token);
   }
 }

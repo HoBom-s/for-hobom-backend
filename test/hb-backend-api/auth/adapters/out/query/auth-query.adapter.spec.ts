@@ -3,6 +3,7 @@ import { AuthQueryAdapter } from "../../../../../../src/hb-backend-api/auth/adap
 import { createMockAuthRepository } from "../../../../../mocks/auth.repository.mock";
 import { createMockAuth } from "../../../../../factories/auth.factory";
 import { AuthEntitySchema } from "../../../../../../src/hb-backend-api/auth/domain/entity/auth.entity";
+import { RefreshToken } from "../../../../../../src/hb-backend-api/auth/domain/vo/refresh-token.vo";
 
 describe("AuthQueryAdapter", () => {
   let authRepository: jest.Mocked<AuthRepository>;
@@ -19,13 +20,18 @@ describe("AuthQueryAdapter", () => {
 
       authRepository.findByRefreshToken.mockResolvedValue(foundAuth);
 
-      const result = await authQueryAdapter.findByRefreshToken("Token");
+      const refreshToken = RefreshToken.fromString(
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidHlwIjoiUmVmcmVzaFRva2VuIiwiaWF0IjoxNjg4ODg4ODg4LCJleHAiOjE2ODg5NzUyODh9.dGhpcy1pcy1ub3QtYS1yZWFsLXNpZ25hdHVyZQ",
+      );
+      const result = await authQueryAdapter.findByRefreshToken(refreshToken);
 
-      expect(authRepository.findByRefreshToken).toHaveBeenCalledWith("Token");
+      expect(authRepository.findByRefreshToken).toHaveBeenCalledWith(
+        refreshToken,
+      );
       expect(result).toBeInstanceOf(AuthEntitySchema);
       expect(result).toMatchObject({
-        nickname: "Robin",
-        refreshToken: "Token",
+        nickname: foundAuth.nickname,
+        refreshToken: foundAuth.refreshToken,
       });
     });
   });

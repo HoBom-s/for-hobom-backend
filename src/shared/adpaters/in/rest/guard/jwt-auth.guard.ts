@@ -5,6 +5,8 @@ import { JwtAuthPayloadModel } from "src/hb-backend-api/auth/domain/model/jwt-au
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard("jwt") {
+  private readonly AUTHORIZE_KEY = "authorization";
+
   constructor(private readonly jwtService: JwtService) {
     super();
   }
@@ -24,7 +26,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
           const newAccessToken = await this.refreshAccessToken(refreshToken);
 
           if (newAccessToken) {
-            request.headers["authorization"] = `Bearer ${newAccessToken}`;
+            request.headers[this.AUTHORIZE_KEY] = `Bearer ${newAccessToken}`;
             return true;
           }
         }
