@@ -8,6 +8,7 @@ import { UserController } from "./adapters/in/rest/user.controller";
 import { UserQueryAdapter } from "./adapters/out/query/user-query.adapter";
 import { GetUserService } from "./application/use-cases/get-user.service";
 import { UserRepositoryImpl } from "./infra/repositories/user.repository.impl";
+import { DIToken } from "../../shared/di/token.di";
 
 @Module({
   imports: [
@@ -21,33 +22,33 @@ import { UserRepositoryImpl } from "./infra/repositories/user.repository.impl";
   controllers: [UserController],
   providers: [
     {
-      provide: "UserRepository",
+      provide: DIToken.UserModule.UserRepository,
       useClass: UserRepositoryImpl,
     },
     {
-      provide: "UserPersistencePort",
+      provide: DIToken.UserModule.UserPersistencePort,
       useClass: UserPersistenceAdapter,
     },
     {
-      provide: "UserQueryPort",
+      provide: DIToken.UserModule.UserQueryPort,
       useClass: UserQueryAdapter,
     },
     {
-      provide: "CreateUserUseCase",
+      provide: DIToken.UserModule.CreateUserUseCase,
       useClass: CreateUserService,
     },
     {
-      provide: "GetUserUseCase",
+      provide: DIToken.UserModule.GetUserUseCase,
       useClass: GetUserService,
     },
   ],
   exports: [
     MongooseModule,
-    "UserRepository",
-    "UserPersistencePort",
-    "UserQueryPort",
-    "CreateUserUseCase",
-    "GetUserUseCase",
+    DIToken.UserModule.UserRepository,
+    DIToken.UserModule.UserPersistencePort,
+    DIToken.UserModule.UserQueryPort,
+    DIToken.UserModule.CreateUserUseCase,
+    DIToken.UserModule.GetUserUseCase,
   ],
 })
 export class UserModule {}

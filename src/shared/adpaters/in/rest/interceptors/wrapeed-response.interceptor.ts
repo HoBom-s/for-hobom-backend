@@ -13,7 +13,7 @@ export class ResponseWrapInterceptor<T>
   implements NestInterceptor<T, ResponseEntity<T>>
 {
   intercept(
-    context: ExecutionContext,
+    _context: ExecutionContext,
     next: CallHandler,
   ): Observable<ResponseEntity<T>> {
     return next.handle().pipe(map((data) => ResponseEntity.ok(data)));

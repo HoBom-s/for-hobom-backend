@@ -8,6 +8,8 @@ import { Model } from "mongoose";
 import { AuthRepository } from "../../domain/repositories/auth.repository";
 import { AuthEntity, AuthEntitySchema } from "../../domain/entity/auth.entity";
 import { AuthDocument } from "../../domain/entity/auth.schema";
+import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
+import { RefreshToken } from "../../domain/vo/refresh-token.vo";
 
 @Injectable()
 export class AuthRepositoryImpl implements AuthRepository {
@@ -16,10 +18,10 @@ export class AuthRepositoryImpl implements AuthRepository {
     private readonly authModel: Model<AuthDocument>,
   ) {}
 
-  public async findByRefreshToken(token: string): Promise<AuthEntity> {
+  public async findByRefreshToken(token: RefreshToken): Promise<AuthEntity> {
     const foundAuth = await this.authModel
       .findOne({
-        refreshToken: token,
+        refreshToken: token.raw,
       })
       .lean()
       .exec();
@@ -39,12 +41,12 @@ export class AuthRepositoryImpl implements AuthRepository {
   }
 
   public async updateRefreshToken(
-    nickname: string,
-    newRefreshToken: string,
+    nickname: UserNickname,
+    newRefreshToken: RefreshToken,
   ): Promise<void> {
     const updateResult = await this.authModel.updateOne(
-      { $or: [{ userId: nickname }, { nickname: nickname }] },
-      { $set: { refreshToken: newRefreshToken } },
+      { $or: [{ nickname: nickname.raw }] },
+      { $set: { refreshToken: newRefreshToken.raw } },
     );
 
     if (updateResult.modifiedCount === 0) {
@@ -52,7 +54,7 @@ export class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  public async revokeToken(token: string): Promise<void> {
+  public async revokeToken(token: RefreshToken): Promise<void> {
     const foundAuth = await this.findByRefreshToken(token);
     if (foundAuth == null) {
       return;

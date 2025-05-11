@@ -16,6 +16,8 @@ import { GetLoginTokenDto } from "../dto/get-login-token.dto";
 import { LoginAuthCommand } from "../../../application/command/login-auth.command";
 import { RefreshAuthTokenUseCase } from "../../../application/ports/in/refresh-auth-token.use-case";
 import { CookiesInterceptor } from "../../../../../shared/adpaters/in/rest/interceptors/cookie.interceptor";
+import { DIToken } from "../../../../../shared/di/token.di";
+import { RefreshToken } from "../../../domain/vo/refresh-token.vo";
 
 @Controller(`${EndPointPrefixConstant}/auth`)
 export class AuthController {
@@ -25,9 +27,9 @@ export class AuthController {
   private REFRESH_TOKEN_EXPIRATION = 30 * 24 * 60 * 60 * 1000;
 
   constructor(
-    @Inject("LoginAuthUseCase")
+    @Inject(DIToken.AuthModule.LoginAuthUseCase)
     private readonly loginAuthUseCase: LoginAuthUseCase,
-    @Inject("RefreshAuthTokenUseCase")
+    @Inject(DIToken.AuthModule.RefreshAuthTokenUseCase)
     private readonly refreshTokenUseCase: RefreshAuthTokenUseCase,
   ) {}
 
@@ -51,7 +53,9 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<ResponseEntity<void>> {
     const refreshToken = String(request.cookies[this.REFRESH_TOKEN]);
-    const loginAuthUser = await this.refreshTokenUseCase.invoke(refreshToken);
+    const loginAuthUser = await this.refreshTokenUseCase.invoke(
+      RefreshToken.fromString(refreshToken),
+    );
 
     response.cookie(this.ACCESS_TOKEN, loginAuthUser.getAccessToken, {
       httpOnly: true,

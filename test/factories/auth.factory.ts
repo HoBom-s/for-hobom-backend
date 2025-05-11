@@ -5,7 +5,8 @@ export function createMockAuth(
 ): AuthEntity {
   return {
     nickname: "Robin",
-    refreshToken: "Token",
+    refreshToken:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidHlwIjoiUmVmcmVzaFRva2VuIiwiaWF0IjoxNjg4ODg4ODg4LCJleHAiOjE2ODg5NzUyODh9.dGhpcy1pcy1ub3QtYS1yZWFsLXNpZ25hdHVyZQ",
     ...overrides,
   } as AuthEntity;
 }

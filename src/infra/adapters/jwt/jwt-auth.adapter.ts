@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { JwtAuthPayloadModel } from "src/hb-backend-api/auth/domain/model/jwt-auth-payload.model";
 import { JwtAuthPort } from "../../../hb-backend-api/auth/application/ports/out/jwt-auth.port";
+import { RefreshToken } from "../../../hb-backend-api/auth/domain/vo/refresh-token.vo";
 
 @Injectable()
 export class JwtAuthAdapter implements JwtAuthPort {
@@ -19,15 +20,15 @@ export class JwtAuthAdapter implements JwtAuthPort {
     });
   }
 
-  public verifyAccessToken(token: string): JwtAuthPayloadModel {
-    return this.jwtService.verify(token);
+  public verifyAccessToken(token: RefreshToken): JwtAuthPayloadModel {
+    return this.jwtService.verify(token.raw);
   }
 
-  public verifyRefreshToken(token: string): JwtAuthPayloadModel {
-    return this.jwtService.verify(token);
+  public verifyRefreshToken(token: RefreshToken): JwtAuthPayloadModel {
+    return this.jwtService.verify(token.raw);
   }
 
-  public decode(token: string): JwtAuthPayloadModel | null {
-    return this.jwtService.decode(token);
+  public decode(token: RefreshToken): JwtAuthPayloadModel | null {
+    return this.jwtService.decode(token.raw);
   }
 }

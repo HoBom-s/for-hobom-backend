@@ -1,13 +1,19 @@
 import { Prop, Schema } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { BaseEntity } from "../../../../shared/base/base.entity";
+import { UserId } from "../vo/user-id.vo";
 
 @Schema({ collection: "user" })
 export class UserEntity extends BaseEntity {
   @Prop({ type: String, required: true })
   username: string;
 
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+    index: true,
+  })
   nickname: string;
 
   @Prop({ type: String, required: true })
@@ -18,6 +24,58 @@ export class UserEntity extends BaseEntity {
 }
 
 export class UserEntitySchema {
+  constructor(
+    private readonly id: UserId,
+    private readonly username: string,
+    private readonly nickname: string,
+    private readonly password: string,
+    private readonly friends: Types.ObjectId[],
+  ) {
+    this.id = id;
+    this.username = username;
+    this.nickname = nickname;
+    this.password = password;
+    this.friends = friends;
+  }
+
+  public static of(
+    id: UserId,
+    username: string,
+    nickname: string,
+    password: string,
+    friends?: Types.ObjectId[],
+  ): UserEntitySchema {
+    return new UserEntitySchema(
+      id,
+      username,
+      nickname,
+      password,
+      friends ?? [],
+    );
+  }
+
+  get getId(): UserId {
+    return this.id;
+  }
+
+  get getUsername(): string {
+    return this.username;
+  }
+
+  get getNickname(): string {
+    return this.nickname;
+  }
+
+  get getPassword(): string {
+    return this.password;
+  }
+
+  get getFriends(): Types.ObjectId[] {
+    return this.friends;
+  }
+}
+
+export class UserCreateEntitySchema {
   constructor(
     private readonly username: string,
     private readonly nickname: string,
@@ -35,8 +93,13 @@ export class UserEntitySchema {
     nickname: string,
     password: string,
     friends?: Types.ObjectId[],
-  ): UserEntitySchema {
-    return new UserEntitySchema(username, nickname, password, friends ?? []);
+  ): UserCreateEntitySchema {
+    return new UserCreateEntitySchema(
+      username,
+      nickname,
+      password,
+      friends ?? [],
+    );
   }
 
   get getUsername(): string {
