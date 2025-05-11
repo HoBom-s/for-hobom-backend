@@ -7,6 +7,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
+import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { CreateUserUseCase } from "../../../application/ports/in/create-user.use-case";
 import { ResponseEntity } from "../../../../../shared/response/response.entity";
@@ -19,7 +20,8 @@ import { DIToken } from "../../../../../shared/di/token.di";
 import { UserId } from "../../../domain/vo/user-id.vo";
 import { ParseUserIdPipe } from "../pipe/user-id.pipe";
 
-@Controller(`${EndPointPrefixConstant}/user`)
+@ApiTags("Users")
+@Controller(`${EndPointPrefixConstant}/users`)
 export class UserController {
   constructor(
     @Inject(DIToken.UserModule.CreateUserUseCase)
@@ -28,6 +30,8 @@ export class UserController {
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
+  @ApiOperation({ description: "UserId 로 사용자 조회" })
+  @ApiParam({ name: "id", type: String })
   @UseGuards(JwtAuthGuard)
   @Get(":id")
   public async findById(
@@ -38,6 +42,7 @@ export class UserController {
     return ResponseEntity.ok<GetUserDto>(GetUserDto.from(foundUser));
   }
 
+  @ApiOperation({ description: "사용자 생성" })
   @Post("")
   public async createUser(
     @Body() body: CreateUserDto,

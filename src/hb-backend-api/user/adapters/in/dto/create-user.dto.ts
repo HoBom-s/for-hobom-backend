@@ -1,14 +1,18 @@
 import { IsNotEmpty, IsString, Matches, MinLength } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateUserDto {
+  @ApiProperty({ type: "string" })
   @IsNotEmpty({ message: "사용자 이름을 입력해주세요." })
   @IsString({ message: "사용자 이름은 문자열만 가능해요." })
   username: string;
 
+  @ApiProperty({ type: "string" })
   @IsNotEmpty({ message: "사용자 닉네임을 입력해 주세요." })
   @IsString({ message: "사용자 닉네임은 문자열만 가능해요." })
   nickname: string;
 
+  @ApiProperty({ type: "string" })
   @IsNotEmpty({ message: "사용자 비밀번호를 입력해 주세요." })
   @IsString({ message: "사용자 비밀번호는 문자열만 가능해요." })
   @MinLength(8, { message: "비밀번호는 최소 8자 이상이어야 해요." })
