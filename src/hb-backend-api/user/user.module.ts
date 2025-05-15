@@ -9,6 +9,7 @@ import { UserQueryAdapter } from "./adapters/out/query/user-query.adapter";
 import { GetUserService } from "./application/use-cases/get-user.service";
 import { UserRepositoryImpl } from "./infra/repositories/user.repository.impl";
 import { DIToken } from "../../shared/di/token.di";
+import { GetUserByNicknameService } from "./application/use-cases/get-user-by-nickname.service";
 
 @Module({
   imports: [
@@ -41,6 +42,10 @@ import { DIToken } from "../../shared/di/token.di";
       provide: DIToken.UserModule.GetUserUseCase,
       useClass: GetUserService,
     },
+    {
+      provide: DIToken.UserModule.GetUserByNicknameUseCase,
+      useClass: GetUserByNicknameService,
+    },
   ],
   exports: [
     MongooseModule,
@@ -49,6 +54,7 @@ import { DIToken } from "../../shared/di/token.di";
     DIToken.UserModule.UserQueryPort,
     DIToken.UserModule.CreateUserUseCase,
     DIToken.UserModule.GetUserUseCase,
+    DIToken.UserModule.GetUserByNicknameUseCase,
   ],
 })
 export class UserModule {}
