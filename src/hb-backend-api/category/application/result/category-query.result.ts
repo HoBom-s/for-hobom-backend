@@ -2,11 +2,12 @@ import { CategoryId } from "../../domain/vo/category-id.vo";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
 import { CategoryEntitySchema } from "../../domain/entity/category.entity";
 import { DailyTodoId } from "../../../daily-todo/domain/vo/daily-todo-id.vo";
+import { CategoryTitle } from "../../domain/vo/category-title.vo";
 
 export class CategoryQueryResult {
   constructor(
     private readonly id: CategoryId,
-    private readonly title: string,
+    private readonly title: CategoryTitle,
     private readonly owner: UserId,
     private readonly dailyTodos: DailyTodoId[],
   ) {
@@ -29,7 +30,7 @@ export class CategoryQueryResult {
     return this.id;
   }
 
-  get getTitle(): string {
+  get getTitle(): CategoryTitle {
     return this.title;
   }
 

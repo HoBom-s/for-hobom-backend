@@ -1,19 +1,20 @@
 import { UserId } from "../../../user/domain/vo/user-id.vo";
+import { CategoryTitle } from "../../domain/vo/category-title.vo";
 
 export class CreateCategoryCommand {
   constructor(
-    private readonly title: string,
+    private readonly title: CategoryTitle,
     private readonly owner: UserId,
   ) {
     this.title = title;
     this.owner = owner;
   }
 
-  public static of(title: string, owner: UserId): CreateCategoryCommand {
+  public static of(title: CategoryTitle, owner: UserId): CreateCategoryCommand {
     return new CreateCategoryCommand(title, owner);
   }
 
-  get getTitle(): string {
+  get getTitle(): CategoryTitle {
     return this.title;
   }
 

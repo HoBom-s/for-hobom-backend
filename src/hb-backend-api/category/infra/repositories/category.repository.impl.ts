@@ -8,6 +8,8 @@ import {
   CategoryEntity,
 } from "../../domain/entity/category.entity";
 import { CategoryId } from "../../domain/vo/category-id.vo";
+import { UserId } from "../../../user/domain/vo/user-id.vo";
+import { CategoryTitle } from "../../domain/vo/category-title.vo";
 
 @Injectable()
 export class CategoryRepositoryImpl implements CategoryRepository {
@@ -20,9 +22,22 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     categoryEntitySchema: CategoryCreateEntitySchema,
   ): Promise<void> {
     await this.categoryModel.create({
-      title: categoryEntitySchema.getTitle,
+      title: categoryEntitySchema.getTitle.raw,
       owner: categoryEntitySchema.getOwner.raw,
     });
+  }
+
+  public async findAll(userId: UserId): Promise<CategoryDocument[]> {
+    const categories = await this.categoryModel
+      .find({
+        owner: userId.raw,
+      })
+      .exec();
+    if (categories == null) {
+      return [];
+    }
+
+    return categories;
   }
 
   public async findById(id: CategoryId): Promise<CategoryDocument> {
@@ -35,10 +50,12 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 
     return foundCategory;
   }
-  public async findByTitle(title: string): Promise<CategoryDocument | null> {
+  public async findByTitle(
+    title: CategoryTitle,
+  ): Promise<CategoryDocument | null> {
     return await this.categoryModel
       .findOne({
-        title: title,
+        title: title.raw,
       })
       .exec();
   }
