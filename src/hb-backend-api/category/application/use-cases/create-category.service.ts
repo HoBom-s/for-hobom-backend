@@ -5,6 +5,7 @@ import { CategoryPersistencePort } from "../ports/out/category-persistence.port"
 import { CreateCategoryCommand } from "../command/create-category.command";
 import { CategoryCreateEntitySchema } from "../../domain/entity/category.entity";
 import { CategoryQueryPort } from "../ports/out/category-query.port";
+import { CategoryTitle } from "../../domain/vo/category-title.vo";
 
 @Injectable()
 export class CreateCategoryService implements CreateCategoryUseCase {
@@ -20,10 +21,10 @@ export class CreateCategoryService implements CreateCategoryUseCase {
     await this.saveCategory(command);
   }
 
-  private async checkAlreadyExistCategoryByTitle(title: string) {
+  private async checkAlreadyExistCategoryByTitle(title: CategoryTitle) {
     const category = await this.categoryQueryPort.getByTitle(title);
     if (category != null) {
-      throw new BadRequestException(`이미 존재하는 카테고리에요. ${title}`);
+      throw new BadRequestException(`이미 존재하는 카테고리에요. ${title.raw}`);
     }
   }
 

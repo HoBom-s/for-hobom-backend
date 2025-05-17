@@ -4,6 +4,7 @@ import { BaseEntity } from "../../../../shared/base/base.entity";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
 import { CategoryId } from "../vo/category-id.vo";
 import { DailyTodoId } from "../../../daily-todo/domain/vo/daily-todo-id.vo";
+import { CategoryTitle } from "../vo/category-title.vo";
 
 @Schema({ collection: "category" })
 export class CategoryEntity extends BaseEntity {
@@ -30,7 +31,7 @@ export class CategoryEntity extends BaseEntity {
 export class CategoryEntitySchema {
   constructor(
     private readonly id: CategoryId,
-    private readonly title: string,
+    private readonly title: CategoryTitle,
     private readonly owner: UserId,
     private readonly dailyTodos: DailyTodoId[],
   ) {
@@ -41,7 +42,7 @@ export class CategoryEntitySchema {
 
   public static of(
     id: CategoryId,
-    title: string,
+    title: CategoryTitle,
     owner: UserId,
     dailyTodos: DailyTodoId[],
   ): CategoryEntitySchema {
@@ -52,7 +53,7 @@ export class CategoryEntitySchema {
     return this.id;
   }
 
-  get getTitle(): string {
+  get getTitle(): CategoryTitle {
     return this.title;
   }
 
@@ -67,18 +68,21 @@ export class CategoryEntitySchema {
 
 export class CategoryCreateEntitySchema {
   constructor(
-    private readonly title: string,
+    private readonly title: CategoryTitle,
     private readonly owner: UserId,
   ) {
     this.title = title;
     this.owner = owner;
   }
 
-  public static of(title: string, owner: UserId): CategoryCreateEntitySchema {
+  public static of(
+    title: CategoryTitle,
+    owner: UserId,
+  ): CategoryCreateEntitySchema {
     return new CategoryCreateEntitySchema(title, owner);
   }
 
-  get getTitle(): string {
+  get getTitle(): CategoryTitle {
     return this.title;
   }
 

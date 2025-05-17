@@ -10,6 +10,7 @@ import { CategoryController } from "./adapters/in/rest/category.controller";
 import { CreateCategoryService } from "./application/use-cases/create-category.service";
 import { CategoryQueryAdapter } from "./adapters/out/query/category-query.adapter";
 import { UserModule } from "../user/user.module";
+import { GetAllCategoryService } from "./application/use-cases/get-all-category.service";
 
 @Module({
   imports: [
@@ -40,6 +41,10 @@ import { UserModule } from "../user/user.module";
       provide: DIToken.CategoryModule.CreateCategoryUseCase,
       useClass: CreateCategoryService,
     },
+    {
+      provide: DIToken.CategoryModule.GetAllCategoryUseCase,
+      useClass: GetAllCategoryService,
+    },
   ],
   exports: [
     MongooseModule,
@@ -47,6 +52,7 @@ import { UserModule } from "../user/user.module";
     DIToken.CategoryModule.CategoryPersistencePort,
     DIToken.CategoryModule.CategoryQueryPort,
     DIToken.CategoryModule.CreateCategoryUseCase,
+    DIToken.CategoryModule.GetAllCategoryUseCase,
   ],
 })
 export class CategoryModule {}

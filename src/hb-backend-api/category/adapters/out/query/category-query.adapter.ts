@@ -7,6 +7,7 @@ import { CategoryEntitySchema } from "../../../domain/entity/category.entity";
 import { UserId } from "../../../../user/domain/vo/user-id.vo";
 import { DailyTodoId } from "../../../../daily-todo/domain/vo/daily-todo-id.vo";
 import { CategoryDocument } from "../../../domain/entity/category.schema";
+import { CategoryTitle } from "../../../domain/vo/category-title.vo";
 
 @Injectable()
 export class CategoryQueryAdapter implements CategoryQueryPort {
@@ -15,13 +16,24 @@ export class CategoryQueryAdapter implements CategoryQueryPort {
     private readonly categoryRepository: CategoryRepository,
   ) {}
 
-  public async getById(categoryId: CategoryId): Promise<CategoryEntitySchema> {
+  public async findById(categoryId: CategoryId): Promise<CategoryEntitySchema> {
     const category = await this.categoryRepository.findById(categoryId);
 
     return this.toResult(category);
   }
 
-  public async getByTitle(title: string): Promise<CategoryEntitySchema | null> {
+  public async findAll(userId: UserId): Promise<CategoryEntitySchema[]> {
+    const categories = await this.categoryRepository.findAll(userId);
+    if (categories.length === 0) {
+      return [];
+    }
+
+    return categories.map(this.toResult);
+  }
+
+  public async getByTitle(
+    title: CategoryTitle,
+  ): Promise<CategoryEntitySchema | null> {
     const category = await this.categoryRepository.findByTitle(title);
 
     if (category == null) {
@@ -34,7 +46,7 @@ export class CategoryQueryAdapter implements CategoryQueryPort {
   private toResult(category: CategoryDocument): CategoryEntitySchema {
     return CategoryEntitySchema.of(
       CategoryId.fromString(String(category._id)),
-      category.title,
+      CategoryTitle.fromString(category.title),
       UserId.fromString(String(category.owner._id)),
       category.dailyTodos.map((dailyTodo) =>
         DailyTodoId.fromString(String(dailyTodo._id)),

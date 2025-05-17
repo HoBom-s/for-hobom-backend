@@ -8,12 +8,12 @@
 export class ResponseEntity<T> {
   private constructor(
     private readonly success: boolean,
-    private readonly item: T | null,
+    private readonly items: T | null,
     private readonly message: string | null,
     private readonly timestamp: string,
   ) {
     this.success = success;
-    this.item = item;
+    this.items = items;
     this.message = message;
     this.timestamp = timestamp;
   }

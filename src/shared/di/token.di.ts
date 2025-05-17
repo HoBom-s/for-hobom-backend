@@ -1,5 +1,4 @@
 import { DITokenRegister } from "./token-registry.di";
-import { GetUserByNicknameUseCase } from "../../hb-backend-api/user/application/ports/in/get-user-by-nickname.use-case";
 
 export class DIToken {
   public static readonly AuthModule = class extends DITokenRegister {
@@ -39,6 +38,9 @@ export class DIToken {
 
     public static CreateCategoryUseCase = this.register(
       "CreateCategoryUseCase",
+    );
+    public static GetAllCategoryUseCase = this.register(
+      "GetAllCategoryUseCase",
     );
   };
 }

@@ -4,6 +4,7 @@ import { CategoryRepository } from "../../../../../../src/hb-backend-api/categor
 import { CategoryPersistenceAdapter } from "../../../../../../src/hb-backend-api/category/adapters/out/persistence/category-persistence.adapter";
 import { CategoryCreateEntitySchema } from "../../../../../../src/hb-backend-api/category/domain/entity/category.entity";
 import { UserId } from "../../../../../../src/hb-backend-api/user/domain/vo/user-id.vo";
+import { CategoryTitle } from "../../../../../../src/hb-backend-api/category/domain/vo/category-title.vo";
 
 describe("CategoryPersistenceAdapter", () => {
   let categoryRepository: jest.Mocked<CategoryRepository>;
@@ -16,10 +17,13 @@ describe("CategoryPersistenceAdapter", () => {
     );
   });
 
-  describe("save", () => {
+  describe("save()", () => {
     it("should call categoryRepository.save with the given category", async () => {
       const userId = new UserId(new Types.ObjectId());
-      const category = new CategoryCreateEntitySchema("Category", userId);
+      const category = new CategoryCreateEntitySchema(
+        CategoryTitle.fromString("Category"),
+        userId,
+      );
 
       await categoryPersistenceAdapter.save(category);
 
