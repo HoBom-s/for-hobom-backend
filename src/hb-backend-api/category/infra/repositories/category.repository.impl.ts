@@ -95,4 +95,12 @@ export class CategoryRepositoryImpl implements CategoryRepository {
       );
     }
   }
+
+  public async deleteOne(categoryId: CategoryId, owner: UserId): Promise<void> {
+    const foundCategory = await this.findById(categoryId, owner);
+    await this.categoryModel.deleteOne({
+      _id: foundCategory.id,
+      owner: foundCategory.owner,
+    });
+  }
 }

@@ -7,6 +7,7 @@ import { CategoryPersistencePort } from "../../../application/ports/out/category
 import { DIToken } from "../../../../../shared/di/token.di";
 import { CategoryRepository } from "../../../domain/repositories/category.repository";
 import { CategoryId } from "src/hb-backend-api/category/domain/vo/category-id.vo";
+import { UserId } from "../../../../user/domain/vo/user-id.vo";
 
 @Injectable()
 export class CategoryPersistenceAdapter implements CategoryPersistencePort {
@@ -26,5 +27,9 @@ export class CategoryPersistenceAdapter implements CategoryPersistencePort {
     categoryUpdateEntitySchema: CategoryUpdateEntitySchema,
   ): Promise<void> {
     await this.categoryRepository.updateTitle(id, categoryUpdateEntitySchema);
+  }
+
+  public async deleteOne(id: CategoryId, owner: UserId): Promise<void> {
+    await this.categoryRepository.deleteOne(id, owner);
   }
 }

@@ -23,4 +23,6 @@ export interface CategoryRepository {
     categoryId: CategoryId,
     categoryUpdateEntitySchema: CategoryUpdateEntitySchema,
   ): Promise<void>;
+
+  deleteOne(categoryId: CategoryId, owner: UserId): Promise<void>;
 }

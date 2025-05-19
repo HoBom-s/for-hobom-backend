@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
-import { CategoryRepository } from "../../../../../src/hb-backend-api/category/domain/repositories/category.repository";
-import { createCategoryRepository } from "../../../../mocks/category.repository.mock";
-import { CategoryQueryAdapter } from "../../../../../src/hb-backend-api/category/adapters/out/query/category-query.adapter";
-import { createMockCategory } from "../../../../factories/category.factory";
-import { CategoryId } from "../../../../../src/hb-backend-api/category/domain/vo/category-id.vo";
-import { CategoryEntitySchema } from "../../../../../src/hb-backend-api/category/domain/entity/category.entity";
-import { CategoryTitle } from "../../../../../src/hb-backend-api/category/domain/vo/category-title.vo";
-import { UserId } from "../../../../../src/hb-backend-api/user/domain/vo/user-id.vo";
+import { CategoryRepository } from "../../../../../../src/hb-backend-api/category/domain/repositories/category.repository";
+import { createCategoryRepository } from "../../../../../mocks/category.repository.mock";
+import { CategoryQueryAdapter } from "../../../../../../src/hb-backend-api/category/adapters/out/query/category-query.adapter";
+import { createMockCategory } from "../../../../../factories/category.factory";
+import { CategoryId } from "../../../../../../src/hb-backend-api/category/domain/vo/category-id.vo";
+import { CategoryEntitySchema } from "../../../../../../src/hb-backend-api/category/domain/entity/category.entity";
+import { CategoryTitle } from "../../../../../../src/hb-backend-api/category/domain/vo/category-title.vo";
+import { UserId } from "../../../../../../src/hb-backend-api/user/domain/vo/user-id.vo";
 
 describe("CategoryQueryAdapter", () => {
   let categoryRepository: jest.Mocked<CategoryRepository>;
