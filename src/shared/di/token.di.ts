@@ -1,4 +1,6 @@
 import { DITokenRegister } from "./token-registry.di";
+import { PatchCategoryUseCase } from "../../hb-backend-api/category/application/ports/in/patch-category.use-case";
+import { GetCategoryUseCase } from "../../hb-backend-api/category/application/ports/in/get-category.use-case";
 
 export class DIToken {
   public static readonly AuthModule = class extends DITokenRegister {
@@ -42,5 +44,7 @@ export class DIToken {
     public static GetAllCategoryUseCase = this.register(
       "GetAllCategoryUseCase",
     );
+    public static GetCategoryUseCase = this.register("GetCategoryUseCase");
+    public static PatchCategoryUseCase = this.register("PatchCategoryUseCase");
   };
 }

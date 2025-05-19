@@ -1,4 +1,7 @@
-import { CategoryCreateEntitySchema } from "../entity/category.entity";
+import {
+  CategoryCreateEntitySchema,
+  CategoryUpdateEntitySchema,
+} from "../entity/category.entity";
 import { CategoryId } from "../vo/category-id.vo";
 import { CategoryDocument } from "../entity/category.schema";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
@@ -9,7 +12,15 @@ export interface CategoryRepository {
 
   findAll(userId: UserId): Promise<CategoryDocument[]>;
 
-  findById(id: CategoryId): Promise<CategoryDocument>;
+  findById(id: CategoryId, owner: UserId): Promise<CategoryDocument>;
 
-  findByTitle(title: CategoryTitle): Promise<CategoryDocument | null>;
+  findByTitle(
+    title: CategoryTitle,
+    owner: UserId,
+  ): Promise<CategoryDocument | null>;
+
+  updateTitle(
+    categoryId: CategoryId,
+    categoryUpdateEntitySchema: CategoryUpdateEntitySchema,
+  ): Promise<void>;
 }

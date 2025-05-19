@@ -6,6 +6,7 @@ import { CategoryDocument } from "../../domain/entity/category.schema";
 import {
   CategoryCreateEntitySchema,
   CategoryEntity,
+  CategoryUpdateEntitySchema,
 } from "../../domain/entity/category.entity";
 import { CategoryId } from "../../domain/vo/category-id.vo";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
@@ -40,11 +41,19 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     return categories;
   }
 
-  public async findById(id: CategoryId): Promise<CategoryDocument> {
-    const foundCategory = await this.categoryModel.findById(id.raw).exec();
+  public async findById(
+    id: CategoryId,
+    owner: UserId,
+  ): Promise<CategoryDocument> {
+    const foundCategory = await this.categoryModel
+      .findOne({
+        _id: id.raw,
+        owner: owner.raw,
+      })
+      .exec();
     if (foundCategory == null) {
       throw new NotFoundException(
-        `해당 카테고리를 찾을 수 없어요. ${id.raw.toHexString()}`,
+        `해당 카테고리를 찾을 수 없어요. 카테고리 ID: ${id.raw.toHexString()}, 유저 ID: ${owner.toString()}`,
       );
     }
 
@@ -52,11 +61,38 @@ export class CategoryRepositoryImpl implements CategoryRepository {
   }
   public async findByTitle(
     title: CategoryTitle,
+    owner: UserId,
   ): Promise<CategoryDocument | null> {
     return await this.categoryModel
       .findOne({
         title: title.raw,
+        owner: owner.raw,
       })
       .exec();
+  }
+
+  public async updateTitle(
+    categoryId: CategoryId,
+    categoryUpdateEntitySchema: CategoryUpdateEntitySchema,
+  ): Promise<void> {
+    const category = await this.categoryModel.findOneAndUpdate(
+      {
+        _id: categoryId.raw,
+        owner: categoryUpdateEntitySchema.getOwner.raw,
+      },
+      {
+        $set: {
+          title: categoryUpdateEntitySchema.getTitle.raw,
+        },
+      },
+      {
+        new: true,
+      },
+    );
+    if (category == null) {
+      throw new NotFoundException(
+        `사용자가 작성한 카테고리를 찾지 못했어요. 카테고리 ID: ${categoryId.toString()}, 사용자 ID: ${categoryUpdateEntitySchema.getOwner.toString()}`,
+      );
+    }
   }
 }

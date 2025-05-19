@@ -11,6 +11,8 @@ import { CreateCategoryService } from "./application/use-cases/create-category.s
 import { CategoryQueryAdapter } from "./adapters/out/query/category-query.adapter";
 import { UserModule } from "../user/user.module";
 import { GetAllCategoryService } from "./application/use-cases/get-all-category.service";
+import { PatchCategoryService } from "./application/use-cases/patch-category.service";
+import { GetCategoryService } from "./application/use-cases/get-category.service";
 
 @Module({
   imports: [
@@ -45,6 +47,14 @@ import { GetAllCategoryService } from "./application/use-cases/get-all-category.
       provide: DIToken.CategoryModule.GetAllCategoryUseCase,
       useClass: GetAllCategoryService,
     },
+    {
+      provide: DIToken.CategoryModule.GetCategoryUseCase,
+      useClass: GetCategoryService,
+    },
+    {
+      provide: DIToken.CategoryModule.PatchCategoryUseCase,
+      useClass: PatchCategoryService,
+    },
   ],
   exports: [
     MongooseModule,
@@ -52,7 +62,9 @@ import { GetAllCategoryService } from "./application/use-cases/get-all-category.
     DIToken.CategoryModule.CategoryPersistencePort,
     DIToken.CategoryModule.CategoryQueryPort,
     DIToken.CategoryModule.CreateCategoryUseCase,
+    DIToken.CategoryModule.GetCategoryUseCase,
     DIToken.CategoryModule.GetAllCategoryUseCase,
+    DIToken.CategoryModule.PatchCategoryUseCase,
   ],
 })
 export class CategoryModule {}

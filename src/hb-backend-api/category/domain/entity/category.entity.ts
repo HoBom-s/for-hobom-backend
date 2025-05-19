@@ -90,3 +90,28 @@ export class CategoryCreateEntitySchema {
     return this.owner;
   }
 }
+
+export class CategoryUpdateEntitySchema {
+  constructor(
+    private readonly title: CategoryTitle,
+    private readonly owner: UserId,
+  ) {
+    this.title = title;
+    this.owner = owner;
+  }
+
+  public static of(
+    title: CategoryTitle,
+    owner: UserId,
+  ): CategoryUpdateEntitySchema {
+    return new CategoryUpdateEntitySchema(title, owner);
+  }
+
+  get getTitle(): CategoryTitle {
+    return this.title;
+  }
+
+  get getOwner(): UserId {
+    return this.owner;
+  }
+}
