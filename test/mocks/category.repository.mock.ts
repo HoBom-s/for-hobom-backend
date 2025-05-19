@@ -7,5 +7,6 @@ export function createCategoryRepository(): jest.Mocked<CategoryRepository> {
     findById: jest.fn(),
     findByTitle: jest.fn(),
     updateTitle: jest.fn(),
+    deleteOne: jest.fn(),
   };
 }

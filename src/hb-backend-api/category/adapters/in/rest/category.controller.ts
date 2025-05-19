@@ -2,6 +2,7 @@ import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -30,6 +31,7 @@ import { ParseCategoryIdPipe } from "../pipe/category-id.pipe";
 import { CategoryId } from "../../../domain/vo/category-id.vo";
 import { PatchCategoryCommand } from "../../../application/command/patch-category.command";
 import { GetCategoryUseCase } from "../../../application/ports/in/get-category.use-case";
+import { DeleteCategoryUseCase } from "../../../application/ports/in/delete-category.use-case";
 
 @ApiTags("Categories")
 @Controller(`${EndPointPrefixConstant}/categories`)
@@ -45,6 +47,8 @@ export class CategoryController {
     private readonly patchCategoryUseCase: PatchCategoryUseCase,
     @Inject(DIToken.CategoryModule.GetCategoryUseCase)
     private readonly getCategoryUseCase: GetCategoryUseCase,
+    @Inject(DIToken.CategoryModule.DeleteCategoryUseCase)
+    private readonly deleteCategoryUseCase: DeleteCategoryUseCase,
   ) {}
 
   @ApiOperation({ description: "모든 카테고리 조회" })
@@ -112,5 +116,20 @@ export class CategoryController {
       id,
       PatchCategoryCommand.of(CategoryTitle.fromString(body.title), user.getId),
     );
+  }
+
+  @ApiOperation({ description: "카테고리 삭제" })
+  @ApiParam({ name: "id", type: String })
+  @UseGuards(JwtAuthGuard)
+  @Delete(":id")
+  public async deleteCategory(
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+    @Param("id", ParseCategoryIdPipe) id: CategoryId,
+  ): Promise<void> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+
+    await this.deleteCategoryUseCase.invoke(id, user.getId);
   }
 }

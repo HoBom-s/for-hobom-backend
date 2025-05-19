@@ -67,4 +67,30 @@ describe("CategoryPersistenceAdapter", () => {
       ).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe("deleteOne()", () => {
+    it("should call categoryRepository.deleteOne with the given category", async () => {
+      const categoryId = new CategoryId(new Types.ObjectId());
+      const userId = new UserId(new Types.ObjectId());
+
+      await categoryPersistenceAdapter.deleteOne(categoryId, userId);
+
+      expect(categoryRepository.deleteOne).toHaveBeenCalledTimes(1);
+      expect(categoryRepository.deleteOne).toHaveBeenCalledWith(
+        categoryId,
+        userId,
+      );
+    });
+
+    it("should throw NotFoundException when the given category id does not exist", async () => {
+      const userId = new UserId(new Types.ObjectId());
+      const categoryId = new CategoryId(new Types.ObjectId());
+
+      categoryRepository.findById.mockResolvedValue(null as any);
+
+      await expect(
+        categoryPersistenceAdapter.deleteOne(categoryId, userId),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
 });

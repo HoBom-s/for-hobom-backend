@@ -13,6 +13,7 @@ import { UserModule } from "../user/user.module";
 import { GetAllCategoryService } from "./application/use-cases/get-all-category.service";
 import { PatchCategoryService } from "./application/use-cases/patch-category.service";
 import { GetCategoryService } from "./application/use-cases/get-category.service";
+import { DeleteCategoryService } from "./application/use-cases/delete-category.service";
 
 @Module({
   imports: [
@@ -55,6 +56,10 @@ import { GetCategoryService } from "./application/use-cases/get-category.service
       provide: DIToken.CategoryModule.PatchCategoryUseCase,
       useClass: PatchCategoryService,
     },
+    {
+      provide: DIToken.CategoryModule.DeleteCategoryUseCase,
+      useClass: DeleteCategoryService,
+    },
   ],
   exports: [
     MongooseModule,
@@ -65,6 +70,7 @@ import { GetCategoryService } from "./application/use-cases/get-category.service
     DIToken.CategoryModule.GetCategoryUseCase,
     DIToken.CategoryModule.GetAllCategoryUseCase,
     DIToken.CategoryModule.PatchCategoryUseCase,
+    DIToken.CategoryModule.DeleteCategoryUseCase,
   ],
 })
 export class CategoryModule {}
