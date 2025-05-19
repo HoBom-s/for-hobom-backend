@@ -4,9 +4,15 @@ import { UserId } from "../../../../user/domain/vo/user-id.vo";
 import { CategoryTitle } from "../../../domain/vo/category-title.vo";
 
 export interface CategoryQueryPort {
-  findById(categoryId: CategoryId): Promise<CategoryEntitySchema>;
+  findById(
+    categoryId: CategoryId,
+    owner: UserId,
+  ): Promise<CategoryEntitySchema>;
 
-  findAll(userId: UserId): Promise<CategoryEntitySchema[]>;
+  findAll(owner: UserId): Promise<CategoryEntitySchema[]>;
 
-  getByTitle(title: CategoryTitle): Promise<CategoryEntitySchema | null>;
+  getByTitle(
+    title: CategoryTitle,
+    owner: UserId,
+  ): Promise<CategoryEntitySchema | null>;
 }

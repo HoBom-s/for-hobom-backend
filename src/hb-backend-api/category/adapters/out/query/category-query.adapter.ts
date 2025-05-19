@@ -16,14 +16,17 @@ export class CategoryQueryAdapter implements CategoryQueryPort {
     private readonly categoryRepository: CategoryRepository,
   ) {}
 
-  public async findById(categoryId: CategoryId): Promise<CategoryEntitySchema> {
-    const category = await this.categoryRepository.findById(categoryId);
+  public async findById(
+    categoryId: CategoryId,
+    owner: UserId,
+  ): Promise<CategoryEntitySchema> {
+    const category = await this.categoryRepository.findById(categoryId, owner);
 
     return this.toResult(category);
   }
 
-  public async findAll(userId: UserId): Promise<CategoryEntitySchema[]> {
-    const categories = await this.categoryRepository.findAll(userId);
+  public async findAll(owner: UserId): Promise<CategoryEntitySchema[]> {
+    const categories = await this.categoryRepository.findAll(owner);
     if (categories.length === 0) {
       return [];
     }
@@ -33,8 +36,9 @@ export class CategoryQueryAdapter implements CategoryQueryPort {
 
   public async getByTitle(
     title: CategoryTitle,
+    owner: UserId,
   ): Promise<CategoryEntitySchema | null> {
-    const category = await this.categoryRepository.findByTitle(title);
+    const category = await this.categoryRepository.findByTitle(title, owner);
 
     if (category == null) {
       return null;

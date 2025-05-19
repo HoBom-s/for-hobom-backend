@@ -6,6 +6,7 @@ import { createMockCategory } from "../../../../factories/category.factory";
 import { CategoryId } from "../../../../../src/hb-backend-api/category/domain/vo/category-id.vo";
 import { CategoryEntitySchema } from "../../../../../src/hb-backend-api/category/domain/entity/category.entity";
 import { CategoryTitle } from "../../../../../src/hb-backend-api/category/domain/vo/category-title.vo";
+import { UserId } from "../../../../../src/hb-backend-api/user/domain/vo/user-id.vo";
 
 describe("CategoryQueryAdapter", () => {
   let categoryRepository: jest.Mocked<CategoryRepository>;
@@ -23,7 +24,8 @@ describe("CategoryQueryAdapter", () => {
       categoryRepository.findById.mockResolvedValue(foundCategory);
 
       const categoryId = new CategoryId(new Types.ObjectId());
-      const result = await categoryQueryAdapter.findById(categoryId);
+      const userId = new UserId(new Types.ObjectId());
+      const result = await categoryQueryAdapter.findById(categoryId, userId);
 
       expect(categoryRepository.findById).toHaveBeenCalledWith(categoryId);
       expect(result).toBeInstanceOf(CategoryEntitySchema);
@@ -41,7 +43,8 @@ describe("CategoryQueryAdapter", () => {
       categoryRepository.findByTitle.mockResolvedValue(foundCategory);
 
       const title = CategoryTitle.fromString("Category");
-      const result = await categoryQueryAdapter.getByTitle(title);
+      const userId = new UserId(new Types.ObjectId());
+      const result = await categoryQueryAdapter.getByTitle(title, userId);
 
       expect(categoryRepository.findById).toHaveBeenCalledWith(title);
       expect(result).toBeInstanceOf(CategoryEntitySchema);
@@ -51,7 +54,7 @@ describe("CategoryQueryAdapter", () => {
       });
 
       const notExistTitle = CategoryTitle.fromString("Noooo");
-      expect(categoryQueryAdapter.getByTitle(notExistTitle)).toBeNull();
+      expect(categoryQueryAdapter.getByTitle(notExistTitle, userId)).toBeNull();
     });
   });
 });

@@ -6,6 +6,7 @@ import { CreateCategoryCommand } from "../command/create-category.command";
 import { CategoryCreateEntitySchema } from "../../domain/entity/category.entity";
 import { CategoryQueryPort } from "../ports/out/category-query.port";
 import { CategoryTitle } from "../../domain/vo/category-title.vo";
+import { UserId } from "../../../user/domain/vo/user-id.vo";
 
 @Injectable()
 export class CreateCategoryService implements CreateCategoryUseCase {
@@ -17,12 +18,18 @@ export class CreateCategoryService implements CreateCategoryUseCase {
   ) {}
 
   public async invoke(command: CreateCategoryCommand): Promise<void> {
-    await this.checkAlreadyExistCategoryByTitle(command.getTitle);
+    await this.checkAlreadyExistCategoryByTitle(
+      command.getTitle,
+      command.getOwner,
+    );
     await this.saveCategory(command);
   }
 
-  private async checkAlreadyExistCategoryByTitle(title: CategoryTitle) {
-    const category = await this.categoryQueryPort.getByTitle(title);
+  private async checkAlreadyExistCategoryByTitle(
+    title: CategoryTitle,
+    owner: UserId,
+  ) {
+    const category = await this.categoryQueryPort.getByTitle(title, owner);
     if (category != null) {
       throw new BadRequestException(`이미 존재하는 카테고리에요. ${title.raw}`);
     }
