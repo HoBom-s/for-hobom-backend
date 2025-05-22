@@ -54,7 +54,7 @@ export class DailyTodoEntity extends BaseEntity {
     required: false,
     default: null,
   })
-  categoryId: Types.ObjectId;
+  category: Types.ObjectId;
 }
 
 export class DailyTodoCreateEntitySchema {
