@@ -19,18 +19,18 @@ export class CookiesInterceptor implements NestInterceptor {
       tap((data) => {
         const response = context.switchToHttp().getResponse<Response>();
 
-        if (data.item.accessToken == null || data.item.refreshToken == null) {
+        if (data.accessToken == null || data.refreshToken == null) {
           throw new Error("검증할 토큰이 존재하지 않아요.");
         }
 
-        response.cookie(this.ACCESS_TOKEN, data.item.accessToken, {
+        response.cookie(this.ACCESS_TOKEN, data.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
           maxAge: this.ACCESS_TOKEN_EXPIRATION,
         });
 
-        response.cookie(this.REFRESH_TOKEN, data.item.refreshToken, {
+        response.cookie(this.REFRESH_TOKEN, data.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",

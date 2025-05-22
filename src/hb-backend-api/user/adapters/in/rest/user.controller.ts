@@ -10,7 +10,6 @@ import {
 import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { CreateUserUseCase } from "../../../application/ports/in/create-user.use-case";
-import { ResponseEntity } from "../../../../../shared/response/response.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { CreateUserCommand } from "../../../application/command/create-user.command";
 import { GetUserUseCase } from "../../../application/ports/in/get-user.use-case";
@@ -36,22 +35,18 @@ export class UserController {
   @Get(":id")
   public async findById(
     @Param("id", ParseUserIdPipe) id: UserId,
-  ): Promise<ResponseEntity<GetUserDto>> {
+  ): Promise<GetUserDto> {
     const foundUser = await this.getUserUseCase.invoke(id);
 
-    return ResponseEntity.ok<GetUserDto>(GetUserDto.from(foundUser));
+    return GetUserDto.from(foundUser);
   }
 
   @ApiOperation({ description: "사용자 생성" })
   @Post("")
-  public async createUser(
-    @Body() body: CreateUserDto,
-  ): Promise<ResponseEntity<void>> {
+  public async createUser(@Body() body: CreateUserDto): Promise<void> {
     const { username, password, nickname } = body;
     const command = CreateUserCommand.of(username, nickname, password);
 
     await this.createUserUseCase.invoke(command);
-
-    return ResponseEntity.ok<void>(undefined);
   }
 }

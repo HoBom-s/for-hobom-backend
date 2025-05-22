@@ -12,7 +12,6 @@ import { Request, Response } from "express";
 import { LoginAuthUseCase } from "../../../application/ports/in/login-auth.use-case";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { LoginAuthDto } from "../dto/login-auth.dto";
-import { ResponseEntity } from "../../../../../shared/response/response.entity";
 import { GetLoginTokenDto } from "../dto/get-login-token.dto";
 import { LoginAuthCommand } from "../../../application/command/login-auth.command";
 import { RefreshAuthTokenUseCase } from "../../../application/ports/in/refresh-auth-token.use-case";
@@ -38,16 +37,12 @@ export class AuthController {
   @ApiOperation({ description: "사용자 로그인" })
   @Post("/login")
   @UseInterceptors(CookiesInterceptor)
-  public async login(
-    @Body() body: LoginAuthDto,
-  ): Promise<ResponseEntity<GetLoginTokenDto>> {
+  public async login(@Body() body: LoginAuthDto): Promise<GetLoginTokenDto> {
     const loginAuthResult = await this.loginAuthUseCase.invoke(
       LoginAuthCommand.of(body.nickname, body.password),
     );
 
-    return ResponseEntity.ok<GetLoginTokenDto>(
-      GetLoginTokenDto.from(loginAuthResult),
-    );
+    return GetLoginTokenDto.from(loginAuthResult);
   }
 
   @ApiOperation({ description: "리프래시 토큰 갱신" })
@@ -55,7 +50,7 @@ export class AuthController {
   public async refresh(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<ResponseEntity<void>> {
+  ): Promise<void> {
     const refreshToken = String(request.cookies[this.REFRESH_TOKEN]);
     const loginAuthUser = await this.refreshTokenUseCase.invoke(
       RefreshToken.fromString(refreshToken),
@@ -73,7 +68,5 @@ export class AuthController {
       sameSite: "strict",
       maxAge: this.REFRESH_TOKEN_EXPIRATION,
     });
-
-    return ResponseEntity.ok<void>(undefined);
   }
 }

@@ -2,7 +2,7 @@ import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import { Request } from "express";
 import { JwtAuthPayloadModel } from "src/hb-backend-api/auth/domain/model/jwt-auth-payload.model";
 
-interface TokenUserInformation {
+export interface TokenUserInformation {
   nickname: string;
   accessToken: string;
 }
