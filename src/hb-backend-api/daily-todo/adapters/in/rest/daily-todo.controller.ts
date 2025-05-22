@@ -13,6 +13,7 @@ import { UserNickname } from "../../../../user/domain/vo/user-nickname.vo";
 import { CreateDailyTodoCommand } from "../../../application/command/create-daily-todo.command";
 import { CategoryId } from "../../../../category/domain/vo/category-id.vo";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
+import { DateHelper } from "../../../../../shared/date/date.helper";
 
 @ApiTags("DailyTodos")
 @Controller(`${EndPointPrefixConstant}/daily-todos`)
@@ -39,7 +40,11 @@ export class DailyTodoController {
       body.category == null ? null : CategoryId.fromString(body.category);
 
     await this.createDailyTOdoUseCase.invoke(
-      CreateDailyTodoCommand.of(body.title, new Date(body.title), categoryId),
+      CreateDailyTodoCommand.of(
+        body.title,
+        DateHelper.parse(body.date),
+        categoryId,
+      ),
       user.getId,
     );
   }
