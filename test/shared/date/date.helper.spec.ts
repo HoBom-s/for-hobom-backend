@@ -61,6 +61,49 @@ describe("DateHelper", () => {
     });
   });
 
+  describe("startOfMonth", () => {
+    it("should return the first day of the month at 00:00:00.000", () => {
+      const inputDate = new Date("2025-05-22T15:30:45.123Z");
+      const result = DateHelper.startOfMonth(new Date(inputDate)); // 원본 훼손 방지 위해 복사본 사용
+
+      expect(result.getDate()).toBe(1);
+      expect(result.getHours()).toBe(0);
+      expect(result.getMinutes()).toBe(0);
+      expect(result.getSeconds()).toBe(0);
+      expect(result.getMilliseconds()).toBe(0);
+      expect(result.getMonth()).toBe(inputDate.getMonth());
+      expect(result.getFullYear()).toBe(inputDate.getFullYear());
+    });
+  });
+
+  describe("endOfMonth", () => {
+    it("should return the last day of the month at 23:59:59.999", () => {
+      const inputDate = new Date("2025-05-22T15:30:45.123Z");
+      const result = DateHelper.endOfMonth(new Date(inputDate));
+
+      expect(result.getDate()).toBe(31);
+      expect(result.getHours()).toBe(23);
+      expect(result.getMinutes()).toBe(59);
+      expect(result.getSeconds()).toBe(59);
+      expect(result.getMilliseconds()).toBe(999);
+      expect(result.getMonth()).toBe(inputDate.getMonth());
+      expect(result.getFullYear()).toBe(inputDate.getFullYear());
+    });
+
+    it("should handle December correctly and roll over to next year", () => {
+      const inputDate = new Date("2025-12-15T10:00:00Z");
+      const result = DateHelper.endOfMonth(new Date(inputDate));
+
+      expect(result.getMonth()).toBe(11); // 0-based, 11 = December
+      expect(result.getDate()).toBe(31);
+      expect(result.getFullYear()).toBe(2025);
+      expect(result.getHours()).toBe(23);
+      expect(result.getMinutes()).toBe(59);
+      expect(result.getSeconds()).toBe(59);
+      expect(result.getMilliseconds()).toBe(999);
+    });
+  });
+
   describe("isValid()", () => {
     it("should return true for valid Date", () => {
       expect(DateHelper.isValid(new Date())).toBe(true);

@@ -1,6 +1,10 @@
 import { UserId } from "../../../../user/domain/vo/user-id.vo";
-import { DailyTodoWithRelationQueryResult } from "../out/daily-todo-query.result";
+import { DailyTodoWithRelationQueryResult } from "../../result/daily-todo-query.result";
+import { YearMonthDayString } from "../../../domain/vo/year-month-day-string.vo";
 
 export interface GetAllDailyTodoUseCase {
-  invoke(owner: UserId): Promise<DailyTodoWithRelationQueryResult[]>;
+  invoke(
+    owner: UserId,
+    date: YearMonthDayString,
+  ): Promise<DailyTodoWithRelationQueryResult[]>;
 }

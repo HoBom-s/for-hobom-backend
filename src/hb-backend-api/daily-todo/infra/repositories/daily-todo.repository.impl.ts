@@ -10,6 +10,8 @@ import { DailyTodoRepository } from "../../domain/repositories/daily-todo.reposi
 import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
 import { DailyTodoAggregationHelper } from "../../adapters/out/aggregation/daily-todo-aggregation.helper";
 import type { DailyTodoWithRelations } from "../../domain/entity/daily-todo.retations";
+import { YearMonthDayString } from "../../domain/vo/year-month-day-string.vo";
+import { DateHelper } from "../../../../shared/date/date.helper";
 
 @Injectable()
 export class DailyTodoRepositoryImpl implements DailyTodoRepository {
@@ -32,12 +34,26 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
     });
   }
 
-  public async findAll(owner: UserId): Promise<DailyTodoWithRelations[]> {
+  public async findAll(
+    owner: UserId,
+    date: YearMonthDayString,
+  ): Promise<DailyTodoWithRelations[]> {
+    const startOfMonth = DateHelper.startOfMonth(
+      DateHelper.parse(date.value, "KST"),
+    );
+    const endDate = DateHelper.parse(date.value, "KST");
+    endDate.setMonth(endDate.getMonth() + 1);
+    const endOfMonth = DateHelper.startOfMonth(endDate);
+
     const dailyTodos = await this.dailyTodoModel
       .aggregate([
         {
           $match: {
             owner: owner.raw,
+            date: {
+              $gte: startOfMonth,
+              $lte: endOfMonth,
+            },
           },
         },
         ...DailyTodoAggregationHelper.buildUserJoin(),

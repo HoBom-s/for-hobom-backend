@@ -1,11 +1,11 @@
-import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
-import { DailyTodoCompleteStatus } from "../../../domain/enums/daily-todo-complete-status.enum";
-import { DailyTodoCycle } from "../../../domain/enums/daily-todo-cycle.enum";
+import { DailyTodoId } from "../../domain/vo/daily-todo-id.vo";
+import { DailyTodoCompleteStatus } from "../../domain/enums/daily-todo-complete-status.enum";
+import { DailyTodoCycle } from "../../domain/enums/daily-todo-cycle.enum";
 import {
   Category,
   DailyTodoWithRelationEntity,
   Owner,
-} from "../../../domain/entity/daily-todo.retations";
+} from "../../domain/entity/daily-todo.retations";
 
 export class DailyTodoWithRelationQueryResult {
   constructor(

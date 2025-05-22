@@ -1,6 +1,6 @@
 import { DailyTodoCompleteStatus } from "../../../domain/enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../../../domain/enums/daily-todo-cycle.enum";
-import { DailyTodoWithRelationQueryResult } from "../../../application/ports/out/daily-todo-query.result";
+import { DailyTodoWithRelationQueryResult } from "../../../application/result/daily-todo-query.result";
 
 interface OwnerType {
   id: string;

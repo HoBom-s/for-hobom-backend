@@ -12,6 +12,7 @@ import {
 import { CategoryId } from "../../../../category/domain/vo/category-id.vo";
 import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
 import { ObjectHelper } from "../../../../../shared/object/object.helper";
+import { YearMonthDayString } from "../../../domain/vo/year-month-day-string.vo";
 
 @Injectable()
 export class DailyTodoQueryAdapter implements DailyTodoQueryPort {
@@ -20,8 +21,11 @@ export class DailyTodoQueryAdapter implements DailyTodoQueryPort {
     private readonly dailyTodoRepository: DailyTodoRepository,
   ) {}
 
-  public async findAll(owner: UserId): Promise<DailyTodoWithRelationEntity[]> {
-    const dailyTodos = await this.dailyTodoRepository.findAll(owner);
+  public async findAll(
+    owner: UserId,
+    date: YearMonthDayString,
+  ): Promise<DailyTodoWithRelationEntity[]> {
+    const dailyTodos = await this.dailyTodoRepository.findAll(owner, date);
 
     return dailyTodos.map(this.toRelationEntity);
   }
