@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { CategoryId } from "src/hb-backend-api/category/domain/vo/category-id.vo";
 import { CategoryQueryPort } from "../../../application/ports/out/category-query.port";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { CategoryRepository } from "../../../domain/repositories/category.repository";
@@ -8,6 +7,7 @@ import { UserId } from "../../../../user/domain/vo/user-id.vo";
 import { DailyTodoId } from "../../../../daily-todo/domain/vo/daily-todo-id.vo";
 import { CategoryDocument } from "../../../domain/entity/category.schema";
 import { CategoryTitle } from "../../../domain/vo/category-title.vo";
+import { CategoryId } from "../../../domain/vo/category-id.vo";
 
 @Injectable()
 export class CategoryQueryAdapter implements CategoryQueryPort {
@@ -34,7 +34,7 @@ export class CategoryQueryAdapter implements CategoryQueryPort {
     return categories.map(this.toResult);
   }
 
-  public async getByTitle(
+  public async findByTitle(
     title: CategoryTitle,
     owner: UserId,
   ): Promise<CategoryEntitySchema | null> {
@@ -51,9 +51,9 @@ export class CategoryQueryAdapter implements CategoryQueryPort {
     return CategoryEntitySchema.of(
       CategoryId.fromString(String(category._id)),
       CategoryTitle.fromString(category.title),
-      UserId.fromString(String(category.owner._id)),
+      UserId.fromString(String(category.owner)),
       category.dailyTodos.map((dailyTodo) =>
-        DailyTodoId.fromString(String(dailyTodo._id)),
+        DailyTodoId.fromString(String(dailyTodo)),
       ),
     );
   }

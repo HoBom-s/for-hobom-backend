@@ -27,16 +27,19 @@ describe("CategoryQueryAdapter", () => {
       const userId = new UserId(new Types.ObjectId());
       const result = await categoryQueryAdapter.findById(categoryId, userId);
 
-      expect(categoryRepository.findById).toHaveBeenCalledWith(categoryId);
+      expect(categoryRepository.findById).toHaveBeenCalledWith(
+        categoryId,
+        userId,
+      );
       expect(result).toBeInstanceOf(CategoryEntitySchema);
       expect(result).toMatchObject({
-        title: "Category",
+        title: CategoryTitle.fromString("Category"),
         dailyTodos: [],
       });
     });
   });
 
-  describe("getByTitle()", () => {
+  describe("findByTitle()", () => {
     it("if existed title should return a CategoryEntitySchema when category id found by categoryId", async () => {
       const foundCategory = createMockCategory();
 
@@ -44,17 +47,23 @@ describe("CategoryQueryAdapter", () => {
 
       const title = CategoryTitle.fromString("Category");
       const userId = new UserId(new Types.ObjectId());
-      const result = await categoryQueryAdapter.getByTitle(title, userId);
+      const result = await categoryQueryAdapter.findByTitle(title, userId);
 
-      expect(categoryRepository.findById).toHaveBeenCalledWith(title);
+      expect(categoryRepository.findByTitle).toHaveBeenCalledWith(
+        title,
+        userId,
+      );
       expect(result).toBeInstanceOf(CategoryEntitySchema);
       expect(result).toMatchObject({
-        title: "Category",
+        title: CategoryTitle.fromString("Category"),
         dailyTodos: [],
       });
 
       const notExistTitle = CategoryTitle.fromString("Noooo");
-      expect(categoryQueryAdapter.getByTitle(notExistTitle, userId)).toBeNull();
+      categoryRepository.findByTitle.mockResolvedValue(null as any);
+      expect(
+        await categoryQueryAdapter.findByTitle(notExistTitle, userId),
+      ).toBeNull();
     });
   });
 });

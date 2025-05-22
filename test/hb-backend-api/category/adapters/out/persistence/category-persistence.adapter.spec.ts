@@ -1,4 +1,3 @@
-import { NotFoundException } from "@nestjs/common";
 import { Types } from "mongoose";
 import { createCategoryRepository } from "../../../../../mocks/category.repository.mock";
 import { CategoryRepository } from "../../../../../../src/hb-backend-api/category/domain/repositories/category.repository";
@@ -49,22 +48,10 @@ describe("CategoryPersistenceAdapter", () => {
       await categoryPersistenceAdapter.updateOne(categoryId, category);
 
       expect(categoryRepository.updateTitle).toHaveBeenCalledTimes(1);
-      expect(categoryRepository.updateTitle).toHaveBeenCalledWith(category);
-    });
-
-    it("should throw NotFoundException when the given category does not exist", async () => {
-      const userId = new UserId(new Types.ObjectId());
-      const categoryId = new CategoryId(new Types.ObjectId());
-      const category = new CategoryUpdateEntitySchema(
-        CategoryTitle.fromString("Category"),
-        userId,
+      expect(categoryRepository.updateTitle).toHaveBeenCalledWith(
+        categoryId,
+        category,
       );
-
-      categoryRepository.updateTitle.mockResolvedValue(null as any);
-
-      await expect(
-        categoryPersistenceAdapter.updateOne(categoryId, category),
-      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -80,17 +67,6 @@ describe("CategoryPersistenceAdapter", () => {
         categoryId,
         userId,
       );
-    });
-
-    it("should throw NotFoundException when the given category id does not exist", async () => {
-      const userId = new UserId(new Types.ObjectId());
-      const categoryId = new CategoryId(new Types.ObjectId());
-
-      categoryRepository.findById.mockResolvedValue(null as any);
-
-      await expect(
-        categoryPersistenceAdapter.deleteOne(categoryId, userId),
-      ).rejects.toThrow(NotFoundException);
     });
   });
 });

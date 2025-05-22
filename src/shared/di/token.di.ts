@@ -48,4 +48,16 @@ export class DIToken {
       "DeleteCategoryUseCase",
     );
   };
+
+  public static readonly DailyTodoModule = class extends DITokenRegister {
+    public static DailyTodoRepository = this.register("DailyTodoRepository");
+
+    public static DailyTodoPersistencePort = this.register(
+      "DailyTodoPersistencePort",
+    );
+
+    public static CreateDailyTodoUseCase = this.register(
+      "CreateDailyTodoUseCase",
+    );
+  };
 }
