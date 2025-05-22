@@ -1,4 +1,5 @@
 import { DITokenRegister } from "./token-registry.di";
+import { GetAllDailyTodoUseCase } from "../../hb-backend-api/daily-todo/application/ports/in/get-all-daily-todo.use-case";
 
 export class DIToken {
   public static readonly AuthModule = class extends DITokenRegister {
@@ -55,9 +56,13 @@ export class DIToken {
     public static DailyTodoPersistencePort = this.register(
       "DailyTodoPersistencePort",
     );
+    public static DailyTodoQueryPort = this.register("DailyTodoQueryPort");
 
     public static CreateDailyTodoUseCase = this.register(
       "CreateDailyTodoUseCase",
+    );
+    public static GetAllDailyTodoUseCase = this.register(
+      "GetAllDailyTodoUseCase",
     );
   };
 }
