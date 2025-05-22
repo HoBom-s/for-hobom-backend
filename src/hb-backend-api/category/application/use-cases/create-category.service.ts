@@ -29,7 +29,7 @@ export class CreateCategoryService implements CreateCategoryUseCase {
     title: CategoryTitle,
     owner: UserId,
   ) {
-    const category = await this.categoryQueryPort.getByTitle(title, owner);
+    const category = await this.categoryQueryPort.findByTitle(title, owner);
     if (category != null) {
       throw new BadRequestException(`이미 존재하는 카테고리에요. ${title.raw}`);
     }

@@ -75,7 +75,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     categoryId: CategoryId,
     categoryUpdateEntitySchema: CategoryUpdateEntitySchema,
   ): Promise<void> {
-    const category = await this.categoryModel.findOneAndUpdate(
+    await this.categoryModel.findOneAndUpdate(
       {
         _id: categoryId.raw,
         owner: categoryUpdateEntitySchema.getOwner.raw,
@@ -85,22 +85,13 @@ export class CategoryRepositoryImpl implements CategoryRepository {
           title: categoryUpdateEntitySchema.getTitle.raw,
         },
       },
-      {
-        new: true,
-      },
     );
-    if (category == null) {
-      throw new NotFoundException(
-        `사용자가 작성한 카테고리를 찾지 못했어요. 카테고리 ID: ${categoryId.toString()}, 사용자 ID: ${categoryUpdateEntitySchema.getOwner.toString()}`,
-      );
-    }
   }
 
   public async deleteOne(categoryId: CategoryId, owner: UserId): Promise<void> {
-    const foundCategory = await this.findById(categoryId, owner);
     await this.categoryModel.deleteOne({
-      _id: foundCategory.id,
-      owner: foundCategory.owner,
+      _id: categoryId.raw,
+      owner: owner.raw,
     });
   }
 }

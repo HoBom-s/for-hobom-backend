@@ -11,7 +11,7 @@ export interface CategoryQueryPort {
 
   findAll(owner: UserId): Promise<CategoryEntitySchema[]>;
 
-  getByTitle(
+  findByTitle(
     title: CategoryTitle,
     owner: UserId,
   ): Promise<CategoryEntitySchema | null>;
