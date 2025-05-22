@@ -7,7 +7,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { CreateDailyTodoUseCase } from "../../../application/ports/in/create-daily-todo.use-case";
 import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
@@ -40,6 +40,7 @@ export class DailyTodoController {
   ) {}
 
   @ApiOperation({ description: "데일리 투두 모두 조회" })
+  @ApiParam({ name: "date", type: String })
   @UseGuards(JwtAuthGuard)
   @Get(":date")
   public async findAll(
