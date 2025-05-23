@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { DailyTodoQueryPort } from "../../../application/ports/out/daily-todo-query.port";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { DailyTodoRepository } from "../../../domain/repositories/daily-todo.repository";
@@ -28,6 +28,20 @@ export class DailyTodoQueryAdapter implements DailyTodoQueryPort {
     const dailyTodos = await this.dailyTodoRepository.findAll(owner, date);
 
     return dailyTodos.map(this.toRelationEntity);
+  }
+
+  public async findById(
+    id: DailyTodoId,
+    owner: UserId,
+  ): Promise<DailyTodoWithRelationEntity> {
+    const dailyTodo = await this.dailyTodoRepository.findById(id, owner);
+    if (dailyTodo == null) {
+      throw new NotFoundException(
+        `해당하는 데일리 투두가 없어요. ID: ${id.toString()}`,
+      );
+    }
+
+    return this.toRelationEntity(dailyTodo);
   }
 
   private toRelationEntity(

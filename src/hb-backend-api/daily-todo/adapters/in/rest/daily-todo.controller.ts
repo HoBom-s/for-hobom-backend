@@ -5,9 +5,10 @@ import {
   Inject,
   Param,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { CreateDailyTodoUseCase } from "../../../application/ports/in/create-daily-todo.use-case";
 import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
@@ -26,6 +27,9 @@ import { GetAllDailyTodoUseCase } from "../../../application/ports/in/get-all-da
 import { GetDailyTodoDto } from "../dto/get-daily-todo.dto";
 import { ParseYearMonthDayStringPipe } from "../pipe/year-month-day-string.pipe";
 import { YearMonthDayString } from "../../../domain/vo/year-month-day-string.vo";
+import { ParseDailyTodoIdPipe } from "../pipe/daily-todo-id.pipe";
+import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
+import { GetDailyTodoUseCase } from "../../../application/ports/in/get-daily-todo.use-case";
 
 @ApiTags("DailyTodos")
 @Controller(`${EndPointPrefixConstant}/daily-todos`)
@@ -37,14 +41,16 @@ export class DailyTodoController {
     private readonly createDailyTOdoUseCase: CreateDailyTodoUseCase,
     @Inject(DIToken.DailyTodoModule.GetAllDailyTodoUseCase)
     private readonly getAllDailyTodoUseCase: GetAllDailyTodoUseCase,
+    @Inject(DIToken.DailyTodoModule.GetDailyTodoUseCase)
+    private readonly getDailyTodoUseCase: GetDailyTodoUseCase,
   ) {}
 
   @ApiOperation({ description: "데일리 투두 모두 조회" })
-  @ApiParam({ name: "date", type: String })
+  @ApiQuery({ name: "date", type: String })
   @UseGuards(JwtAuthGuard)
-  @Get(":date")
+  @Get("")
   public async findAll(
-    @Param("date", ParseYearMonthDayStringPipe) date: YearMonthDayString,
+    @Query("date", ParseYearMonthDayStringPipe) date: YearMonthDayString,
     @NicknameAndAccessToken() userInfo: TokenUserInformation,
   ): Promise<GetDailyTodoDto[]> {
     const user = await this.getUserByNicknameUseCase.invoke(
@@ -57,6 +63,23 @@ export class DailyTodoController {
     );
 
     return dailyTodos.map(GetDailyTodoDto.from);
+  }
+
+  @ApiOperation({ description: "데일리 투두 단건 조회" })
+  @ApiParam({ name: "id", type: String })
+  @UseGuards(JwtAuthGuard)
+  @Get(":id")
+  public async findById(
+    @Param("id", ParseDailyTodoIdPipe) id: DailyTodoId,
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+  ): Promise<GetDailyTodoDto> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+
+    const dailyTodo = await this.getDailyTodoUseCase.invoke(id, user.getId);
+
+    return GetDailyTodoDto.from(dailyTodo);
   }
 
   @ApiOperation({ description: "데일리 투두 생성" })
