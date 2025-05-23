@@ -66,6 +66,7 @@ export class CategoryController {
   }
 
   @ApiOperation({ description: "카테고리 단건 조회" })
+  @ApiParam({ name: "id", type: String })
   @UseGuards(JwtAuthGuard)
   @Get(":id")
   public async getOne(

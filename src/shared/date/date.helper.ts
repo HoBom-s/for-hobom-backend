@@ -46,23 +46,45 @@ export class DateHelper {
     );
   }
 
+  public static startOfMonth(date: Date): Date {
+    date.setDate(1);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  public static endOfMonth(date: Date): Date {
+    const month = date.getMonth();
+    date.setFullYear(date.getFullYear(), month + 1, 0);
+    date.setHours(23, 59, 59, 999);
+    return date;
+  }
+
   public static isValid(date: unknown): boolean {
     return date instanceof Date && !isNaN(date.getTime());
   }
 
-  public static parse(dateStr: string): Date {
+  public static parse(dateStr: string, timezone: "KST" | "UTC" = "UTC"): Date {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     if (!regex.test(dateStr)) {
       throw new Error("Invalid date string");
     }
 
     const [year, month, day] = dateStr.split("-").map(Number);
-    const parsed = new Date(year, month - 1, day);
-    if (
-      parsed.getFullYear() !== year ||
-      parsed.getMonth() !== month - 1 ||
-      parsed.getDate() !== day
-    ) {
+
+    let parsed: Date;
+
+    if (timezone === "KST") {
+      parsed = new Date(Date.UTC(year, month - 1, day, 15, 0, 0));
+    } else {
+      parsed = new Date(year, month - 1, day);
+    }
+
+    const y =
+      timezone === "KST" ? parsed.getUTCFullYear() : parsed.getFullYear();
+    const m = timezone === "KST" ? parsed.getUTCMonth() : parsed.getMonth();
+    const d = timezone === "KST" ? parsed.getUTCDate() : parsed.getDate();
+
+    if (y !== year || m !== month - 1 || d !== day) {
       throw new Error("Invalid date");
     }
 
