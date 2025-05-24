@@ -8,6 +8,9 @@ import { DIToken } from "../../shared/di/token.di";
 import { DailyTodoRepositoryImpl } from "./infra/repositories/daily-todo.repository.impl";
 import { DailyTodoPersistenceAdapter } from "./adapters/out/persistence/daily-todo-persistence.adapter";
 import { CreateDailyTodoService } from "./application/use-cases/create-daily-todo.service";
+import { DailyTodoQueryAdapter } from "./adapters/out/query/daily-todo-query.adapter";
+import { GetAllDailyTodoService } from "./application/use-cases/get-all-daily-todo.service";
+import { GetDailyTodoService } from "./application/use-cases/get-daily-todo.service";
 
 @Module({
   imports: [
@@ -29,8 +32,20 @@ import { CreateDailyTodoService } from "./application/use-cases/create-daily-tod
       useClass: DailyTodoPersistenceAdapter,
     },
     {
+      provide: DIToken.DailyTodoModule.DailyTodoQueryPort,
+      useClass: DailyTodoQueryAdapter,
+    },
+    {
       provide: DIToken.DailyTodoModule.CreateDailyTodoUseCase,
       useClass: CreateDailyTodoService,
+    },
+    {
+      provide: DIToken.DailyTodoModule.GetAllDailyTodoUseCase,
+      useClass: GetAllDailyTodoService,
+    },
+    {
+      provide: DIToken.DailyTodoModule.GetDailyTodoUseCase,
+      useClass: GetDailyTodoService,
     },
   ],
   controllers: [DailyTodoController],
@@ -38,7 +53,10 @@ import { CreateDailyTodoService } from "./application/use-cases/create-daily-tod
     MongooseModule,
     DIToken.DailyTodoModule.DailyTodoRepository,
     DIToken.DailyTodoModule.DailyTodoPersistencePort,
+    DIToken.DailyTodoModule.DailyTodoQueryPort,
     DIToken.DailyTodoModule.CreateDailyTodoUseCase,
+    DIToken.DailyTodoModule.GetAllDailyTodoUseCase,
+    DIToken.DailyTodoModule.GetDailyTodoUseCase,
   ],
 })
 export class DailyTodoModule {}

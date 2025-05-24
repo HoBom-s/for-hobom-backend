@@ -55,9 +55,14 @@ export class DIToken {
     public static DailyTodoPersistencePort = this.register(
       "DailyTodoPersistencePort",
     );
+    public static DailyTodoQueryPort = this.register("DailyTodoQueryPort");
 
     public static CreateDailyTodoUseCase = this.register(
       "CreateDailyTodoUseCase",
     );
+    public static GetAllDailyTodoUseCase = this.register(
+      "GetAllDailyTodoUseCase",
+    );
+    public static GetDailyTodoUseCase = this.register("GetDailyTodoUseCase");
   };
 }

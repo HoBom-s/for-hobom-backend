@@ -10,6 +10,9 @@ import { AuthPersistencePort } from "../ports/out/auth-persistence.port";
 import { AuthEntitySchema } from "../../domain/entity/auth.entity";
 import { DIToken } from "../../../../shared/di/token.di";
 import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
+import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
+import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
+import { AuthQueryPort } from "../ports/out/auth-query.port";
 
 @Injectable()
 export class LoginAuthService implements LoginAuthUseCase {
@@ -18,10 +21,14 @@ export class LoginAuthService implements LoginAuthUseCase {
     private readonly userQueryPort: UserQueryPort,
     @Inject(DIToken.AuthModule.AuthPersistencePort)
     private readonly authPersistencePort: AuthPersistencePort,
+    @Inject(DIToken.AuthModule.AuthQueryPort)
+    private readonly authQueryPort: AuthQueryPort,
     @Inject(DIToken.AuthModule.JwtAuthPort)
     private readonly jwtAuthPort: JwtAuthPort,
+    public readonly transactionRunner: TransactionRunner,
   ) {}
 
+  @Transactional()
   public async invoke(command: LoginAuthCommand): Promise<LoginAuthResult> {
     const foundUser = await this.findUserByNickname(
       UserNickname.fromString(command.getNickname),
@@ -35,10 +42,28 @@ export class LoginAuthService implements LoginAuthUseCase {
       throw new BadRequestException("일치하는 사용자 정보가 없어요.");
     }
 
-    const accessToken = this.generateAccessToken(foundUser.getNickname);
-    const refreshToken = this.generateRefreshToken(foundUser.getNickname);
+    const nickname = UserNickname.fromString(foundUser.getNickname);
+    const existingAuth = await this.authQueryPort.findByNickname(nickname);
+    const now = new Date();
 
-    await this.saveRefreshToken(foundUser.getNickname, refreshToken);
+    let refreshToken: string;
+
+    const accessToken = this.generateAccessToken(nickname.raw);
+
+    const isExistingTokenValid =
+      existingAuth != null &&
+      existingAuth.getExpiredAt.getTime() > now.getTime();
+
+    if (isExistingTokenValid) {
+      refreshToken = existingAuth.getRefreshToken;
+    } else {
+      refreshToken = this.generateRefreshToken(nickname.raw);
+      const expiresAt = this.calculateRefreshTokenExpiry();
+
+      await this.authPersistencePort.saveRefreshToken(
+        AuthEntitySchema.of(nickname.raw, refreshToken, expiresAt),
+      );
+    }
 
     return LoginAuthResult.of(accessToken, refreshToken);
   }
@@ -79,5 +104,19 @@ export class LoginAuthService implements LoginAuthUseCase {
     await this.authPersistencePort.saveRefreshToken(
       AuthEntitySchema.of(nickname, refreshToken, expiresAt),
     );
+  }
+
+  private calculateRefreshTokenExpiry(): Date {
+    const expiresAt = new Date();
+    expiresAt.setDate(
+      expiresAt.getDate() +
+        Number(
+          String(process.env.HOBOM_JWT_REFRESH_TOKEN_EXPIRED).replaceAll(
+            "d",
+            "",
+          ),
+        ),
+    );
+    return expiresAt;
   }
 }

@@ -3,5 +3,7 @@ import { DailyTodoRepository } from "../../src/hb-backend-api/daily-todo/domain/
 export function createDailyTodoRepository(): jest.Mocked<DailyTodoRepository> {
   return {
     save: jest.fn(),
+    findAll: jest.fn(),
+    findById: jest.fn(),
   };
 }

@@ -15,10 +15,10 @@ export class DailyTodoEntity extends BaseEntity {
   title: string;
 
   @Prop({
-    type: String,
+    type: Date,
     required: true,
   })
-  date: string;
+  date: Date;
 
   @Prop({
     type: Types.ObjectId,
@@ -54,7 +54,7 @@ export class DailyTodoEntity extends BaseEntity {
     required: false,
     default: null,
   })
-  categoryId: Types.ObjectId;
+  category: Types.ObjectId;
 }
 
 export class DailyTodoCreateEntitySchema {
