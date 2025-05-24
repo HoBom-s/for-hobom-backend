@@ -14,7 +14,7 @@ export class TransactionRunner {
         MongoSessionContext.runWithSession(session, fn),
       );
     } finally {
-      session.endSession();
+      await session.endSession();
     }
   }
 }
