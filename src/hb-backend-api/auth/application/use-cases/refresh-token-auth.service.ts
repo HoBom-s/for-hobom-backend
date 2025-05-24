@@ -8,6 +8,8 @@ import { LoginAuthResult } from "../result/login-auth.result";
 import { DIToken } from "../../../../shared/di/token.di";
 import { RefreshToken } from "../../domain/vo/refresh-token.vo";
 import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
+import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
+import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
 @Injectable()
 export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
@@ -18,8 +20,10 @@ export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
     private readonly authQueryPort: AuthQueryPort,
     @Inject(DIToken.AuthModule.AuthPersistencePort)
     private readonly authPersistencePort: AuthPersistencePort,
+    public readonly transactionRunner: TransactionRunner,
   ) {}
 
+  @Transactional()
   public async invoke(refreshToken: RefreshToken): Promise<LoginAuthResult> {
     try {
       const payload = this.jwtAuthPort.verifyRefreshToken(refreshToken);

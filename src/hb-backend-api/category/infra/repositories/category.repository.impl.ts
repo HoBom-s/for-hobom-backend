@@ -11,6 +11,7 @@ import {
 import { CategoryId } from "../../domain/vo/category-id.vo";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
 import { CategoryTitle } from "../../domain/vo/category-title.vo";
+import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 
 @Injectable()
 export class CategoryRepositoryImpl implements CategoryRepository {
@@ -22,10 +23,18 @@ export class CategoryRepositoryImpl implements CategoryRepository {
   public async save(
     categoryEntitySchema: CategoryCreateEntitySchema,
   ): Promise<void> {
-    await this.categoryModel.create({
-      title: categoryEntitySchema.getTitle.raw,
-      owner: categoryEntitySchema.getOwner.raw,
-    });
+    const session = MongoSessionContext.getSession();
+    await this.categoryModel.create(
+      [
+        {
+          title: categoryEntitySchema.getTitle.raw,
+          owner: categoryEntitySchema.getOwner.raw,
+        },
+      ],
+      {
+        session: session,
+      },
+    );
   }
 
   public async findAll(userId: UserId): Promise<CategoryDocument[]> {
@@ -75,6 +84,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     categoryId: CategoryId,
     categoryUpdateEntitySchema: CategoryUpdateEntitySchema,
   ): Promise<void> {
+    const session = MongoSessionContext.getSession();
     await this.categoryModel.findOneAndUpdate(
       {
         _id: categoryId.raw,
@@ -85,13 +95,15 @@ export class CategoryRepositoryImpl implements CategoryRepository {
           title: categoryUpdateEntitySchema.getTitle.raw,
         },
       },
+      { session: session },
     );
   }
 
   public async deleteOne(categoryId: CategoryId, owner: UserId): Promise<void> {
-    await this.categoryModel.deleteOne({
-      _id: categoryId.raw,
-      owner: owner.raw,
-    });
+    const session = MongoSessionContext.getSession();
+    await this.categoryModel.deleteOne(
+      { _id: categoryId.raw, owner: owner.raw },
+      { session: session },
+    );
   }
 }

@@ -10,6 +10,7 @@ import { AuthEntity, AuthEntitySchema } from "../../domain/entity/auth.entity";
 import { AuthDocument } from "../../domain/entity/auth.schema";
 import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
 import { RefreshToken } from "../../domain/vo/refresh-token.vo";
+import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 
 @Injectable()
 export class AuthRepositoryImpl implements AuthRepository {
@@ -32,21 +33,40 @@ export class AuthRepositoryImpl implements AuthRepository {
     return foundAuth;
   }
 
+  public async findByNickname(
+    nickname: UserNickname,
+  ): Promise<AuthEntity | null> {
+    const foundAuth = await this.authModel.findOne({ nickname: nickname.raw });
+    if (foundAuth == null) {
+      return null;
+    }
+
+    return foundAuth;
+  }
+
   public async save(authEntitySchema: AuthEntitySchema): Promise<void> {
-    await this.authModel.create({
-      nickname: authEntitySchema.getNickname,
-      refreshToken: authEntitySchema.getRefreshToken,
-      expiresAt: authEntitySchema.getExpiredAt,
-    });
+    const session = MongoSessionContext.getSession();
+    await this.authModel.create(
+      [
+        {
+          nickname: authEntitySchema.getNickname,
+          refreshToken: authEntitySchema.getRefreshToken,
+          expiresAt: authEntitySchema.getExpiredAt,
+        },
+      ],
+      { session: session },
+    );
   }
 
   public async updateRefreshToken(
     nickname: UserNickname,
     newRefreshToken: RefreshToken,
   ): Promise<void> {
+    const session = MongoSessionContext.getSession();
     const updateResult = await this.authModel.updateOne(
-      { $or: [{ nickname: nickname.raw }] },
+      { nickname: nickname.raw },
       { $set: { refreshToken: newRefreshToken.raw } },
+      { session: session },
     );
 
     if (updateResult.modifiedCount === 0) {

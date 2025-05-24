@@ -6,6 +6,8 @@ import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
 import { CategoryId } from "../../domain/vo/category-id.vo";
 import { CategoryQueryPort } from "../ports/out/category-query.port";
 import { CategoryEntitySchema } from "../../domain/entity/category.entity";
+import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
+import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
 @Injectable()
 export class DeleteCategoryService implements DeleteCategoryUseCase {
@@ -14,8 +16,10 @@ export class DeleteCategoryService implements DeleteCategoryUseCase {
     private readonly categoryQueryPort: CategoryQueryPort,
     @Inject(DIToken.CategoryModule.CategoryPersistencePort)
     private readonly categoryPersistencePort: CategoryPersistencePort,
+    public readonly transactionRunner: TransactionRunner,
   ) {}
 
+  @Transactional()
   public async invoke(id: CategoryId, owner: UserId): Promise<void> {
     const foundCategory = await this.get(id, owner);
     await this.delete(foundCategory.getId, foundCategory.getOwner);

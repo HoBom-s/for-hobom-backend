@@ -5,6 +5,7 @@ import { DailyTodoModule } from "./hb-backend-api/daily-todo/daily-todo.module";
 import { RoutineModule } from "./hb-backend-api/routine/routine.module";
 import { CategoryModule } from "./hb-backend-api/category/category.module";
 import { AuthModule } from "./hb-backend-api/auth/auth.module";
+import { TransactionModule } from "./infra/mongo/transaction/transaction.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from "./hb-backend-api/auth/auth.module";
     RoutineModule,
     CategoryModule,
     AuthModule,
+    TransactionModule,
   ],
 })
 export class AppModule {}

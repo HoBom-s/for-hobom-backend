@@ -7,6 +7,8 @@ import { CategoryCreateEntitySchema } from "../../domain/entity/category.entity"
 import { CategoryQueryPort } from "../ports/out/category-query.port";
 import { CategoryTitle } from "../../domain/vo/category-title.vo";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
+import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
+import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
 @Injectable()
 export class CreateCategoryService implements CreateCategoryUseCase {
@@ -15,8 +17,10 @@ export class CreateCategoryService implements CreateCategoryUseCase {
     private readonly categoryPersistencePort: CategoryPersistencePort,
     @Inject(DIToken.CategoryModule.CategoryQueryPort)
     private readonly categoryQueryPort: CategoryQueryPort,
+    public readonly transactionRunner: TransactionRunner,
   ) {}
 
+  @Transactional()
   public async invoke(command: CreateCategoryCommand): Promise<void> {
     await this.checkAlreadyExistCategoryByTitle(
       command.getTitle,
