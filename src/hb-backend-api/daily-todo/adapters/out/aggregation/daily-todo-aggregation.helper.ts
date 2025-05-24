@@ -42,4 +42,28 @@ export class DailyTodoAggregationHelper {
       },
     ];
   }
+
+  public static buildProject(): PipelineStage[] {
+    return [
+      {
+        $project: {
+          id: "$_id",
+          title: 1,
+          date: 1,
+          reaction: 1,
+          progress: 1,
+          cycle: 1,
+          owner: {
+            id: "$owner._id",
+            username: "$owner.username",
+            nickname: "$owner.nickname",
+          },
+          category: {
+            id: "$category._id",
+            title: "$category.title",
+          },
+        },
+      },
+    ];
+  }
 }

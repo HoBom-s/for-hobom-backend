@@ -10,6 +10,7 @@ import { DailyTodoPersistenceAdapter } from "./adapters/out/persistence/daily-to
 import { CreateDailyTodoService } from "./application/use-cases/create-daily-todo.service";
 import { DailyTodoQueryAdapter } from "./adapters/out/query/daily-todo-query.adapter";
 import { GetAllDailyTodoService } from "./application/use-cases/get-all-daily-todo.service";
+import { GetDailyTodoService } from "./application/use-cases/get-daily-todo.service";
 
 @Module({
   imports: [
@@ -42,6 +43,10 @@ import { GetAllDailyTodoService } from "./application/use-cases/get-all-daily-to
       provide: DIToken.DailyTodoModule.GetAllDailyTodoUseCase,
       useClass: GetAllDailyTodoService,
     },
+    {
+      provide: DIToken.DailyTodoModule.GetDailyTodoUseCase,
+      useClass: GetDailyTodoService,
+    },
   ],
   controllers: [DailyTodoController],
   exports: [
@@ -51,6 +56,7 @@ import { GetAllDailyTodoService } from "./application/use-cases/get-all-daily-to
     DIToken.DailyTodoModule.DailyTodoQueryPort,
     DIToken.DailyTodoModule.CreateDailyTodoUseCase,
     DIToken.DailyTodoModule.GetAllDailyTodoUseCase,
+    DIToken.DailyTodoModule.GetDailyTodoUseCase,
   ],
 })
 export class DailyTodoModule {}

@@ -4,5 +4,6 @@ export function createDailyTodoRepository(): jest.Mocked<DailyTodoRepository> {
   return {
     save: jest.fn(),
     findAll: jest.fn(),
+    findById: jest.fn(),
   };
 }
