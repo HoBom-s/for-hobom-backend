@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { DailyTodoDocument } from "../../domain/entity/daily-todo.schema";
@@ -14,6 +14,7 @@ import { DateHelper } from "../../../../shared/date/date.helper";
 import { DailyTodoId } from "../../domain/vo/daily-todo-id.vo";
 import { AggregateQuery } from "../../../../infra/mongo/query/aggregate.query";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
+import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 
 @Injectable()
 export class DailyTodoRepositoryImpl implements DailyTodoRepository {
@@ -30,15 +31,23 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
   public async save(
     dailyTodoCreateSchemaEntity: DailyTodoCreateEntitySchema,
   ): Promise<void> {
-    await this.dailyTodoModel.create({
-      title: dailyTodoCreateSchemaEntity.getTitle,
-      date: dailyTodoCreateSchemaEntity.getDate,
-      owner: dailyTodoCreateSchemaEntity.getOwner.raw,
-      reaction: dailyTodoCreateSchemaEntity.getReaction,
-      progress: dailyTodoCreateSchemaEntity.getProgress,
-      cycle: dailyTodoCreateSchemaEntity.getCycle,
-      category: dailyTodoCreateSchemaEntity.getCategory,
-    });
+    const session = MongoSessionContext.getSession();
+    await this.dailyTodoModel.create(
+      [
+        {
+          title: dailyTodoCreateSchemaEntity.getTitle,
+          date: dailyTodoCreateSchemaEntity.getDate,
+          owner: dailyTodoCreateSchemaEntity.getOwner.raw,
+          reaction: dailyTodoCreateSchemaEntity.getReaction,
+          progress: dailyTodoCreateSchemaEntity.getProgress,
+          cycle: dailyTodoCreateSchemaEntity.getCycle,
+          category: dailyTodoCreateSchemaEntity.getCategory,
+        },
+      ],
+      {
+        session: session,
+      },
+    );
   }
 
   public async findAll(

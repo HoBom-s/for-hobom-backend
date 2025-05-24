@@ -7,14 +7,18 @@ import { CreateDailyTodoCommand } from "../command/create-daily-todo.command";
 import { DailyTodoCreateEntitySchema } from "../../domain/entity/daily-todo.entity";
 import { DailyTodoCompleteStatus } from "../../domain/enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../../domain/enums/daily-todo-cycle.enum";
+import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
+import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 
 @Injectable()
 export class CreateDailyTodoService implements CreateDailyTodoUseCase {
   constructor(
     @Inject(DIToken.DailyTodoModule.DailyTodoPersistencePort)
     private readonly dailyTodoPersistencePort: DailyTodoPersistencePort,
+    public readonly transactionRunner: TransactionRunner,
   ) {}
 
+  @Transactional()
   public async invoke(
     command: CreateDailyTodoCommand,
     owner: UserId,
