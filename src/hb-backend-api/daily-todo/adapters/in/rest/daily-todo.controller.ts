@@ -136,7 +136,7 @@ export class DailyTodoController {
     );
   }
 
-  @ApiOperation({ description: "데일리 투두 완료 상태 변경" })
+  @ApiOperation({ description: "데일리 투두 밴벽 저게 변경" })
   @UseGuards(JwtAuthGuard)
   @Patch("/:id/cycle-status")
   public async changeCycleStatus(
