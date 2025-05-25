@@ -11,6 +11,8 @@ import { CreateDailyTodoService } from "./application/use-cases/create-daily-tod
 import { DailyTodoQueryAdapter } from "./adapters/out/query/daily-todo-query.adapter";
 import { GetAllDailyTodoService } from "./application/use-cases/get-all-daily-todo.service";
 import { GetDailyTodoService } from "./application/use-cases/get-daily-todo.service";
+import { UpdateDailyTodoCompleteStatusService } from "./application/use-cases/update-daily-todo-complete-status.service";
+import { UpdateDailyTodoCycleService } from "./application/result/update-daily-todo-cycle.service";
 
 @Module({
   imports: [
@@ -47,6 +49,14 @@ import { GetDailyTodoService } from "./application/use-cases/get-daily-todo.serv
       provide: DIToken.DailyTodoModule.GetDailyTodoUseCase,
       useClass: GetDailyTodoService,
     },
+    {
+      provide: DIToken.DailyTodoModule.UpdateDailyTodoCompleteStatusUseCase,
+      useClass: UpdateDailyTodoCompleteStatusService,
+    },
+    {
+      provide: DIToken.DailyTodoModule.UpdateDailyTodoCycleUseCase,
+      useClass: UpdateDailyTodoCycleService,
+    },
   ],
   controllers: [DailyTodoController],
   exports: [
@@ -57,6 +67,8 @@ import { GetDailyTodoService } from "./application/use-cases/get-daily-todo.serv
     DIToken.DailyTodoModule.CreateDailyTodoUseCase,
     DIToken.DailyTodoModule.GetAllDailyTodoUseCase,
     DIToken.DailyTodoModule.GetDailyTodoUseCase,
+    DIToken.DailyTodoModule.UpdateDailyTodoCompleteStatusUseCase,
+    DIToken.DailyTodoModule.UpdateDailyTodoCycleUseCase,
   ],
 })
 export class DailyTodoModule {}

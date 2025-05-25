@@ -3,6 +3,10 @@ import { DailyTodoPersistencePort } from "../../../application/ports/out/daily-t
 import { DIToken } from "../../../../../shared/di/token.di";
 import { DailyTodoRepository } from "../../../domain/repositories/daily-todo.repository";
 import { DailyTodoCreateEntitySchema } from "src/hb-backend-api/daily-todo/domain/entity/daily-todo.entity";
+import { DailyTodoCompleteStatus } from "src/hb-backend-api/daily-todo/domain/enums/daily-todo-complete-status.enum";
+import { DailyTodoCycle } from "src/hb-backend-api/daily-todo/domain/enums/daily-todo-cycle.enum";
+import { DailyTodoId } from "src/hb-backend-api/daily-todo/domain/vo/daily-todo-id.vo";
+import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
 
 @Injectable()
 export class DailyTodoPersistenceAdapter implements DailyTodoPersistencePort {
@@ -15,5 +19,25 @@ export class DailyTodoPersistenceAdapter implements DailyTodoPersistencePort {
     dailyTodoCreateEntitySchema: DailyTodoCreateEntitySchema,
   ): Promise<void> {
     await this.dailyTodoRepository.save(dailyTodoCreateEntitySchema);
+  }
+
+  public async updateDailyTodoCompleteStatus(
+    id: DailyTodoId,
+    owner: UserId,
+    progress: DailyTodoCompleteStatus,
+  ): Promise<void> {
+    await this.dailyTodoRepository.updateDailyTodoCompleteStatus(
+      id,
+      owner,
+      progress,
+    );
+  }
+
+  public async updateDailyTodoCycle(
+    id: DailyTodoId,
+    owner: UserId,
+    cycle: DailyTodoCycle,
+  ): Promise<void> {
+    await this.dailyTodoRepository.updateDailyTodoCycle(id, owner, cycle);
   }
 }

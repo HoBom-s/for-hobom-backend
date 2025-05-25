@@ -15,6 +15,8 @@ import { DailyTodoId } from "../../domain/vo/daily-todo-id.vo";
 import { AggregateQuery } from "../../../../infra/mongo/query/aggregate.query";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
+import { DailyTodoCompleteStatus } from "../../domain/enums/daily-todo-complete-status.enum";
+import { DailyTodoCycle } from "../../domain/enums/daily-todo-cycle.enum";
 
 @Injectable()
 export class DailyTodoRepositoryImpl implements DailyTodoRepository {
@@ -96,6 +98,54 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
             { $limit: 1 },
           ])
           .exec(),
+    );
+  }
+
+  public async updateDailyTodoCompleteStatus(
+    id: DailyTodoId,
+    owner: UserId,
+    progress: DailyTodoCompleteStatus,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
+    cache.clear();
+    await this.dailyTodoModel.findOneAndUpdate(
+      {
+        _id: id.raw,
+        owner: owner.raw,
+      },
+      {
+        $set: {
+          progress: progress,
+        },
+      },
+      {
+        session: session,
+      },
+    );
+  }
+
+  public async updateDailyTodoCycle(
+    id: DailyTodoId,
+    owner: UserId,
+    cycle: DailyTodoCycle,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
+    cache.clear();
+    await this.dailyTodoModel.findOneAndUpdate(
+      {
+        _id: id.raw,
+        owner: owner.raw,
+      },
+      {
+        $set: {
+          cycle: cycle,
+        },
+      },
+      {
+        session: session,
+      },
     );
   }
 }
