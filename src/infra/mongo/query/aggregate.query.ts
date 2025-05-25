@@ -47,4 +47,8 @@ export class AggregateQuery<T> {
 
     return result;
   }
+
+  public get cache(): MemoryCache<T | T[]> {
+    return this.memoryCache;
+  }
 }

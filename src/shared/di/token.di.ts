@@ -64,5 +64,11 @@ export class DIToken {
       "GetAllDailyTodoUseCase",
     );
     public static GetDailyTodoUseCase = this.register("GetDailyTodoUseCase");
+    public static UpdateDailyTodoCompleteStatusUseCase = this.register(
+      "UpdateDailyTodoCompleteStatusUseCase",
+    );
+    public static UpdateDailyTodoCycleUseCase = this.register(
+      "UpdateDailyTodoCycleUseCase",
+    );
   };
 }
