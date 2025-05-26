@@ -3,6 +3,7 @@ import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
 import { UserId } from "../../../../user/domain/vo/user-id.vo";
 import { DailyTodoCompleteStatus } from "../../../domain/enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../../../domain/enums/daily-todo-cycle.enum";
+import { Reaction } from "../../../domain/entity/daily-todo.retations";
 
 export interface DailyTodoPersistencePort {
   save(dailyTodoCreateEntitySchema: DailyTodoCreateEntitySchema): Promise<void>;
@@ -22,6 +23,6 @@ export interface DailyTodoPersistencePort {
   updateDailyTodoReaction(
     id: DailyTodoId,
     owner: UserId,
-    reaction: string,
+    reaction: Reaction,
   ): Promise<void>;
 }

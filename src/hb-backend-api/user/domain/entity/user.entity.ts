@@ -16,6 +16,13 @@ export class UserEntity extends BaseEntity {
   })
   nickname: string;
 
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+  })
+  email: string;
+
   @Prop({ type: String, required: true })
   password: string;
 
@@ -27,12 +34,14 @@ export class UserEntitySchema {
   constructor(
     private readonly id: UserId,
     private readonly username: string,
+    private readonly email: string,
     private readonly nickname: string,
     private readonly password: string,
     private readonly friends: Types.ObjectId[],
   ) {
     this.id = id;
     this.username = username;
+    this.email = email;
     this.nickname = nickname;
     this.password = password;
     this.friends = friends;
@@ -41,6 +50,7 @@ export class UserEntitySchema {
   public static of(
     id: UserId,
     username: string,
+    email: string,
     nickname: string,
     password: string,
     friends?: Types.ObjectId[],
@@ -48,6 +58,7 @@ export class UserEntitySchema {
     return new UserEntitySchema(
       id,
       username,
+      email,
       nickname,
       password,
       friends ?? [],
@@ -60,6 +71,10 @@ export class UserEntitySchema {
 
   get getUsername(): string {
     return this.username;
+  }
+
+  get getEmail(): string {
+    return this.email;
   }
 
   get getNickname(): string {

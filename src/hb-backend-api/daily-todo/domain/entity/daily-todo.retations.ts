@@ -8,7 +8,7 @@ export interface DailyTodoWithRelations {
   _id: string;
   title: string;
   date: Date;
-  reaction: string | null;
+  reaction: { value: string; reactionUserId: string } | null;
   progress: DailyTodoCompleteStatus;
   cycle: DailyTodoCycle;
   owner: {
@@ -72,12 +72,34 @@ export class Category {
   }
 }
 
+export class Reaction {
+  constructor(
+    private readonly value: string,
+    private readonly reactionUserId: UserId,
+  ) {
+    this.value = value;
+    this.reactionUserId = reactionUserId;
+  }
+
+  public static of(value: string, reactionUserId: UserId): Reaction {
+    return new Reaction(value, reactionUserId);
+  }
+
+  public get getValue(): string {
+    return this.value;
+  }
+
+  public get getReactionUserId(): UserId {
+    return this.reactionUserId;
+  }
+}
+
 export class DailyTodoWithRelationEntity {
   constructor(
     private readonly id: DailyTodoId,
     private readonly title: string,
     private readonly date: Date,
-    private readonly reaction: string | null,
+    private readonly reaction: Reaction | null,
     private readonly progress: DailyTodoCompleteStatus,
     private readonly cycle: DailyTodoCycle,
     private readonly owner: Owner,
@@ -97,7 +119,7 @@ export class DailyTodoWithRelationEntity {
     id: DailyTodoId,
     title: string,
     date: Date,
-    reaction: string | null,
+    reaction: Reaction | null,
     progress: DailyTodoCompleteStatus,
     cycle: DailyTodoCycle,
     owner: Owner,
@@ -127,7 +149,7 @@ export class DailyTodoWithRelationEntity {
     return this.date;
   }
 
-  public get getReaction(): string | null {
+  public get getReaction(): Reaction | null {
     return this.reaction;
   }
 

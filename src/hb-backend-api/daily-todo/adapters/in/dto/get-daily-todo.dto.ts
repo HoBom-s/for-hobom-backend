@@ -13,12 +13,17 @@ interface CategoryType {
   title: string;
 }
 
+interface ReactionType {
+  value: string;
+  reactionUserId: string;
+}
+
 export class GetDailyTodoDto {
   constructor(
     private readonly id: string,
     private readonly title: string,
     private readonly date: Date,
-    private readonly reaction: string | null,
+    private readonly reaction: ReactionType | null,
     private readonly progress: DailyTodoCompleteStatus,
     private readonly cycle: DailyTodoCycle,
     private readonly owner: OwnerType,
@@ -49,11 +54,18 @@ export class GetDailyTodoDto {
             id: entity.getCategory.getId.toString(),
             title: entity.getCategory.getTitle,
           };
+    const reaction: ReactionType | null =
+      entity.getReaction == null
+        ? null
+        : {
+            value: entity.getReaction.getValue,
+            reactionUserId: entity.getReaction.getReactionUserId.toString(),
+          };
     return new GetDailyTodoDto(
       entity.getId.toString(),
       entity.getTitle,
       entity.getDate,
-      entity.getReaction,
+      reaction,
       entity.getProgress,
       entity.getCycle,
       owner,

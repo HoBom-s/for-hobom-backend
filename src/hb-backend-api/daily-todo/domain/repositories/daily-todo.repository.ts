@@ -1,6 +1,9 @@
 import { DailyTodoCreateEntitySchema } from "../entity/daily-todo.entity";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
-import type { DailyTodoWithRelations } from "../entity/daily-todo.retations";
+import {
+  DailyTodoWithRelations,
+  Reaction,
+} from "../entity/daily-todo.retations";
 import { YearMonthDayString } from "../vo/year-month-day-string.vo";
 import { DailyTodoId } from "../vo/daily-todo-id.vo";
 import { DailyTodoCompleteStatus } from "../enums/daily-todo-complete-status.enum";
@@ -34,6 +37,6 @@ export interface DailyTodoRepository {
   updateDailyTodoReaction(
     id: DailyTodoId,
     owner: UserId,
-    reaction: string,
+    reaction: Reaction,
   ): Promise<void>;
 }

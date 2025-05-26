@@ -40,6 +40,8 @@ import { UpdateDailyTodoCycleCommand } from "../../../application/command/update
 import { UpdateDailyTodoReactionDto } from "../dto/update-daily-todo-reaction.dto";
 import { UpdateDailyTodoReactionUseCase } from "../../../application/ports/in/update-daily-todo-reaction.use-case";
 import { UpdateDailyTodoReactionCommand } from "../../../application/command/update-daily-todo-reaction.command";
+import { Reaction } from "../../../domain/entity/daily-todo.retations";
+import { UserId } from "../../../../user/domain/vo/user-id.vo";
 
 @ApiTags("DailyTodos")
 @Controller(`${EndPointPrefixConstant}/daily-todos`)
@@ -172,10 +174,14 @@ export class DailyTodoController {
       UserNickname.fromString(userInfo.nickname),
     );
 
+    const reaction = Reaction.of(
+      body.reaction,
+      UserId.fromString(body.reactionUserId),
+    );
     await this.updateDailyTodoReaction.invoke(
       id,
       user.getId,
-      UpdateDailyTodoReactionCommand.of(body.reaction),
+      UpdateDailyTodoReactionCommand.of(reaction),
     );
   }
 }

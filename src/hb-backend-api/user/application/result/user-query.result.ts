@@ -6,11 +6,13 @@ export class UserQueryResult {
   constructor(
     private readonly id: UserId,
     private readonly username: string,
+    private readonly email: string,
     private readonly nickname: string,
     private readonly friends: Types.ObjectId[],
   ) {
     this.id = id;
     this.username = username;
+    this.email = email;
     this.nickname = nickname;
     this.friends = friends;
   }
@@ -19,6 +21,7 @@ export class UserQueryResult {
     return new UserQueryResult(
       entity.getId,
       entity.getUsername,
+      entity.getEmail,
       entity.getNickname,
       entity.getFriends,
     );
@@ -30,6 +33,10 @@ export class UserQueryResult {
 
   get getUsername(): string {
     return this.username;
+  }
+
+  get getEmail(): string {
+    return this.email;
   }
 
   get getNickname(): string {
