@@ -30,4 +30,10 @@ export interface DailyTodoRepository {
     owner: UserId,
     cycle: DailyTodoCycle,
   ): Promise<void>;
+
+  updateDailyTodoReaction(
+    id: DailyTodoId,
+    owner: UserId,
+    reaction: string,
+  ): Promise<void>;
 }

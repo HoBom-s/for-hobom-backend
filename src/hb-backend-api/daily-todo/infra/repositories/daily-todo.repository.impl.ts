@@ -108,7 +108,6 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
   ): Promise<void> {
     const session = MongoSessionContext.getSession();
     const cache = this.aggregateQuery.cache;
-    cache.clear();
     await this.dailyTodoModel.findOneAndUpdate(
       {
         _id: id.raw,
@@ -123,6 +122,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
         session: session,
       },
     );
+    cache.clear();
   }
 
   public async updateDailyTodoCycle(
@@ -132,7 +132,6 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
   ): Promise<void> {
     const session = MongoSessionContext.getSession();
     const cache = this.aggregateQuery.cache;
-    cache.clear();
     await this.dailyTodoModel.findOneAndUpdate(
       {
         _id: id.raw,
@@ -147,5 +146,30 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
         session: session,
       },
     );
+    cache.clear();
+  }
+
+  public async updateDailyTodoReaction(
+    id: DailyTodoId,
+    owner: UserId,
+    reaction: string,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
+    await this.dailyTodoModel.findOneAndUpdate(
+      {
+        _id: id.raw,
+        owner: owner.raw,
+      },
+      {
+        $set: {
+          reaction: reaction,
+        },
+      },
+      {
+        session: session,
+      },
+    );
+    cache.clear();
   }
 }

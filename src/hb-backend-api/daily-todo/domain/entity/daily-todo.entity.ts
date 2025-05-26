@@ -29,7 +29,6 @@ export class DailyTodoEntity extends BaseEntity {
 
   @Prop({
     type: String,
-    ref: "emoji-reaction",
     default: null,
   })
   reaction: string;

@@ -18,4 +18,10 @@ export interface DailyTodoPersistencePort {
     owner: UserId,
     cycle: DailyTodoCycle,
   ): Promise<void>;
+
+  updateDailyTodoReaction(
+    id: DailyTodoId,
+    owner: UserId,
+    reaction: string,
+  ): Promise<void>;
 }

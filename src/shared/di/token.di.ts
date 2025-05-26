@@ -70,5 +70,8 @@ export class DIToken {
     public static UpdateDailyTodoCycleUseCase = this.register(
       "UpdateDailyTodoCycleUseCase",
     );
+    public static UpdateDailyTodoReactionUseCase = this.register(
+      "UpdateDailyTodoReactionUseCase",
+    );
   };
 }

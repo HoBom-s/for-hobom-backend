@@ -40,4 +40,12 @@ export class DailyTodoPersistenceAdapter implements DailyTodoPersistencePort {
   ): Promise<void> {
     await this.dailyTodoRepository.updateDailyTodoCycle(id, owner, cycle);
   }
+
+  public async updateDailyTodoReaction(
+    id: DailyTodoId,
+    owner: UserId,
+    reaction: string,
+  ): Promise<void> {
+    await this.dailyTodoRepository.updateDailyTodoReaction(id, owner, reaction);
+  }
 }
