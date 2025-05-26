@@ -37,6 +37,9 @@ import { UpdateDailyTodoCompleteStatusCommand } from "../../../application/comma
 import { UpdateDailyTodoCycleDto } from "../dto/update-daily-todo-cycle.dto";
 import { UpdateDailyTodoCycleUseCase } from "../../../application/ports/in/update-daily-todo-cycle.use-case";
 import { UpdateDailyTodoCycleCommand } from "../../../application/command/update-daily-todo-cycle.command";
+import { UpdateDailyTodoReactionDto } from "../dto/update-daily-todo-reaction.dto";
+import { UpdateDailyTodoReactionUseCase } from "../../../application/ports/in/update-daily-todo-reaction.use-case";
+import { UpdateDailyTodoReactionCommand } from "../../../application/command/update-daily-todo-reaction.command";
 
 @ApiTags("DailyTodos")
 @Controller(`${EndPointPrefixConstant}/daily-todos`)
@@ -54,6 +57,8 @@ export class DailyTodoController {
     private readonly updateDailyTodoCompleteStatusUseCase: UpdateDailyTodoCompleteStatusUseCase,
     @Inject(DIToken.DailyTodoModule.UpdateDailyTodoCycleUseCase)
     private readonly updateDailyTodoCycleUseCase: UpdateDailyTodoCycleUseCase,
+    @Inject(DIToken.DailyTodoModule.UpdateDailyTodoReactionUseCase)
+    private readonly updateDailyTodoReaction: UpdateDailyTodoReactionUseCase,
   ) {}
 
   @ApiOperation({ description: "데일리 투두 모두 조회" })
@@ -152,6 +157,25 @@ export class DailyTodoController {
       id,
       user.getId,
       UpdateDailyTodoCycleCommand.of(body.cycle),
+    );
+  }
+
+  @ApiOperation({ description: "데일리 투두 리액션 변경" })
+  @UseGuards(JwtAuthGuard)
+  @Patch("/:id/reaction")
+  public async updateReaction(
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+    @Param("id", ParseDailyTodoIdPipe) id: DailyTodoId,
+    @Body() body: UpdateDailyTodoReactionDto,
+  ): Promise<void> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+
+    await this.updateDailyTodoReaction.invoke(
+      id,
+      user.getId,
+      UpdateDailyTodoReactionCommand.of(body.reaction),
     );
   }
 }

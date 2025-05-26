@@ -7,5 +7,6 @@ export function createDailyTodoRepository(): jest.Mocked<DailyTodoRepository> {
     findById: jest.fn(),
     updateDailyTodoCompleteStatus: jest.fn(),
     updateDailyTodoCycle: jest.fn(),
+    updateDailyTodoReaction: jest.fn(),
   };
 }
