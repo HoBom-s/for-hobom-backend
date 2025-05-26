@@ -8,7 +8,10 @@ import {
 } from "../../domain/entity/daily-todo.entity";
 import { DailyTodoRepository } from "../../domain/repositories/daily-todo.repository";
 import { DailyTodoAggregationHelper } from "../../adapters/out/aggregation/daily-todo-aggregation.helper";
-import type { DailyTodoWithRelations } from "../../domain/entity/daily-todo.retations";
+import {
+  DailyTodoWithRelations,
+  Reaction,
+} from "../../domain/entity/daily-todo.retations";
 import { YearMonthDayString } from "../../domain/vo/year-month-day-string.vo";
 import { DateHelper } from "../../../../shared/date/date.helper";
 import { DailyTodoId } from "../../domain/vo/daily-todo-id.vo";
@@ -152,7 +155,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
   public async updateDailyTodoReaction(
     id: DailyTodoId,
     owner: UserId,
-    reaction: string,
+    reaction: Reaction,
   ): Promise<void> {
     const session = MongoSessionContext.getSession();
     const cache = this.aggregateQuery.cache;
@@ -163,7 +166,10 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
       },
       {
         $set: {
-          reaction: reaction,
+          reaction: {
+            value: reaction.getValue,
+            reactionUserId: reaction.getReactionUserId.raw,
+          },
         },
       },
       {

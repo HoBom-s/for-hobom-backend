@@ -8,6 +8,7 @@ import {
   DailyTodoWithRelationEntity,
   type DailyTodoWithRelations,
   Owner,
+  Reaction,
 } from "../../../domain/entity/daily-todo.retations";
 import { CategoryId } from "../../../../category/domain/vo/category-id.vo";
 import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
@@ -51,7 +52,12 @@ export class DailyTodoQueryAdapter implements DailyTodoQueryPort {
       DailyTodoId.fromString(dailyTodo._id),
       dailyTodo.title,
       dailyTodo.date,
-      dailyTodo.reaction,
+      dailyTodo.reaction == null
+        ? null
+        : Reaction.of(
+            dailyTodo.reaction.value,
+            UserId.fromString(dailyTodo.reaction.reactionUserId),
+          ),
       dailyTodo.progress,
       dailyTodo.cycle,
       Owner.of(

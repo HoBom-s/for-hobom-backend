@@ -7,6 +7,7 @@ import { DailyTodoCompleteStatus } from "src/hb-backend-api/daily-todo/domain/en
 import { DailyTodoCycle } from "src/hb-backend-api/daily-todo/domain/enums/daily-todo-cycle.enum";
 import { DailyTodoId } from "src/hb-backend-api/daily-todo/domain/vo/daily-todo-id.vo";
 import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
+import { Reaction } from "../../../domain/entity/daily-todo.retations";
 
 @Injectable()
 export class DailyTodoPersistenceAdapter implements DailyTodoPersistencePort {
@@ -44,7 +45,7 @@ export class DailyTodoPersistenceAdapter implements DailyTodoPersistencePort {
   public async updateDailyTodoReaction(
     id: DailyTodoId,
     owner: UserId,
-    reaction: string,
+    reaction: Reaction,
   ): Promise<void> {
     await this.dailyTodoRepository.updateDailyTodoReaction(id, owner, reaction);
   }

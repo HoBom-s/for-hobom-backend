@@ -8,7 +8,10 @@ import { UpdateDailyTodoReactionCommand } from "../command/update-daily-todo-rea
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { DailyTodoQueryPort } from "../ports/out/daily-todo-query.port";
-import { DailyTodoWithRelationEntity } from "../../domain/entity/daily-todo.retations";
+import {
+  DailyTodoWithRelationEntity,
+  Reaction,
+} from "../../domain/entity/daily-todo.retations";
 
 @Injectable()
 export class UpdateDailyTodoReactionService
@@ -46,7 +49,7 @@ export class UpdateDailyTodoReactionService
   private async updateReaction(
     id: DailyTodoId,
     owner: UserId,
-    reaction: string,
+    reaction: Reaction,
   ): Promise<void> {
     await this.dailyTodoPersistencePort.updateDailyTodoReaction(
       id,
