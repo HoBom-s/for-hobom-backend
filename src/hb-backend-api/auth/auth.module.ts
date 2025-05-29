@@ -44,11 +44,6 @@ import { DIToken } from "../../shared/di/token.di";
   ],
   providers: [
     JwtStrategy,
-    JwtAuthGuard,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
     {
       provide: DIToken.AuthModule.JwtAuthPort,
       useClass: JwtAuthAdapter,
