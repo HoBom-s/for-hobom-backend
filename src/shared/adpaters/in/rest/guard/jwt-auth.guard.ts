@@ -1,4 +1,8 @@
-import { Injectable, ExecutionContext } from "@nestjs/common";
+import {
+  Injectable,
+  ExecutionContext,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { JwtService } from "@nestjs/jwt";
 import { JwtAuthPayloadModel } from "src/hb-backend-api/auth/domain/model/jwt-auth-payload.model";
@@ -19,18 +23,24 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
       try {
         const decoded = this.jwtService.verify<JwtAuthPayloadModel>(token);
         request.nickname = decoded.sub;
-      } catch (e) {
-        const refreshToken = String(request.cookies["refreshToken"]);
+      } catch (err) {
+        if (err.name === "TokenExpiredError") {
+          throw new UnauthorizedException("토큰이 만료됐어요.");
+        } else {
+          const refreshToken = String(request.cookies["refreshToken"]);
 
-        if (refreshToken) {
-          const newAccessToken = await this.refreshAccessToken(refreshToken);
+          if (refreshToken) {
+            const newAccessToken = await this.refreshAccessToken(refreshToken);
 
-          if (newAccessToken) {
-            request.headers[this.AUTHORIZE_KEY] = `Bearer ${newAccessToken}`;
-            return true;
+            if (newAccessToken) {
+              request.headers[this.AUTHORIZE_KEY] = `Bearer ${newAccessToken}`;
+              return true;
+            }
           }
+          throw new Error(
+            `토큰을 갱신하지 못했어요. ${err.name} : ${err.message}`,
+          );
         }
-        throw new Error(`토큰을 갱신하지 못했어요. ${e.name} : ${e.message}`);
       }
     }
 
