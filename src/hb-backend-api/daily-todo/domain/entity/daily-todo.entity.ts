@@ -28,11 +28,13 @@ export class DailyTodoEntity extends BaseEntity {
   owner: Types.ObjectId;
 
   @Prop({
-    type: String,
-    ref: "emoji-reaction",
+    type: Map,
     default: null,
   })
-  reaction: string;
+  reaction: {
+    value: string;
+    reactionUserId: Types.ObjectId;
+  };
 
   @Prop({
     type: String,

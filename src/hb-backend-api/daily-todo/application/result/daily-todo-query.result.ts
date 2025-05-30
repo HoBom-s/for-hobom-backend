@@ -5,6 +5,7 @@ import {
   Category,
   DailyTodoWithRelationEntity,
   Owner,
+  Reaction,
 } from "../../domain/entity/daily-todo.retations";
 
 export class DailyTodoWithRelationQueryResult {
@@ -12,7 +13,7 @@ export class DailyTodoWithRelationQueryResult {
     private readonly id: DailyTodoId,
     private readonly title: string,
     private readonly date: Date,
-    private readonly reaction: string | null,
+    private readonly reaction: Reaction | null,
     private readonly progress: DailyTodoCompleteStatus,
     private readonly cycle: DailyTodoCycle,
     private readonly owner: Owner,
@@ -55,7 +56,7 @@ export class DailyTodoWithRelationQueryResult {
     return this.date;
   }
 
-  public get getReaction(): string | null {
+  public get getReaction(): Reaction | null {
     return this.reaction;
   }
 

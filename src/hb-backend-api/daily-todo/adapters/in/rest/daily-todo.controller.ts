@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -30,6 +31,17 @@ import { YearMonthDayString } from "../../../domain/vo/year-month-day-string.vo"
 import { ParseDailyTodoIdPipe } from "../pipe/daily-todo-id.pipe";
 import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
 import { GetDailyTodoUseCase } from "../../../application/ports/in/get-daily-todo.use-case";
+import { UpdateDailyTodoCompleteStatusUseCase } from "../../../application/ports/in/update-daily-todo-complete-status.use-case";
+import { UpdateDailyTodoCompleteStatusDto } from "../dto/update-daily-todo-complete-status.dto";
+import { UpdateDailyTodoCompleteStatusCommand } from "../../../application/command/update-daily-todo-complete-status.command";
+import { UpdateDailyTodoCycleDto } from "../dto/update-daily-todo-cycle.dto";
+import { UpdateDailyTodoCycleUseCase } from "../../../application/ports/in/update-daily-todo-cycle.use-case";
+import { UpdateDailyTodoCycleCommand } from "../../../application/command/update-daily-todo-cycle.command";
+import { UpdateDailyTodoReactionDto } from "../dto/update-daily-todo-reaction.dto";
+import { UpdateDailyTodoReactionUseCase } from "../../../application/ports/in/update-daily-todo-reaction.use-case";
+import { UpdateDailyTodoReactionCommand } from "../../../application/command/update-daily-todo-reaction.command";
+import { Reaction } from "../../../domain/entity/daily-todo.retations";
+import { UserId } from "../../../../user/domain/vo/user-id.vo";
 
 @ApiTags("DailyTodos")
 @Controller(`${EndPointPrefixConstant}/daily-todos`)
@@ -43,6 +55,12 @@ export class DailyTodoController {
     private readonly getAllDailyTodoUseCase: GetAllDailyTodoUseCase,
     @Inject(DIToken.DailyTodoModule.GetDailyTodoUseCase)
     private readonly getDailyTodoUseCase: GetDailyTodoUseCase,
+    @Inject(DIToken.DailyTodoModule.UpdateDailyTodoCompleteStatusUseCase)
+    private readonly updateDailyTodoCompleteStatusUseCase: UpdateDailyTodoCompleteStatusUseCase,
+    @Inject(DIToken.DailyTodoModule.UpdateDailyTodoCycleUseCase)
+    private readonly updateDailyTodoCycleUseCase: UpdateDailyTodoCycleUseCase,
+    @Inject(DIToken.DailyTodoModule.UpdateDailyTodoReactionUseCase)
+    private readonly updateDailyTodoReaction: UpdateDailyTodoReactionUseCase,
   ) {}
 
   @ApiOperation({ description: "데일리 투두 모두 조회" })
@@ -103,6 +121,67 @@ export class DailyTodoController {
         categoryId,
       ),
       user.getId,
+    );
+  }
+
+  @ApiOperation({ description: "데일리 투두 완료 상태 변경" })
+  @UseGuards(JwtAuthGuard)
+  @Patch("/:id/complete-status")
+  public async changeCompleteStatus(
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+    @Param("id", ParseDailyTodoIdPipe) id: DailyTodoId,
+    @Body() body: UpdateDailyTodoCompleteStatusDto,
+  ): Promise<void> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+
+    await this.updateDailyTodoCompleteStatusUseCase.invoke(
+      id,
+      user.getId,
+      UpdateDailyTodoCompleteStatusCommand.of(body.status),
+    );
+  }
+
+  @ApiOperation({ description: "데일리 투두 반복 주기 변경" })
+  @UseGuards(JwtAuthGuard)
+  @Patch("/:id/cycle-status")
+  public async changeCycleStatus(
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+    @Param("id", ParseDailyTodoIdPipe) id: DailyTodoId,
+    @Body() body: UpdateDailyTodoCycleDto,
+  ): Promise<void> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+
+    await this.updateDailyTodoCycleUseCase.invoke(
+      id,
+      user.getId,
+      UpdateDailyTodoCycleCommand.of(body.cycle),
+    );
+  }
+
+  @ApiOperation({ description: "데일리 투두 리액션 변경" })
+  @UseGuards(JwtAuthGuard)
+  @Patch("/:id/reaction")
+  public async updateReaction(
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+    @Param("id", ParseDailyTodoIdPipe) id: DailyTodoId,
+    @Body() body: UpdateDailyTodoReactionDto,
+  ): Promise<void> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+
+    const reaction = Reaction.of(
+      body.reaction,
+      UserId.fromString(body.reactionUserId),
+    );
+    await this.updateDailyTodoReaction.invoke(
+      id,
+      user.getId,
+      UpdateDailyTodoReactionCommand.of(reaction),
     );
   }
 }

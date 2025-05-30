@@ -8,13 +8,18 @@ import {
 } from "../../domain/entity/daily-todo.entity";
 import { DailyTodoRepository } from "../../domain/repositories/daily-todo.repository";
 import { DailyTodoAggregationHelper } from "../../adapters/out/aggregation/daily-todo-aggregation.helper";
-import type { DailyTodoWithRelations } from "../../domain/entity/daily-todo.retations";
+import {
+  DailyTodoWithRelations,
+  Reaction,
+} from "../../domain/entity/daily-todo.retations";
 import { YearMonthDayString } from "../../domain/vo/year-month-day-string.vo";
 import { DateHelper } from "../../../../shared/date/date.helper";
 import { DailyTodoId } from "../../domain/vo/daily-todo-id.vo";
 import { AggregateQuery } from "../../../../infra/mongo/query/aggregate.query";
 import { UserId } from "../../../user/domain/vo/user-id.vo";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
+import { DailyTodoCompleteStatus } from "../../domain/enums/daily-todo-complete-status.enum";
+import { DailyTodoCycle } from "../../domain/enums/daily-todo-cycle.enum";
 
 @Injectable()
 export class DailyTodoRepositoryImpl implements DailyTodoRepository {
@@ -97,5 +102,80 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
           ])
           .exec(),
     );
+  }
+
+  public async updateDailyTodoCompleteStatus(
+    id: DailyTodoId,
+    owner: UserId,
+    progress: DailyTodoCompleteStatus,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
+    await this.dailyTodoModel.findOneAndUpdate(
+      {
+        _id: id.raw,
+        owner: owner.raw,
+      },
+      {
+        $set: {
+          progress: progress,
+        },
+      },
+      {
+        session: session,
+      },
+    );
+    cache.clear();
+  }
+
+  public async updateDailyTodoCycle(
+    id: DailyTodoId,
+    owner: UserId,
+    cycle: DailyTodoCycle,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
+    await this.dailyTodoModel.findOneAndUpdate(
+      {
+        _id: id.raw,
+        owner: owner.raw,
+      },
+      {
+        $set: {
+          cycle: cycle,
+        },
+      },
+      {
+        session: session,
+      },
+    );
+    cache.clear();
+  }
+
+  public async updateDailyTodoReaction(
+    id: DailyTodoId,
+    owner: UserId,
+    reaction: Reaction,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
+    await this.dailyTodoModel.findOneAndUpdate(
+      {
+        _id: id.raw,
+        owner: owner.raw,
+      },
+      {
+        $set: {
+          reaction: {
+            value: reaction.getValue,
+            reactionUserId: reaction.getReactionUserId.raw,
+          },
+        },
+      },
+      {
+        session: session,
+      },
+    );
+    cache.clear();
   }
 }

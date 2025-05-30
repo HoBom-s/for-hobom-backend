@@ -24,6 +24,7 @@ export class UserQueryAdapter implements UserQueryPort {
     return UserEntitySchema.of(
       UserId.fromString(String(foundUser._id)),
       foundUser.username,
+      foundUser.email,
       foundUser.nickname,
       foundUser.password,
       foundUser.friends,
@@ -43,6 +44,7 @@ export class UserQueryAdapter implements UserQueryPort {
     return UserEntitySchema.of(
       UserId.fromString(String(foundUser._id)),
       foundUser.username,
+      foundUser.email,
       foundUser.nickname,
       foundUser.password,
       foundUser.friends,
