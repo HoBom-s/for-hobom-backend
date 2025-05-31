@@ -22,6 +22,11 @@ export interface DailyTodoRepository {
     owner: UserId,
   ): Promise<DailyTodoWithRelations | null>;
 
+  findByDate(
+    owner: UserId,
+    date: YearMonthDayString,
+  ): Promise<DailyTodoWithRelations[]>;
+
   updateDailyTodoCompleteStatus(
     id: DailyTodoId,
     owner: UserId,

@@ -42,6 +42,7 @@ import { UpdateDailyTodoReactionUseCase } from "../../../application/ports/in/up
 import { UpdateDailyTodoReactionCommand } from "../../../application/command/update-daily-todo-reaction.command";
 import { Reaction } from "../../../domain/entity/daily-todo.retations";
 import { UserId } from "../../../../user/domain/vo/user-id.vo";
+import { GetDailyTodoByDateUseCase } from "../../../application/ports/in/get-daily-todo-by-date.use-case";
 
 @ApiTags("DailyTodos")
 @Controller(`${EndPointPrefixConstant}/daily-todos`)
@@ -61,6 +62,8 @@ export class DailyTodoController {
     private readonly updateDailyTodoCycleUseCase: UpdateDailyTodoCycleUseCase,
     @Inject(DIToken.DailyTodoModule.UpdateDailyTodoReactionUseCase)
     private readonly updateDailyTodoReaction: UpdateDailyTodoReactionUseCase,
+    @Inject(DIToken.DailyTodoModule.GetDailyTodoByDateUseCase)
+    private readonly getDailyTodoByDateUseCase: GetDailyTodoByDateUseCase,
   ) {}
 
   @ApiOperation({ description: "데일리 투두 모두 조회" })
@@ -98,6 +101,25 @@ export class DailyTodoController {
     const dailyTodo = await this.getDailyTodoUseCase.invoke(id, user.getId);
 
     return GetDailyTodoDto.from(dailyTodo);
+  }
+
+  @ApiOperation({ description: "데일리 투두 날짜로 조회" })
+  @UseGuards(JwtAuthGuard)
+  @Get("/by-date/:date")
+  public async findByDate(
+    @Param("date", ParseYearMonthDayStringPipe) date: YearMonthDayString,
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+  ): Promise<GetDailyTodoDto[]> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+
+    const dailyTodos = await this.getDailyTodoByDateUseCase.invoke(
+      user.getId,
+      date,
+    );
+
+    return dailyTodos.map(GetDailyTodoDto.from);
   }
 
   @ApiOperation({ description: "데일리 투두 생성" })
