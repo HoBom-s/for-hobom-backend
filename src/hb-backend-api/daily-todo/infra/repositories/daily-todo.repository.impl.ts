@@ -104,6 +104,33 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
     );
   }
 
+  public async findByDate(
+    owner: UserId,
+    date: YearMonthDayString,
+  ): Promise<DailyTodoWithRelations[]> {
+    const parsedDate = DateHelper.parse(date.value, "KST");
+    const startOfDay = DateHelper.startOfDay(parsedDate);
+    const endOfDay = DateHelper.endOfDay(parsedDate);
+
+    return this.aggregateQuery.fetchAll(
+      `daily-todos:${owner.toString()}:${date.value}`,
+      () =>
+        this.dailyTodoModel
+          .aggregate([
+            {
+              $match: {
+                owner: owner.raw,
+                date: { $gte: startOfDay, $lte: endOfDay },
+              },
+            },
+            ...DailyTodoAggregationHelper.buildUserJoin(),
+            ...DailyTodoAggregationHelper.buildCategoryJoin(),
+            ...DailyTodoAggregationHelper.buildProject(),
+          ])
+          .exec(),
+    );
+  }
+
   public async updateDailyTodoCompleteStatus(
     id: DailyTodoId,
     owner: UserId,

@@ -45,6 +45,15 @@ export class DailyTodoQueryAdapter implements DailyTodoQueryPort {
     return this.toRelationEntity(dailyTodo);
   }
 
+  public async findByDate(
+    owner: UserId,
+    date: YearMonthDayString,
+  ): Promise<DailyTodoWithRelationEntity[]> {
+    const dailyTodos = await this.dailyTodoRepository.findByDate(owner, date);
+
+    return dailyTodos.map(this.toRelationEntity);
+  }
+
   private toRelationEntity(
     dailyTodo: DailyTodoWithRelations,
   ): DailyTodoWithRelationEntity {

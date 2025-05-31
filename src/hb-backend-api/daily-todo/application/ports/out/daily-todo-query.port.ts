@@ -13,4 +13,9 @@ export interface DailyTodoQueryPort {
     id: DailyTodoId,
     owner: UserId,
   ): Promise<DailyTodoWithRelationEntity>;
+
+  findByDate(
+    owner: UserId,
+    date: YearMonthDayString,
+  ): Promise<DailyTodoWithRelationEntity[]>;
 }
