@@ -53,8 +53,7 @@ export class DailyTodoEntity extends BaseEntity {
   @Prop({
     type: Types.ObjectId,
     ref: "category",
-    required: false,
-    default: null,
+    required: true,
   })
   category: Types.ObjectId;
 }
