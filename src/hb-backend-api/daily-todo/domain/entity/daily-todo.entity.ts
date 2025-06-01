@@ -53,8 +53,7 @@ export class DailyTodoEntity extends BaseEntity {
   @Prop({
     type: Types.ObjectId,
     ref: "category",
-    required: false,
-    default: null,
+    required: true,
   })
   category: Types.ObjectId;
 }
@@ -67,7 +66,7 @@ export class DailyTodoCreateEntitySchema {
     private readonly reaction: string | null,
     private readonly progress: DailyTodoCompleteStatus,
     private readonly cycle: DailyTodoCycle,
-    private readonly category: CategoryId | null,
+    private readonly category: CategoryId,
   ) {
     this.title = title;
     this.date = date;
@@ -85,7 +84,7 @@ export class DailyTodoCreateEntitySchema {
     reaction: string | null,
     progress: DailyTodoCompleteStatus,
     cycle: DailyTodoCycle,
-    category: CategoryId | null,
+    category: CategoryId,
   ): DailyTodoCreateEntitySchema {
     return new DailyTodoCreateEntitySchema(
       title,
@@ -122,7 +121,7 @@ export class DailyTodoCreateEntitySchema {
     return this.cycle;
   }
 
-  public get getCategory(): CategoryId | null {
+  public get getCategory(): CategoryId {
     return this.category;
   }
 }

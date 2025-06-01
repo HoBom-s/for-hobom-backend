@@ -100,7 +100,10 @@ describe("DailyTodoQueryAdapter", () => {
           username: "Robin",
           nickname: "Robin",
         },
-        category: null,
+        category: {
+          id: new CategoryId(new Types.ObjectId()).toString(),
+          title: "Category",
+        },
       });
 
       const result = await dailyTodoQueryAdapter.findById(
@@ -113,7 +116,7 @@ describe("DailyTodoQueryAdapter", () => {
         dummyUserId,
       );
       expect(result.getTitle).toBe("Sample");
-      expect(result.getCategory?.getTitle).toBe(undefined);
+      expect(result.getCategory.getTitle).toBe("Category");
     });
 
     it("should throw NotFoundException if not found", async () => {

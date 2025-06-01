@@ -4,7 +4,7 @@ export class CreateDailyTodoCommand {
   constructor(
     private readonly title: string,
     private readonly date: Date,
-    private readonly category: CategoryId | null,
+    private readonly category: CategoryId,
   ) {
     this.title = title;
     this.date = date;
@@ -14,7 +14,7 @@ export class CreateDailyTodoCommand {
   public static of(
     title: string,
     date: Date,
-    category: CategoryId | null,
+    category: CategoryId,
   ): CreateDailyTodoCommand {
     return new CreateDailyTodoCommand(title, date, category);
   }
@@ -27,7 +27,7 @@ export class CreateDailyTodoCommand {
     return this.date;
   }
 
-  public get getCategory(): CategoryId | null {
+  public get getCategory(): CategoryId {
     return this.category;
   }
 }
