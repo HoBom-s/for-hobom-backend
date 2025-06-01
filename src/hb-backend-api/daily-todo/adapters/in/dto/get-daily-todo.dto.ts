@@ -27,7 +27,7 @@ export class GetDailyTodoDto {
     private readonly progress: DailyTodoCompleteStatus,
     private readonly cycle: DailyTodoCycle,
     private readonly owner: OwnerType,
-    private readonly category: CategoryType | null,
+    private readonly category: CategoryType,
   ) {
     this.id = id;
     this.title = title;
@@ -47,13 +47,10 @@ export class GetDailyTodoDto {
       username: entity.getOwner.getUsername,
       nickname: entity.getOwner.getNickname,
     };
-    const category: CategoryType | null =
-      entity.getCategory == null
-        ? null
-        : {
-            id: entity.getCategory.getId.toString(),
-            title: entity.getCategory.getTitle,
-          };
+    const category: CategoryType = {
+      id: entity.getCategory.getId.toString(),
+      title: entity.getCategory.getTitle,
+    };
     const reaction: ReactionType | null =
       entity.getReaction == null
         ? null

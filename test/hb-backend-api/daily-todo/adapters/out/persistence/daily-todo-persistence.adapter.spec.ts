@@ -6,6 +6,7 @@ import { DailyTodoCreateEntitySchema } from "../../../../../../src/hb-backend-ap
 import { UserId } from "../../../../../../src/hb-backend-api/user/domain/vo/user-id.vo";
 import { DailyTodoCompleteStatus } from "../../../../../../src/hb-backend-api/daily-todo/domain/enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../../../../../../src/hb-backend-api/daily-todo/domain/enums/daily-todo-cycle.enum";
+import { CategoryId } from "../../../../../../src/hb-backend-api/category/domain/vo/category-id.vo";
 
 describe("DailyTodoPersistenceAdapter", () => {
   let dailyTodoRepository: jest.Mocked<DailyTodoRepository>;
@@ -21,6 +22,7 @@ describe("DailyTodoPersistenceAdapter", () => {
   describe("save()", () => {
     it("should call dailyTodoRepository.save with the given dailyTodo", async () => {
       const userId = new UserId(new Types.ObjectId());
+      const categoryId = new CategoryId(new Types.ObjectId());
       const dailyTodo = DailyTodoCreateEntitySchema.of(
         "todo",
         new Date(),
@@ -28,7 +30,7 @@ describe("DailyTodoPersistenceAdapter", () => {
         null,
         DailyTodoCompleteStatus.PROGRESS,
         DailyTodoCycle.EVERYDAY,
-        null,
+        categoryId,
       );
 
       await dailyTodoPersistenceAdapter.save(dailyTodo);

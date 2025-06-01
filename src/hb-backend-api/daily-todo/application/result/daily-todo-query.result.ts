@@ -17,7 +17,7 @@ export class DailyTodoWithRelationQueryResult {
     private readonly progress: DailyTodoCompleteStatus,
     private readonly cycle: DailyTodoCycle,
     private readonly owner: Owner,
-    private readonly category: Category | null,
+    private readonly category: Category,
   ) {
     this.id = id;
     this.title = title;
@@ -72,7 +72,7 @@ export class DailyTodoWithRelationQueryResult {
     return this.owner;
   }
 
-  public get getCategory(): Category | null {
+  public get getCategory(): Category {
     return this.category;
   }
 }

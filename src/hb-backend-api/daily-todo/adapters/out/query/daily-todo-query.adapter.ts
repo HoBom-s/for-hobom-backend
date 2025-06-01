@@ -12,7 +12,6 @@ import {
 } from "../../../domain/entity/daily-todo.retations";
 import { CategoryId } from "../../../../category/domain/vo/category-id.vo";
 import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
-import { ObjectHelper } from "../../../../../shared/object/object.helper";
 import { YearMonthDayString } from "../../../domain/vo/year-month-day-string.vo";
 
 @Injectable()
@@ -74,14 +73,10 @@ export class DailyTodoQueryAdapter implements DailyTodoQueryPort {
         dailyTodo.owner.username,
         dailyTodo.owner.nickname,
       ),
-      dailyTodo.category == null
-        ? null
-        : ObjectHelper.isEmpty(dailyTodo?.category)
-          ? null
-          : Category.of(
-              CategoryId.fromString(dailyTodo.category.id),
-              dailyTodo.category.title,
-            ),
+      Category.of(
+        CategoryId.fromString(dailyTodo.category.id),
+        dailyTodo.category.title,
+      ),
     );
   }
 }
