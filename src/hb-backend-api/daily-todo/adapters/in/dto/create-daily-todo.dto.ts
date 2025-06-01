@@ -16,5 +16,6 @@ export class CreateDailyTodoDto {
   @ApiProperty({ type: "string" })
   @IsOptional()
   @IsString({ message: "카테고리는 문자열이어야 해요." })
-  category: string | null;
+  @IsNotEmpty({ message: "데일리 투두의 카테고리는 필수에요." })
+  category: string;
 }

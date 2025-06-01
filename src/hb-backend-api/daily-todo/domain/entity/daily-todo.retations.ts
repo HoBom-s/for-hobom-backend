@@ -19,7 +19,7 @@ export interface DailyTodoWithRelations {
   category: {
     id: string;
     title: string;
-  } | null;
+  };
 }
 
 export class Owner {
@@ -103,7 +103,7 @@ export class DailyTodoWithRelationEntity {
     private readonly progress: DailyTodoCompleteStatus,
     private readonly cycle: DailyTodoCycle,
     private readonly owner: Owner,
-    private readonly category: Category | null,
+    private readonly category: Category,
   ) {
     this.id = id;
     this.title = title;
@@ -123,7 +123,7 @@ export class DailyTodoWithRelationEntity {
     progress: DailyTodoCompleteStatus,
     cycle: DailyTodoCycle,
     owner: Owner,
-    category: Category | null,
+    category: Category,
   ): DailyTodoWithRelationEntity {
     return new DailyTodoWithRelationEntity(
       id,
@@ -165,7 +165,7 @@ export class DailyTodoWithRelationEntity {
     return this.owner;
   }
 
-  public get getCategory(): Category | null {
+  public get getCategory(): Category {
     return this.category;
   }
 }

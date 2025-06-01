@@ -133,8 +133,7 @@ export class DailyTodoController {
       UserNickname.fromString(userInfo.nickname),
     );
 
-    const categoryId =
-      body.category == null ? null : CategoryId.fromString(body.category);
+    const categoryId = CategoryId.fromString(body.category);
 
     await this.createDailyTOdoUseCase.invoke(
       CreateDailyTodoCommand.of(
