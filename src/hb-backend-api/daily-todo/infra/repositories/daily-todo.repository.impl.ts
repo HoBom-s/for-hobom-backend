@@ -46,7 +46,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
           reaction: dailyTodoCreateSchemaEntity.getReaction,
           progress: dailyTodoCreateSchemaEntity.getProgress,
           cycle: dailyTodoCreateSchemaEntity.getCycle,
-          category: dailyTodoCreateSchemaEntity.getCategory.raw,
+          category: dailyTodoCreateSchemaEntity.getCategory,
         },
       ],
       {
