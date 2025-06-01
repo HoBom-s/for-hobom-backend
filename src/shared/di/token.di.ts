@@ -1,5 +1,4 @@
 import { DITokenRegister } from "./token-registry.di";
-import { GetDailyTodoByDateUseCase } from "../../hb-backend-api/daily-todo/application/ports/in/get-daily-todo-by-date.use-case";
 
 export class DIToken {
   public static readonly AuthModule = class extends DITokenRegister {
