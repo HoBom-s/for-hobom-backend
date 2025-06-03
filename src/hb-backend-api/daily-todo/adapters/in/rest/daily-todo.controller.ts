@@ -9,7 +9,13 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { CreateDailyTodoUseCase } from "../../../application/ports/in/create-daily-todo.use-case";
 import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
@@ -66,7 +72,11 @@ export class DailyTodoController {
     private readonly getDailyTodoByDateUseCase: GetDailyTodoByDateUseCase,
   ) {}
 
-  @ApiOperation({ description: "데일리 투두 모두 조회" })
+  @ApiOperation({
+    summary: "데일리 투두 모두 조회",
+    description: "데일리 투두 모두 조회",
+  })
+  @ApiResponse({ type: [GetDailyTodoDto] })
   @ApiQuery({ name: "date", type: String })
   @UseGuards(JwtAuthGuard)
   @Get("")
@@ -86,7 +96,11 @@ export class DailyTodoController {
     return dailyTodos.map(GetDailyTodoDto.from);
   }
 
-  @ApiOperation({ description: "데일리 투두 단건 조회" })
+  @ApiOperation({
+    summary: "데일리 투두 단건 조회",
+    description: "데일리 투두 단건 조회",
+  })
+  @ApiResponse({ type: GetDailyTodoDto })
   @ApiParam({ name: "id", type: String })
   @UseGuards(JwtAuthGuard)
   @Get(":id")
@@ -103,7 +117,11 @@ export class DailyTodoController {
     return GetDailyTodoDto.from(dailyTodo);
   }
 
-  @ApiOperation({ description: "데일리 투두 날짜로 조회" })
+  @ApiOperation({
+    summary: "데일리 투두 날짜로 조회",
+    description: "데일리 투두 날짜로 조회",
+  })
+  @ApiResponse({ type: [GetDailyTodoDto] })
   @UseGuards(JwtAuthGuard)
   @Get("/by-date/:date")
   public async findByDate(
@@ -122,7 +140,10 @@ export class DailyTodoController {
     return dailyTodos.map(GetDailyTodoDto.from);
   }
 
-  @ApiOperation({ description: "데일리 투두 생성" })
+  @ApiOperation({
+    summary: "데일리 투두 생성",
+    description: "데일리 투두 생성",
+  })
   @UseGuards(JwtAuthGuard)
   @Post("")
   public async create(
@@ -145,7 +166,10 @@ export class DailyTodoController {
     );
   }
 
-  @ApiOperation({ description: "데일리 투두 완료 상태 변경" })
+  @ApiOperation({
+    summary: "데일리 투두 완료 상태 변경",
+    description: "데일리 투두 완료 상태 변경",
+  })
   @UseGuards(JwtAuthGuard)
   @Patch("/:id/complete-status")
   public async changeCompleteStatus(
@@ -164,7 +188,10 @@ export class DailyTodoController {
     );
   }
 
-  @ApiOperation({ description: "데일리 투두 반복 주기 변경" })
+  @ApiOperation({
+    summary: "데일리 투두 반복 주기 변경",
+    description: "데일리 투두 반복 주기 변경",
+  })
   @UseGuards(JwtAuthGuard)
   @Patch("/:id/cycle-status")
   public async changeCycleStatus(
@@ -183,7 +210,10 @@ export class DailyTodoController {
     );
   }
 
-  @ApiOperation({ description: "데일리 투두 리액션 변경" })
+  @ApiOperation({
+    summary: "데일리 투두 리액션 변경",
+    description: "데일리 투두 리액션 변경",
+  })
   @UseGuards(JwtAuthGuard)
   @Patch("/:id/reaction")
   public async updateReaction(

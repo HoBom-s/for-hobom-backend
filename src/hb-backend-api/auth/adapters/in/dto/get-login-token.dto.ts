@@ -1,10 +1,14 @@
 import { LoginAuthResult } from "../../../application/result/login-auth.result";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class GetLoginTokenDto {
-  constructor(
-    private readonly accessToken: string,
-    private readonly refreshToken: string,
-  ) {
+  @ApiProperty({ type: "string" })
+  accessToken: string;
+
+  @ApiProperty({ type: "string" })
+  refreshToken: string;
+
+  constructor(accessToken: string, refreshToken: string) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
   }

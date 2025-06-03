@@ -1,11 +1,24 @@
 import { CategoryQueryResult } from "../../../application/result/category-query.result";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class GetCategoryDto {
+  @ApiProperty({ type: String })
+  id: string;
+
+  @ApiProperty({ type: String })
+  title: string;
+
+  @ApiProperty({ type: String })
+  ownerId: string;
+
+  @ApiProperty({ type: [String] })
+  dailyTodos: string[];
+
   constructor(
-    private readonly id: string,
-    private readonly title: string,
-    private readonly ownerId: string,
-    private readonly dailyTodos: string[],
+    id: string,
+    title: string,
+    ownerId: string,
+    dailyTodos: string[],
   ) {
     this.id = id;
     this.title = title;

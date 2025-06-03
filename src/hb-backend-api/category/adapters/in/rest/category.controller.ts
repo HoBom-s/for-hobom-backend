@@ -1,4 +1,4 @@
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import {
   Body,
   Controller,
@@ -51,7 +51,11 @@ export class CategoryController {
     private readonly deleteCategoryUseCase: DeleteCategoryUseCase,
   ) {}
 
-  @ApiOperation({ description: "모든 카테고리 조회" })
+  @ApiOperation({
+    summary: "모든 카테고리 조회",
+    description: "모든 카테고리 조회",
+  })
+  @ApiResponse({ type: [GetCategoryDto] })
   @UseGuards(JwtAuthGuard)
   @Get("")
   public async getAll(
@@ -65,8 +69,12 @@ export class CategoryController {
     return categories.map(GetCategoryDto.from);
   }
 
-  @ApiOperation({ description: "카테고리 단건 조회" })
+  @ApiOperation({
+    summary: "카테고리 단건 조회",
+    description: "카테고리 단건 조회",
+  })
   @ApiParam({ name: "id", type: String })
+  @ApiResponse({ type: GetCategoryDto })
   @UseGuards(JwtAuthGuard)
   @Get(":id")
   public async getOne(
@@ -81,7 +89,10 @@ export class CategoryController {
     return GetCategoryDto.from(category);
   }
 
-  @ApiOperation({ description: "카테고리 생성" })
+  @ApiOperation({
+    summary: "카테고리 생성",
+    description: "카테고리 생성",
+  })
   @UseGuards(JwtAuthGuard)
   @Post("")
   public async createCategory(
@@ -100,7 +111,10 @@ export class CategoryController {
     );
   }
 
-  @ApiOperation({ description: "카테고리 수정" })
+  @ApiOperation({
+    summary: "카테고리 수정",
+    description: "카테고리 수정",
+  })
   @ApiParam({ name: "id", type: String })
   @UseGuards(JwtAuthGuard)
   @Patch(":id")
@@ -119,7 +133,10 @@ export class CategoryController {
     );
   }
 
-  @ApiOperation({ description: "카테고리 삭제" })
+  @ApiOperation({
+    summary: "카테고리 삭제",
+    description: "카테고리 삭제",
+  })
   @ApiParam({ name: "id", type: String })
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
