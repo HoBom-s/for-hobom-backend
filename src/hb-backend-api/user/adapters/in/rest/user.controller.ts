@@ -7,7 +7,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { CreateUserUseCase } from "../../../application/ports/in/create-user.use-case";
 import { CreateUserDto } from "../dto/create-user.dto";
@@ -29,7 +29,11 @@ export class UserController {
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
-  @ApiOperation({ description: "UserId 로 사용자 조회" })
+  @ApiOperation({
+    summary: "UserId 로 사용자 조회",
+    description: "UserId 로 사용자 조회",
+  })
+  @ApiResponse({ type: GetUserDto })
   @ApiParam({ name: "id", type: String })
   @UseGuards(JwtAuthGuard)
   @Get(":id")
@@ -41,7 +45,10 @@ export class UserController {
     return GetUserDto.from(foundUser);
   }
 
-  @ApiOperation({ description: "사용자 생성" })
+  @ApiOperation({
+    summary: "사용자 생성",
+    description: "사용자 생성",
+  })
   @Post("")
   public async createUser(@Body() body: CreateUserDto): Promise<void> {
     const { username, password, nickname } = body;
