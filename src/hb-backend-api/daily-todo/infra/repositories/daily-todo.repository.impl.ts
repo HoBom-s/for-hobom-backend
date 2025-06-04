@@ -205,4 +205,22 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
     );
     cache.clear();
   }
+
+  public async deleteDailyTodoById(
+    id: DailyTodoId,
+    owner: UserId,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
+    await this.dailyTodoModel.deleteOne(
+      {
+        _id: id.raw,
+        owner: owner.raw,
+      },
+      {
+        session: session,
+      },
+    );
+    cache.clear();
+  }
 }

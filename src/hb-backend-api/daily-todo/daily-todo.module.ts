@@ -21,6 +21,8 @@ import { GetDailyTodoByIdController } from "./adapters/in/rest/gat-daily-todo-by
 import { GetAllDailyTodoController } from "./adapters/in/rest/get-all-daily-todo.controller";
 import { UpdateDailyTodoCompleteStatusController } from "./adapters/in/rest/update-daily-todo-complete-status.controller";
 import { UpdateDailyTodoCycleStatusController } from "./adapters/in/rest/update-daily-todo-cycle-status.controller";
+import { DeleteDailyTodoService } from "./application/use-cases/delete-daily-todo.service";
+import { DeleteDailyTodoController } from "./adapters/in/rest/delete-daily-todo.controller";
 
 @Module({
   imports: [
@@ -73,6 +75,10 @@ import { UpdateDailyTodoCycleStatusController } from "./adapters/in/rest/update-
       provide: DIToken.DailyTodoModule.GetDailyTodoByDateUseCase,
       useClass: GetDailyTodoByDateService,
     },
+    {
+      provide: DIToken.DailyTodoModule.DeleteDailyTodoUseCase,
+      useClass: DeleteDailyTodoService,
+    },
   ],
   controllers: [
     CreateDailyTodoController,
@@ -82,6 +88,7 @@ import { UpdateDailyTodoCycleStatusController } from "./adapters/in/rest/update-
     UpdateDailyTodoCompleteStatusController,
     UpdateDailyTodoCycleStatusController,
     UpdateDailyTodoReactionController,
+    DeleteDailyTodoController,
   ],
   exports: [
     MongooseModule,
@@ -95,6 +102,7 @@ import { UpdateDailyTodoCycleStatusController } from "./adapters/in/rest/update-
     DIToken.DailyTodoModule.UpdateDailyTodoCycleUseCase,
     DIToken.DailyTodoModule.UpdateDailyTodoReactionUseCase,
     DIToken.DailyTodoModule.GetDailyTodoByDateUseCase,
+    DIToken.DailyTodoModule.DeleteDailyTodoUseCase,
   ],
 })
 export class DailyTodoModule {}

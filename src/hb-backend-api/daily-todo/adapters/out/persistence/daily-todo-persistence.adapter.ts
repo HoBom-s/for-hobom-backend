@@ -49,4 +49,11 @@ export class DailyTodoPersistenceAdapter implements DailyTodoPersistencePort {
   ): Promise<void> {
     await this.dailyTodoRepository.updateDailyTodoReaction(id, owner, reaction);
   }
+
+  public async deleteDailyTodoById(
+    id: DailyTodoId,
+    owner: UserId,
+  ): Promise<void> {
+    await this.dailyTodoRepository.deleteDailyTodoById(id, owner);
+  }
 }
