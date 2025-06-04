@@ -10,9 +10,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle("HoBom Backend API Document 🐻🦊")
-    .setDescription("HoBom System")
-    .setVersion("1.0")
-    .addTag("HoBom")
+    .setDescription("HoBom System Backend")
+    .setVersion("1.1.0")
+    .setLicense("HoBom", "https://github.com/hobom-s")
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api-docs", app, documentFactory);

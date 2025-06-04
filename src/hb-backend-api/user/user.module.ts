@@ -4,12 +4,13 @@ import { UserEntity } from "./domain/entity/user.entity";
 import { UserSchema } from "./domain/entity/user.schema";
 import { UserPersistenceAdapter } from "./adapters/out/persistence/user-persistence.adapter";
 import { CreateUserService } from "./application/use-cases/create-user.service";
-import { UserController } from "./adapters/in/rest/user.controller";
+import { CreateUserController } from "./adapters/in/rest/create-user.controller";
 import { UserQueryAdapter } from "./adapters/out/query/user-query.adapter";
 import { GetUserService } from "./application/use-cases/get-user.service";
 import { UserRepositoryImpl } from "./infra/repositories/user.repository.impl";
 import { DIToken } from "../../shared/di/token.di";
 import { GetUserByNicknameService } from "./application/use-cases/get-user-by-nickname.service";
+import { GetUserByIdController } from "./adapters/in/rest/get-user-by-id.controller";
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { GetUserByNicknameService } from "./application/use-cases/get-user-by-ni
       },
     ]),
   ],
-  controllers: [UserController],
+  controllers: [CreateUserController, GetUserByIdController],
   providers: [
     {
       provide: DIToken.UserModule.UserRepository,
