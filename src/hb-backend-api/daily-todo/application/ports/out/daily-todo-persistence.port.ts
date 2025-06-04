@@ -25,4 +25,6 @@ export interface DailyTodoPersistencePort {
     owner: UserId,
     reaction: Reaction,
   ): Promise<void>;
+
+  deleteDailyTodoById(id: DailyTodoId, owner: UserId): Promise<void>;
 }
