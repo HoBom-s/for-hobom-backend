@@ -3,7 +3,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { DailyTodoEntity } from "./domain/entity/daily-todo.entity";
 import { DailyTodoSchema } from "./domain/entity/daily-todo.schema";
 import { UserModule } from "../user/user.module";
-import { DailyTodoController } from "./adapters/in/rest/daily-todo.controller";
+import { UpdateDailyTodoReactionController } from "./adapters/in/rest/update-daily-todo-reaction.controller";
 import { DIToken } from "../../shared/di/token.di";
 import { DailyTodoRepositoryImpl } from "./infra/repositories/daily-todo.repository.impl";
 import { DailyTodoPersistenceAdapter } from "./adapters/out/persistence/daily-todo-persistence.adapter";
@@ -15,6 +15,14 @@ import { UpdateDailyTodoCompleteStatusService } from "./application/use-cases/up
 import { UpdateDailyTodoCycleService } from "./application/use-cases/update-daily-todo-cycle.service";
 import { UpdateDailyTodoReactionService } from "./application/use-cases/update-daily-todo-reaction.service";
 import { GetDailyTodoByDateService } from "./application/use-cases/get-daily-todo-by-date.service";
+import { CreateDailyTodoController } from "./adapters/in/rest/create-daily-todo.controller";
+import { GetAllDailyTodoByDateController } from "./adapters/in/rest/gat-all-daily-todo-by-date.controller";
+import { GetDailyTodoByIdController } from "./adapters/in/rest/gat-daily-todo-by-id.controller";
+import { GetAllDailyTodoController } from "./adapters/in/rest/get-all-daily-todo.controller";
+import { UpdateDailyTodoCompleteStatusController } from "./adapters/in/rest/update-daily-todo-complete-status.controller";
+import { UpdateDailyTodoCycleStatusController } from "./adapters/in/rest/update-daily-todo-cycle-status.controller";
+import { DeleteDailyTodoService } from "./application/use-cases/delete-daily-todo.service";
+import { DeleteDailyTodoController } from "./adapters/in/rest/delete-daily-todo.controller";
 
 @Module({
   imports: [
@@ -67,8 +75,21 @@ import { GetDailyTodoByDateService } from "./application/use-cases/get-daily-tod
       provide: DIToken.DailyTodoModule.GetDailyTodoByDateUseCase,
       useClass: GetDailyTodoByDateService,
     },
+    {
+      provide: DIToken.DailyTodoModule.DeleteDailyTodoUseCase,
+      useClass: DeleteDailyTodoService,
+    },
   ],
-  controllers: [DailyTodoController],
+  controllers: [
+    CreateDailyTodoController,
+    GetAllDailyTodoByDateController,
+    GetDailyTodoByIdController,
+    GetAllDailyTodoController,
+    UpdateDailyTodoCompleteStatusController,
+    UpdateDailyTodoCycleStatusController,
+    UpdateDailyTodoReactionController,
+    DeleteDailyTodoController,
+  ],
   exports: [
     MongooseModule,
     DIToken.DailyTodoModule.DailyTodoRepository,
@@ -81,6 +102,7 @@ import { GetDailyTodoByDateService } from "./application/use-cases/get-daily-tod
     DIToken.DailyTodoModule.UpdateDailyTodoCycleUseCase,
     DIToken.DailyTodoModule.UpdateDailyTodoReactionUseCase,
     DIToken.DailyTodoModule.GetDailyTodoByDateUseCase,
+    DIToken.DailyTodoModule.DeleteDailyTodoUseCase,
   ],
 })
 export class DailyTodoModule {}
