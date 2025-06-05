@@ -37,6 +37,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
     dailyTodoCreateSchemaEntity: DailyTodoCreateEntitySchema,
   ): Promise<void> {
     const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
     await this.dailyTodoModel.create(
       [
         {
@@ -53,6 +54,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
         session: session,
       },
     );
+    cache.clear();
   }
 
   public async findAll(
