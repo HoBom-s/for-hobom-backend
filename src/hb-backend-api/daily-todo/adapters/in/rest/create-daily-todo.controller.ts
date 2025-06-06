@@ -22,7 +22,7 @@ export class CreateDailyTodoController {
     @Inject(DIToken.UserModule.GetUserByNicknameUseCase)
     private readonly getUserByNicknameUseCase: GetUserByNicknameUseCase,
     @Inject(DIToken.DailyTodoModule.CreateDailyTodoUseCase)
-    private readonly createDailyTOdoUseCase: CreateDailyTodoUseCase,
+    private readonly createDailyTodoUseCase: CreateDailyTodoUseCase,
   ) {}
 
   @ApiOperation({
@@ -41,7 +41,7 @@ export class CreateDailyTodoController {
 
     const categoryId = CategoryId.fromString(body.category);
 
-    await this.createDailyTOdoUseCase.invoke(
+    await this.createDailyTodoUseCase.invoke(
       CreateDailyTodoCommand.of(
         body.title,
         DateHelper.parse(body.date, "KST"),

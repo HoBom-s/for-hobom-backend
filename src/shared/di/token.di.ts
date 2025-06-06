@@ -80,4 +80,18 @@ export class DIToken {
       "DeleteDailyTodoUseCase",
     );
   };
+
+  public static readonly MenuRecommendationModule = class extends DITokenRegister {
+    public static MenuRecommendationRepository = this.register(
+      "MenuRecommendationRepository",
+    );
+
+    public static MenuRecommendationPersistencePort = this.register(
+      "MenuRecommendationPersistencePort",
+    );
+
+    public static CreateMenuRecommendationUseCase = this.register(
+      "CreateMenuRecommendationUseCase",
+    );
+  };
 }

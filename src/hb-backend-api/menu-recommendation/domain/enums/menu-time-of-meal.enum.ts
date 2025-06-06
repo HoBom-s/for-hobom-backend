@@ -1,4 +1,4 @@
-export enum MenuTimeOfMealEnum {
+export enum MenuTimeOfMeal {
   BREAKFAST = "BREAKFAST",
 
   LUNCH = "LUNCH",

@@ -2,7 +2,7 @@ import { Prop, Schema } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { BaseEntity } from "../../../../shared/base/base.entity";
 import { MenuKind } from "../enums/menu-kind.enum";
-import { MenuTimeOfMealEnum } from "../enums/menu-time-of-meal.enum";
+import { MenuTimeOfMeal } from "../enums/menu-time-of-meal.enum";
 import { FoodType } from "../enums/food-type.enum";
 
 @Schema({ collection: "menu-recommendation" })
@@ -23,11 +23,11 @@ export class MenuRecommendationEntity extends BaseEntity {
 
   @Prop({
     type: String,
-    enum: MenuTimeOfMealEnum,
-    default: MenuTimeOfMealEnum.BREAKFAST,
+    enum: MenuTimeOfMeal,
+    default: MenuTimeOfMeal.BREAKFAST,
     required: true,
   })
-  timeOfMeal: MenuTimeOfMealEnum;
+  timeOfMeal: MenuTimeOfMeal;
 
   @Prop({
     type: String,
