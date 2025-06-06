@@ -5,6 +5,7 @@ import { DailyTodoModule } from "./hb-backend-api/daily-todo/daily-todo.module";
 import { CategoryModule } from "./hb-backend-api/category/category.module";
 import { AuthModule } from "./hb-backend-api/auth/auth.module";
 import { TransactionModule } from "./infra/mongo/transaction/transaction.module";
+import { MenuRecommendationModule } from "./hb-backend-api/menu-recommendation/menu-recommendation.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TransactionModule } from "./infra/mongo/transaction/transaction.module"
     DailyTodoModule,
     CategoryModule,
     AuthModule,
+    MenuRecommendationModule,
     TransactionModule,
   ],
 })
