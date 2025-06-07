@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { PickTodayMenuUseCase } from "../ports/in/pick-today-menu.use-case";
 import { TodayMenuId } from "../../domain/vo/today-menu.vo";
 import { DIToken } from "../../../../shared/di/token.di";
@@ -55,7 +55,7 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
 
   private checkCandidates(candidates: MenuRecommendationRelationEntity[]) {
     if (candidates.length === 0) {
-      throw new Error("추첨할 메뉴가 없어요.");
+      throw new BadRequestException("추첨할 메뉴가 없어요.");
     }
   }
 
