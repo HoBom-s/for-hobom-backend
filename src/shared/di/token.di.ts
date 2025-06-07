@@ -100,4 +100,16 @@ export class DIToken {
       "FindAllMenuRecommendationUseCase",
     );
   };
+
+  public static readonly TodayMenuModule = class extends DITokenRegister {
+    public static TodayMenuRepository = this.register("TodayMenuRepository");
+
+    public static TodayMenuPersistencePort = this.register(
+      "TodayMenuPersistencePort",
+    );
+
+    public static UpsertTodayMenuUseCase = this.register(
+      "UpsertTodayMenuUseCase",
+    );
+  };
 }
