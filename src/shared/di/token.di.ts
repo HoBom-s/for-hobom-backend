@@ -107,9 +107,14 @@ export class DIToken {
     public static TodayMenuPersistencePort = this.register(
       "TodayMenuPersistencePort",
     );
+    public static TodayMenuQueryPort = this.register("TodayMenuQueryPort");
 
     public static UpsertTodayMenuUseCase = this.register(
       "UpsertTodayMenuUseCase",
     );
+    public static FindTodayMenuByIdUseCase = this.register(
+      "FindTodayMenuByIdUseCase",
+    );
+    public static PickTodayMenuUseCase = this.register("PickTodayMenuUseCase");
   };
 }

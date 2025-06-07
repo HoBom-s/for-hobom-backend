@@ -6,6 +6,7 @@ import { TodayMenuPersistencePort } from "../ports/out/today-menu-persistence.po
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { UpsertTodayMenuEntity } from "../../domain/entity/upsert-today-menu.entity";
+import { TodayMenuId } from "../../domain/vo/today-menu.vo";
 
 @Injectable()
 export class UpsertTodayMenuService implements UpsertTodayMenuUseCase {
@@ -16,12 +17,12 @@ export class UpsertTodayMenuService implements UpsertTodayMenuUseCase {
   ) {}
 
   @Transactional()
-  public async invoke(command: UpsertTodayMenuCommand): Promise<void> {
-    await this.upsert(command);
+  public async invoke(command: UpsertTodayMenuCommand): Promise<TodayMenuId> {
+    return await this.upsert(command);
   }
 
-  private async upsert(command: UpsertTodayMenuCommand): Promise<void> {
-    await this.todayMenuPersistencePort.upsert(
+  private async upsert(command: UpsertTodayMenuCommand): Promise<TodayMenuId> {
+    return await this.todayMenuPersistencePort.upsert(
       UpsertTodayMenuEntity.from(command),
     );
   }

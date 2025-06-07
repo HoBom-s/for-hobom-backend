@@ -3,6 +3,7 @@ import { TodayMenuPersistencePort } from "../../../application/ports/out/today-m
 import { DIToken } from "../../../../../shared/di/token.di";
 import { TodayMenuRepository } from "../../../infra/today-menu.repository";
 import { UpsertTodayMenuEntity } from "src/hb-backend-api/today-menu/domain/entity/upsert-today-menu.entity";
+import { TodayMenuId } from "../../../domain/vo/today-menu.vo";
 
 @Injectable()
 export class TodayMenuPersistenceAdapter implements TodayMenuPersistencePort {
@@ -11,7 +12,7 @@ export class TodayMenuPersistenceAdapter implements TodayMenuPersistencePort {
     private readonly todayMenuRepository: TodayMenuRepository,
   ) {}
 
-  public async upsert(entity: UpsertTodayMenuEntity): Promise<void> {
-    await this.todayMenuRepository.upsert(entity);
+  public async upsert(entity: UpsertTodayMenuEntity): Promise<TodayMenuId> {
+    return await this.todayMenuRepository.upsert(entity);
   }
 }
