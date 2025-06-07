@@ -16,10 +16,13 @@ import { FoodType } from "../../../../../src/hb-backend-api/menu-recommendation/
 import { UserId } from "../../../../../src/hb-backend-api/user/domain/vo/user-id.vo";
 import { YearMonthDayString } from "../../../../../src/hb-backend-api/daily-todo/domain/vo/year-month-day-string.vo";
 import { TodayMenuRelationEntity } from "../../../../../src/hb-backend-api/today-menu/domain/entity/today-menu-with-relations.entity";
+import { TransactionRunner } from "../../../../../src/infra/mongo/transaction/transaction.runner";
+import { TodayMenuPersistencePort } from "../../../../../src/hb-backend-api/today-menu/application/ports/out/today-menu-persistence.port";
 
 describe("PickTodayMenuService", () => {
   let pickTodayMenuService: PickTodayMenuService;
   let todayMenuQueryPort: jest.Mocked<TodayMenuQueryPort>;
+  let todayMenuPersistencePort: jest.Mocked<TodayMenuPersistencePort>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,11 +34,26 @@ describe("PickTodayMenuService", () => {
             findById: jest.fn(),
           },
         },
+        {
+          provide: DIToken.TodayMenuModule.TodayMenuPersistencePort,
+          useValue: {
+            upsert: jest.fn(),
+          },
+        },
+        {
+          provide: TransactionRunner,
+          useValue: {
+            run: jest.fn((callback) => callback()),
+          },
+        },
       ],
     }).compile();
 
     pickTodayMenuService = module.get(PickTodayMenuService);
     todayMenuQueryPort = module.get(DIToken.TodayMenuModule.TodayMenuQueryPort);
+    todayMenuPersistencePort = module.get(
+      DIToken.TodayMenuModule.TodayMenuPersistencePort,
+    );
   });
 
   it("should pick a menu from candidates", async () => {
@@ -75,6 +93,7 @@ describe("PickTodayMenuService", () => {
     const result = await pickTodayMenuService.invoke(command);
 
     expect(result).toBe(secondMenuId);
+    expect(todayMenuPersistencePort.upsert).toHaveBeenCalledTimes(1);
   });
 
   it("should throw error if no candidates exist", async () => {
