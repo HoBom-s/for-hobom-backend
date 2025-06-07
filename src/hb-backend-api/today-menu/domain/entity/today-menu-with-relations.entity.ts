@@ -1,0 +1,73 @@
+import { MenuKind } from "../../../menu-recommendation/domain/enums/menu-kind.enum";
+import { MenuTimeOfMeal } from "../../../menu-recommendation/domain/enums/menu-time-of-meal.enum";
+import { FoodType } from "../../../menu-recommendation/domain/enums/food-type.enum";
+import { TodayMenuId } from "../vo/today-menu.vo";
+import { MenuRecommendationRelationEntity } from "../../../menu-recommendation/domain/entity/menu-recommendation-with-relations.entity";
+import { YearMonthDayString } from "../../../daily-todo/domain/vo/year-month-day-string.vo";
+
+export interface MenuItem {
+  id: string;
+  name: string;
+  menuKind: MenuKind;
+  timeOfMeal: MenuTimeOfMeal;
+  foodType: FoodType;
+  registerPerson: {
+    id: string;
+    username: string;
+    nickname: string;
+  };
+}
+
+export class TodayMenuWithRelationsEntity {
+  id: string;
+
+  recommendedMenu: MenuItem;
+
+  candidates: MenuItem[];
+
+  recommendationDate: string;
+}
+
+export class TodayMenuRelationEntity {
+  constructor(
+    private readonly id: TodayMenuId,
+    private readonly recommendedMenu: MenuRecommendationRelationEntity,
+    private readonly candidates: MenuRecommendationRelationEntity[],
+    private readonly recommendationDate: YearMonthDayString,
+  ) {
+    this.id = id;
+    this.recommendedMenu = recommendedMenu;
+    this.candidates = candidates;
+    this.recommendationDate = recommendationDate;
+  }
+
+  public static of(
+    id: TodayMenuId,
+    recommendedMenu: MenuRecommendationRelationEntity,
+    candidates: MenuRecommendationRelationEntity[],
+    recommendationDate: YearMonthDayString,
+  ): TodayMenuRelationEntity {
+    return new TodayMenuRelationEntity(
+      id,
+      recommendedMenu,
+      candidates,
+      recommendationDate,
+    );
+  }
+
+  public get getId(): TodayMenuId {
+    return this.id;
+  }
+
+  public get getRecommendedMenu(): MenuRecommendationRelationEntity {
+    return this.recommendedMenu;
+  }
+
+  public get getCandidates(): MenuRecommendationRelationEntity[] {
+    return this.candidates;
+  }
+
+  public get getRecommendationDate(): YearMonthDayString {
+    return this.recommendationDate;
+  }
+}
