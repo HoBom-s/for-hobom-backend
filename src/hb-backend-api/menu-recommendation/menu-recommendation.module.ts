@@ -8,6 +8,9 @@ import { MenuRecommendationRepositoryImpl } from "./domain/repositories/menu-rec
 import { MenuRecommendationPersistenceAdapter } from "./adapters/out/persistence/menu-recommendation-persistence.adapter";
 import { CreateMenuRecommendationService } from "./application/use-cases/create-menu-recommendation.service";
 import { CreateMenuRecommendationController } from "./adapters/in/rest/create-menu-recommendation.controller";
+import { MenuRecommendationQueryAdapter } from "./adapters/out/query/menu-recommendation-query.adapter";
+import { FindAllMenuRecommendationService } from "./application/use-cases/find-all-menu-recommendation.service";
+import { FindAllMenuRecommendationController } from "./adapters/in/rest/find-all-menu-recommendation.controller";
 
 @Module({
   imports: [
@@ -19,7 +22,10 @@ import { CreateMenuRecommendationController } from "./adapters/in/rest/create-me
     ]),
     UserModule,
   ],
-  controllers: [CreateMenuRecommendationController],
+  controllers: [
+    CreateMenuRecommendationController,
+    FindAllMenuRecommendationController,
+  ],
   providers: [
     {
       provide: DIToken.MenuRecommendationModule.MenuRecommendationRepository,
@@ -31,15 +37,26 @@ import { CreateMenuRecommendationController } from "./adapters/in/rest/create-me
       useClass: MenuRecommendationPersistenceAdapter,
     },
     {
+      provide: DIToken.MenuRecommendationModule.MenuRecommendationQueryPort,
+      useClass: MenuRecommendationQueryAdapter,
+    },
+    {
       provide: DIToken.MenuRecommendationModule.CreateMenuRecommendationUseCase,
       useClass: CreateMenuRecommendationService,
+    },
+    {
+      provide:
+        DIToken.MenuRecommendationModule.FindAllMenuRecommendationUseCase,
+      useClass: FindAllMenuRecommendationService,
     },
   ],
   exports: [
     MongooseModule,
     DIToken.MenuRecommendationModule.MenuRecommendationRepository,
     DIToken.MenuRecommendationModule.MenuRecommendationPersistencePort,
+    DIToken.MenuRecommendationModule.MenuRecommendationQueryPort,
     DIToken.MenuRecommendationModule.CreateMenuRecommendationUseCase,
+    DIToken.MenuRecommendationModule.FindAllMenuRecommendationUseCase,
   ],
 })
 export class MenuRecommendationModule {}

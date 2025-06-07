@@ -6,6 +6,8 @@ import { CreateMenuRecommendationEntity } from "../entity/create-menu-recommenda
 import { MenuRecommendationDocument } from "../entity/menu-recommendation.schema";
 import { MenuRecommendationEntity } from "../entity/menu-recommendation.entity";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
+import { MenuRecommendationWithRelationsEntity } from "../entity/menu-recommendation-with-relations.entity";
+import { MenuRecommendationAggregationHelper } from "../../adapters/out/aggregator/menu-recommendation-aggregation.helper";
 
 @Injectable()
 export class MenuRecommendationRepositoryImpl
@@ -32,5 +34,14 @@ export class MenuRecommendationRepositoryImpl
         session: session,
       },
     );
+  }
+
+  public async findAll(): Promise<MenuRecommendationWithRelationsEntity[]> {
+    return await this.menuRecommendationModel
+      .aggregate([
+        ...MenuRecommendationAggregationHelper.buildUserJoin(),
+        ...MenuRecommendationAggregationHelper.buildProject(),
+      ])
+      .exec();
   }
 }

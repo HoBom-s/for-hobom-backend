@@ -89,9 +89,15 @@ export class DIToken {
     public static MenuRecommendationPersistencePort = this.register(
       "MenuRecommendationPersistencePort",
     );
+    public static MenuRecommendationQueryPort = this.register(
+      "MenuRecommendationQueryPort",
+    );
 
     public static CreateMenuRecommendationUseCase = this.register(
       "CreateMenuRecommendationUseCase",
+    );
+    public static FindAllMenuRecommendationUseCase = this.register(
+      "FindAllMenuRecommendationUseCase",
     );
   };
 }
