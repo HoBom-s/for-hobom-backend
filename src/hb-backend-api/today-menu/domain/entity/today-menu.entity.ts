@@ -7,6 +7,7 @@ export class TodayMenuEntity extends BaseEntity {
   @Prop({
     type: Types.ObjectId,
     ref: "menu-recommendation",
+    default: null,
   })
   recommendedMenu: Types.ObjectId;
 
@@ -20,6 +21,7 @@ export class TodayMenuEntity extends BaseEntity {
   @Prop({
     type: String,
     required: true,
+    default: null,
   })
   recommendationDate: string;
 }
