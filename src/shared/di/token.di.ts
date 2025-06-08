@@ -80,4 +80,41 @@ export class DIToken {
       "DeleteDailyTodoUseCase",
     );
   };
+
+  public static readonly MenuRecommendationModule = class extends DITokenRegister {
+    public static MenuRecommendationRepository = this.register(
+      "MenuRecommendationRepository",
+    );
+
+    public static MenuRecommendationPersistencePort = this.register(
+      "MenuRecommendationPersistencePort",
+    );
+    public static MenuRecommendationQueryPort = this.register(
+      "MenuRecommendationQueryPort",
+    );
+
+    public static CreateMenuRecommendationUseCase = this.register(
+      "CreateMenuRecommendationUseCase",
+    );
+    public static FindAllMenuRecommendationUseCase = this.register(
+      "FindAllMenuRecommendationUseCase",
+    );
+  };
+
+  public static readonly TodayMenuModule = class extends DITokenRegister {
+    public static TodayMenuRepository = this.register("TodayMenuRepository");
+
+    public static TodayMenuPersistencePort = this.register(
+      "TodayMenuPersistencePort",
+    );
+    public static TodayMenuQueryPort = this.register("TodayMenuQueryPort");
+
+    public static UpsertTodayMenuUseCase = this.register(
+      "UpsertTodayMenuUseCase",
+    );
+    public static FindTodayMenuByIdUseCase = this.register(
+      "FindTodayMenuByIdUseCase",
+    );
+    public static PickTodayMenuUseCase = this.register("PickTodayMenuUseCase");
+  };
 }

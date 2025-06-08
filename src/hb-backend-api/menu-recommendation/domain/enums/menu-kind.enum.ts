@@ -1,0 +1,15 @@
+export enum MenuKind {
+  KOREAN = "KOREAN",
+
+  JAPANESE = "JAPANESE",
+
+  CHINESE = "CHINESE",
+
+  INDIAN = "INDIAN",
+
+  MEXICAN = "MEXICAN",
+
+  AMERICAN = "AMERICAN ",
+
+  ITALIAN = "ITALIAN",
+}
