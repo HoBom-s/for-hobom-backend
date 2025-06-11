@@ -37,7 +37,7 @@ export class DailyTodoAggregationHelper {
       },
       {
         $unwind: {
-          path: "$rowner",
+          path: "$owner",
         },
       },
     ];
