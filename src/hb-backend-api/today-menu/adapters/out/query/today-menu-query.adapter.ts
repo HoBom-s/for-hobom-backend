@@ -37,7 +37,9 @@ export class TodayMenuQueryAdapter implements TodayMenuQueryPort {
   ): TodayMenuRelationEntity {
     return TodayMenuRelationEntity.of(
       TodayMenuId.fromSting(entity.id),
-      this.toMenuRecommendation(entity.recommendedMenu),
+      entity.recommendedMenu?.id == null
+        ? null
+        : this.toMenuRecommendation(entity.recommendedMenu),
       entity.candidates.map(this.toMenuRecommendation),
       YearMonthDayString.fromString(entity.recommendationDate),
     );
