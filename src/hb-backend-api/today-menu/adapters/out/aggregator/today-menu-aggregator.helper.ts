@@ -47,7 +47,15 @@ export class TodayMenuAggregator {
             $map: {
               input: "$candidates",
               as: "c",
-              in: "$$c.value",
+              in: {
+                $cond: [
+                  {
+                    $eq: [{ $type: "$$c" }, "object"],
+                  },
+                  "$$c.value",
+                  "$$c",
+                ],
+              },
             },
           },
         },
