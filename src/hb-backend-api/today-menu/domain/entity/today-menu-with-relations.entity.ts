@@ -31,7 +31,7 @@ export class TodayMenuWithRelationsEntity {
 export class TodayMenuRelationEntity {
   constructor(
     private readonly id: TodayMenuId,
-    private readonly recommendedMenu: MenuRecommendationRelationEntity,
+    private readonly recommendedMenu: MenuRecommendationRelationEntity | null,
     private readonly candidates: MenuRecommendationRelationEntity[],
     private readonly recommendationDate: YearMonthDayString,
   ) {
@@ -43,7 +43,7 @@ export class TodayMenuRelationEntity {
 
   public static of(
     id: TodayMenuId,
-    recommendedMenu: MenuRecommendationRelationEntity,
+    recommendedMenu: MenuRecommendationRelationEntity | null,
     candidates: MenuRecommendationRelationEntity[],
     recommendationDate: YearMonthDayString,
   ): TodayMenuRelationEntity {
@@ -59,7 +59,10 @@ export class TodayMenuRelationEntity {
     return this.id;
   }
 
-  public get getRecommendedMenu(): MenuRecommendationRelationEntity {
+  public get getRecommendedMenu(): MenuRecommendationRelationEntity | null {
+    if (this.recommendedMenu == null) {
+      return null;
+    }
     return this.recommendedMenu;
   }
 
