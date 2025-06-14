@@ -51,10 +51,10 @@ describe("TodayMenuQueryAdapter", () => {
     const result = await todayMenuQueryAdapter.findById(todayMenuId);
 
     expect(result.getId.toString()).toBe(todayMenuId.toString());
-    expect(result.getRecommendedMenu.getId.toString()).toBe(
+    expect(result.getRecommendedMenu?.getId.toString()).toBe(
       menuRecommendationId.toString(),
     );
-    expect(result.getRecommendedMenu.getName).toBe("FoodName");
+    expect(result.getRecommendedMenu?.getName).toBe("FoodName");
     expect(result.getCandidates.length).toBe(1);
     expect(result.getRecommendationDate.value).toBe("2025-06-07");
   });

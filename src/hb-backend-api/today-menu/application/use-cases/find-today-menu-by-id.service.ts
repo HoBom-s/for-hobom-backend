@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { FindTodayMenuByIdUseCase } from "../ports/in/find-today-menu-by-id.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { TodayMenuQueryPort } from "../ports/out/today-menu-query.port";
@@ -31,6 +31,9 @@ export class FindTodayMenuByIdService implements FindTodayMenuByIdUseCase {
     entity: TodayMenuRelationEntity,
   ): GetTodayMenuQueryResult {
     const recommendedMenu = entity.getRecommendedMenu;
+    if (recommendedMenu == null) {
+      throw new NotFoundException("찾으려는 메뉴가 존재하지 않아요.");
+    }
     const candidatesMenu = entity.getCandidates;
     return GetTodayMenuQueryResult.of(
       entity.getId,
