@@ -53,7 +53,7 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
               entity.getRecommendedMenu?.raw == null
                 ? null
                 : entity.getRecommendedMenu.raw,
-            candidates: entity.getCandidates,
+            candidates: entity.getCandidates.map((item) => item.raw),
             recommendationDate:
               entity.getRecommendationDate == null
                 ? null
