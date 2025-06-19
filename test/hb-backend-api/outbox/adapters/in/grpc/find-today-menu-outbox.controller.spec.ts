@@ -8,6 +8,7 @@ import { DIToken } from "../../../../../../src/shared/di/token.di";
 import { OutboxId } from "../../../../../../src/hb-backend-api/outbox/domain/vo/outbox-id.vo";
 import { FindOutboxQueryResult } from "../../../../../../src/hb-backend-api/outbox/application/result/find-outbox-query.result";
 import { FindOutboxEntity } from "../../../../../../src/hb-backend-api/outbox/domain/entity/find-outbox.entity";
+import { FindTodayMenuOutboxResultDto } from "../../../../../../src/hb-backend-api/outbox/adapters/in/dto/find-today-menu-outbox-result.dto";
 
 describe("FindTodayMenuOutboxController", () => {
   let controller: FindTodayMenuOutboxController;
@@ -56,12 +57,13 @@ describe("FindTodayMenuOutboxController", () => {
       mockFindOutboxQueryResult,
     ]);
 
-    const result = await controller.findBy({
-      eventType: EventType.TODAY_MENU,
-      status: OutboxStatus.PENDING,
-    });
+    const result: { items: FindTodayMenuOutboxResultDto[] } =
+      await controller.findBy({
+        eventType: EventType.TODAY_MENU,
+        status: OutboxStatus.PENDING,
+      });
 
-    expect(result.length).toBe(1);
-    expect(result[0].payload.name).toBe("food name");
+    expect(result.items.length).toBe(1);
+    expect(result.items[0].payload.name).toBe("food name");
   });
 });
