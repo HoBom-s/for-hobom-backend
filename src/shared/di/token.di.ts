@@ -124,5 +124,10 @@ export class DIToken {
     public static OutboxPersistencePort = this.register(
       "OutboxPersistencePort",
     );
+    public static OutboxQueryPort = this.register("OutboxQueryPort");
+
+    public static FindOutboxByEventTypeAndStatusUseCase = this.register(
+      "FindOutboxByEventTypeAndStatusUseCase",
+    );
   };
 }

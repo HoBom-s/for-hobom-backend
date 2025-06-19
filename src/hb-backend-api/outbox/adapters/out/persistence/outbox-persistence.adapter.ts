@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { OutboxPersistencePort } from "../../../application/ports/out/outbox-persistence.port";
-import { OutboxRepository } from "../../../infra/outbox.repository";
+import { OutboxRepository } from "../../../infra/repositories/outbox.repository";
 import { CreateOutboxEntity } from "../../../domain/entity/create-outbox.entity";
 import { DIToken } from "../../../../../shared/di/token.di";
 

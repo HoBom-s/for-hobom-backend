@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import * as cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";
 import { ResponseWrapInterceptor } from "./shared/adpaters/in/rest/interceptors/wrapeed-response.interceptor";
+import { grpcOptions } from "./infra/grpc/options.grpc";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,7 +19,6 @@ async function bootstrap() {
   SwaggerModule.setup("api-docs", app, documentFactory);
 
   app.enableCors();
-
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
@@ -29,10 +29,14 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(new ResponseWrapInterceptor());
 
+  app.connectMicroservice(grpcOptions);
+
+  await app.startAllMicroservices();
   await app.listen(Number(process.env.HOBOM_BACKEND_PORT), () => {
     console.log(
-      `Welcome to the HoBom System Backend API server on port ${Number(process.env.HOBOM_BACKEND_PORT)} ! 🚀`,
+      `🚀 REST API server running on port ${process.env.HOBOM_BACKEND_PORT}`,
     );
+    console.log(`📡 gRPC server running on port 50051`);
   });
 }
 
