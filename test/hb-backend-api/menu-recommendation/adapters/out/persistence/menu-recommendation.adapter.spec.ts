@@ -19,7 +19,7 @@ describe("MenuRecommendationAdapter", () => {
   });
 
   describe("save()", () => {
-    it("should call menuRecommendationAdapter.save with the given menu recommendation entity", async () => {
+    it("should call menuRecommendationPersistenceAdapter.save with the given menu recommendation entity", async () => {
       const userId = new UserId(new Types.ObjectId());
       const menuRecommendation = CreateMenuRecommendationEntity.of(
         "menu",

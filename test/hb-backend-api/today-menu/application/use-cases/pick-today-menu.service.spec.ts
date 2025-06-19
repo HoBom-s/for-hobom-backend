@@ -18,11 +18,13 @@ import { YearMonthDayString } from "../../../../../src/hb-backend-api/daily-todo
 import { TodayMenuRelationEntity } from "../../../../../src/hb-backend-api/today-menu/domain/entity/today-menu-with-relations.entity";
 import { TransactionRunner } from "../../../../../src/infra/mongo/transaction/transaction.runner";
 import { TodayMenuPersistencePort } from "../../../../../src/hb-backend-api/today-menu/application/ports/out/today-menu-persistence.port";
+import { OutboxPersistencePort } from "../../../../../src/hb-backend-api/outbox/application/ports/out/outbox-persistence.port";
 
 describe("PickTodayMenuService", () => {
   let pickTodayMenuService: PickTodayMenuService;
   let todayMenuQueryPort: jest.Mocked<TodayMenuQueryPort>;
   let todayMenuPersistencePort: jest.Mocked<TodayMenuPersistencePort>;
+  let outboxPersistencePort: jest.Mocked<OutboxPersistencePort>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,6 +43,12 @@ describe("PickTodayMenuService", () => {
           },
         },
         {
+          provide: DIToken.OutboxModule.OutboxPersistencePort,
+          useValue: {
+            save: jest.fn(),
+          },
+        },
+        {
           provide: TransactionRunner,
           useValue: {
             run: jest.fn((callback) => callback()),
@@ -53,6 +61,9 @@ describe("PickTodayMenuService", () => {
     todayMenuQueryPort = module.get(DIToken.TodayMenuModule.TodayMenuQueryPort);
     todayMenuPersistencePort = module.get(
       DIToken.TodayMenuModule.TodayMenuPersistencePort,
+    );
+    outboxPersistencePort = module.get(
+      DIToken.OutboxModule.OutboxPersistencePort,
     );
   });
 
@@ -94,6 +105,7 @@ describe("PickTodayMenuService", () => {
 
     expect(result).toBe(secondMenuId);
     expect(todayMenuPersistencePort.upsert).toHaveBeenCalledTimes(1);
+    expect(outboxPersistencePort.save).toHaveBeenCalledTimes(1);
   });
 
   it("should throw error if no candidates exist", async () => {
