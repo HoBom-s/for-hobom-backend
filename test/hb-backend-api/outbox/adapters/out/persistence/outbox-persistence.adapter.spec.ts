@@ -1,4 +1,4 @@
-import { OutboxRepository } from "../../../../../../src/hb-backend-api/outbox/infra/outbox.repository";
+import { OutboxRepository } from "../../../../../../src/hb-backend-api/outbox/infra/repositories/outbox.repository";
 import { OutboxPersistenceAdapter } from "../../../../../../src/hb-backend-api/outbox/adapters/out/persistence/outbox-persistence.adapter";
 import { createOutboxRepository } from "../../../../../mocks/outbox.repository.mock";
 import { CreateOutboxEntity } from "../../../../../../src/hb-backend-api/outbox/domain/entity/create-outbox.entity";

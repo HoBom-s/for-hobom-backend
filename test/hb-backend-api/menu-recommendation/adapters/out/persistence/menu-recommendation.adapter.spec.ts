@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { MenuRecommendationRepository } from "../../../../../../src/hb-backend-api/menu-recommendation/infra/menu-recommendation.repository";
+import { MenuRecommendationRepository } from "../../../../../../src/hb-backend-api/menu-recommendation/infra/repositories/menu-recommendation.repository";
 import { MenuRecommendationPersistenceAdapter } from "../../../../../../src/hb-backend-api/menu-recommendation/adapters/out/persistence/menu-recommendation-persistence.adapter";
 import { createMenuRecommendationRepository } from "../../../../../mocks/menu-recommendation.repository.mock";
 import { UserId } from "../../../../../../src/hb-backend-api/user/domain/vo/user-id.vo";

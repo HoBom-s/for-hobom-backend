@@ -6,7 +6,7 @@ import {
   RegisterPerson,
 } from "src/hb-backend-api/menu-recommendation/domain/entity/menu-recommendation-with-relations.entity";
 import { DIToken } from "../../../../../shared/di/token.di";
-import { MenuRecommendationRepository } from "../../../infra/menu-recommendation.repository";
+import { MenuRecommendationRepository } from "../../../infra/repositories/menu-recommendation.repository";
 import { UserId } from "../../../../user/domain/vo/user-id.vo";
 import { MenuRecommendationId } from "../../../domain/vo/menu-recommendation-id.vo";
 

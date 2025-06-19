@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { MenuRecommendationPersistencePort } from "../../../application/ports/out/menu-recommendation-persistence.port";
-import { MenuRecommendationRepository } from "../../../infra/menu-recommendation.repository";
+import { MenuRecommendationRepository } from "../../../infra/repositories/menu-recommendation.repository";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { CreateMenuRecommendationEntity } from "../../../domain/entity/create-menu-recommendation.entity";
 

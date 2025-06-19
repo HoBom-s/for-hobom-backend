@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { MenuRecommendationRepository } from "../../infra/menu-recommendation.repository";
+import { MenuRecommendationRepository } from "../../infra/repositories/menu-recommendation.repository";
 import { CreateMenuRecommendationEntity } from "../entity/create-menu-recommendation.entity";
 import { MenuRecommendationDocument } from "../entity/menu-recommendation.schema";
 import { MenuRecommendationEntity } from "../entity/menu-recommendation.entity";
