@@ -117,4 +117,12 @@ export class DIToken {
     );
     public static PickTodayMenuUseCase = this.register("PickTodayMenuUseCase");
   };
+
+  public static readonly OutboxModule = class extends DITokenRegister {
+    public static OutboxRepository = this.register("OutboxRepository");
+
+    public static OutboxPersistencePort = this.register(
+      "OutboxPersistencePort",
+    );
+  };
 }

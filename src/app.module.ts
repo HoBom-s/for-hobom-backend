@@ -7,6 +7,7 @@ import { AuthModule } from "./hb-backend-api/auth/auth.module";
 import { TransactionModule } from "./infra/mongo/transaction/transaction.module";
 import { MenuRecommendationModule } from "./hb-backend-api/menu-recommendation/menu-recommendation.module";
 import { TodayMenuModule } from "./hb-backend-api/today-menu/today-menu.module";
+import { OutboxModule } from "./hb-backend-api/outbox/outbox.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TodayMenuModule } from "./hb-backend-api/today-menu/today-menu.module";
     AuthModule,
     MenuRecommendationModule,
     TodayMenuModule,
+    OutboxModule,
     TransactionModule,
   ],
 })

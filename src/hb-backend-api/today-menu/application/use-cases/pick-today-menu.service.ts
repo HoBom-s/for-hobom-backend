@@ -14,6 +14,11 @@ import { UpsertTodayMenuCommand } from "../command/upsert-today-menu.command";
 import { UpsertTodayMenuEntity } from "../../domain/entity/upsert-today-menu.entity";
 import { DateHelper } from "../../../../shared/date/date.helper";
 import { YearMonthDayString } from "../../../daily-todo/domain/vo/year-month-day-string.vo";
+import { OutboxPersistencePort } from "../../../outbox/application/ports/out/outbox-persistence.port";
+import { CreateOutboxEntity } from "../../../outbox/domain/entity/create-outbox.entity";
+import { EventType } from "../../../outbox/domain/enum/event-type.enum";
+import { OutboxStatus } from "../../../outbox/domain/enum/outbox-status.enum";
+import { OutboxPayloadFactoryRegistry } from "../../../outbox/domain/factories/outbox-payload-factory.registry";
 
 @Injectable()
 export class PickTodayMenuService implements PickTodayMenuUseCase {
@@ -22,6 +27,8 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
     private readonly todayMenuQueryPort: TodayMenuQueryPort,
     @Inject(DIToken.TodayMenuModule.TodayMenuPersistencePort)
     private readonly todayMenuPersistencePort: TodayMenuPersistencePort,
+    @Inject(DIToken.OutboxModule.OutboxPersistencePort)
+    private readonly outboxPersistencePort: OutboxPersistencePort,
     public readonly transactionRunner: TransactionRunner,
   ) {}
 
@@ -33,6 +40,7 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
     this.checkCandidates(menu.getCandidates);
 
     const candidates = menu.getCandidates;
+    const forPickRandomIndex = this.getRandomIndex(candidates.length);
     const pickedMenuId = this.pickCandidate(
       candidates,
       this.getRandomIndex(candidates.length),
@@ -44,6 +52,10 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
         YearMonthDayString.fromString(DateHelper.formatDate()),
         command.getId,
       ),
+    );
+    await this.saveOutboxBy(
+      pickedMenuId.toString(),
+      candidates[forPickRandomIndex].getName,
     );
 
     return pickedMenuId;
@@ -76,5 +88,30 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
     await this.todayMenuPersistencePort.upsert(
       UpsertTodayMenuEntity.from(command),
     );
+  }
+
+  private createTodayMenuOutboxEntity(
+    todayMenuId: string,
+    pickedName: string,
+  ): CreateOutboxEntity {
+    const payload = OutboxPayloadFactoryRegistry.TODAY_MENU({
+      todayMenuId: todayMenuId,
+      name: pickedName,
+    });
+    return CreateOutboxEntity.of(
+      EventType.TODAY_MENU,
+      payload,
+      OutboxStatus.PENDING,
+      1,
+      1,
+    );
+  }
+
+  private async saveOutboxBy(
+    todayMenuId: string,
+    pickedName: string,
+  ): Promise<void> {
+    const payload = this.createTodayMenuOutboxEntity(todayMenuId, pickedName);
+    await this.outboxPersistencePort.save(payload);
   }
 }
