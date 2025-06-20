@@ -8,3 +8,7 @@
 
 # env
 .env
+
+# ignore everything inside proto except the submodule itself
+/hobom-buf-proto/*
+!.gitmodules

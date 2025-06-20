@@ -7,7 +7,7 @@ export const grpcOptions: MicroserviceOptions = {
     package: "outbox",
     protoPath: join(
       __dirname,
-      "../../../src/hb-backend-api/outbox/infra/grpc/outbox.proto",
+      "../../../hobom-buf-proto/proto/menu/outbox/v1/hobom-menu-outbox.proto",
     ),
     url: "0.0.0.0:50051",
   },
