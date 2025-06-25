@@ -1,6 +1,3 @@
-[submodule "proto"]
-	path = proto
-	url = https://github.com/HoBom-s/hobom-buf-proto
 [submodule "hobom-buf-proto"]
 	path = hobom-buf-proto
 	url = https://github.com/HoBom-s/hobom-buf-proto

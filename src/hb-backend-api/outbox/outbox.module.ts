@@ -8,6 +8,8 @@ import { OutboxPersistenceAdapter } from "./adapters/out/persistence/outbox-pers
 import { OutboxQueryAdapter } from "./adapters/out/query/outbox-query.adapter";
 import { FindOutboxByEventTypeAndStatusService } from "./application/use-cases/find-outbox-by-event-type-and-status.service";
 import { FindTodayMenuOutboxController } from "./adapters/in/grpc/find-today-menu-outbox.controller";
+import { PatchOutboxMarkAsSentService } from "./application/use-cases/patch-outbox-mark-as-sent.service";
+import { PatchTodayMenuOutboxMarkAsSentController } from "./adapters/in/grpc/patch-today-menu-outbox-mark-as-sent.controller";
 
 @Module({
   imports: [
@@ -18,7 +20,10 @@ import { FindTodayMenuOutboxController } from "./adapters/in/grpc/find-today-men
       },
     ]),
   ],
-  controllers: [FindTodayMenuOutboxController],
+  controllers: [
+    FindTodayMenuOutboxController,
+    PatchTodayMenuOutboxMarkAsSentController,
+  ],
   providers: [
     {
       provide: DIToken.OutboxModule.OutboxRepository,
@@ -36,6 +41,10 @@ import { FindTodayMenuOutboxController } from "./adapters/in/grpc/find-today-men
       provide: DIToken.OutboxModule.FindOutboxByEventTypeAndStatusUseCase,
       useClass: FindOutboxByEventTypeAndStatusService,
     },
+    {
+      provide: DIToken.OutboxModule.PatchOutboxMarkAsSentUseCase,
+      useClass: PatchOutboxMarkAsSentService,
+    },
   ],
   exports: [
     MongooseModule,
@@ -43,6 +52,7 @@ import { FindTodayMenuOutboxController } from "./adapters/in/grpc/find-today-men
     DIToken.OutboxModule.OutboxPersistencePort,
     DIToken.OutboxModule.OutboxQueryPort,
     DIToken.OutboxModule.FindOutboxByEventTypeAndStatusUseCase,
+    DIToken.OutboxModule.PatchOutboxMarkAsSentUseCase,
   ],
 })
 export class OutboxModule {}
