@@ -8,6 +8,7 @@ import { CreateOutboxEntity } from "../entity/create-outbox.entity";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 import { EventType } from "../enum/event-type.enum";
 import { OutboxStatus } from "../enum/outbox-status.enum";
+import { EventId } from "../vo/event-id.vo";
 
 @Injectable()
 export class OutboxRepositoryImpl implements OutboxRepository {
@@ -34,6 +35,46 @@ export class OutboxRepositoryImpl implements OutboxRepository {
       {
         session: session,
       },
+    );
+  }
+
+  public async markAsSent(eventId: EventId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.outboxModel.updateOne(
+      { eventId: eventId.raw },
+      {
+        $set: {
+          status: OutboxStatus.SENT,
+          sentAt: new Date(),
+          lastError: null,
+        },
+        $inc: {
+          version: 1,
+        },
+      },
+      session,
+    );
+  }
+
+  public async markAsFailed(
+    eventId: EventId,
+    errorMessage: string,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.outboxModel.updateOne(
+      { eventId: eventId.raw },
+      {
+        $set: {
+          status: OutboxStatus.FAILED,
+          failedAt: new Date(),
+          lastError: errorMessage,
+        },
+        $inc: {
+          retryCount: 1,
+          version: 1,
+        },
+      },
+      session,
     );
   }
 
