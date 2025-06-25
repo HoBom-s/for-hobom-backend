@@ -20,6 +20,10 @@ describe("OutboxPersistenceAdapter", () => {
       const input = {
         todayMenuId: "1",
         name: "menu-name",
+        username: "user",
+        nickname: "nickname",
+        email: "email",
+        userId: "userId",
       };
       const factory = OutboxPayloadFactoryRegistry[EventType.TODAY_MENU];
       const payload = factory(input);

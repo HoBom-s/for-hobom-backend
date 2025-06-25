@@ -19,6 +19,8 @@ import { CreateOutboxEntity } from "../../../outbox/domain/entity/create-outbox.
 import { EventType } from "../../../outbox/domain/enum/event-type.enum";
 import { OutboxStatus } from "../../../outbox/domain/enum/outbox-status.enum";
 import { OutboxPayloadFactoryRegistry } from "../../../outbox/domain/factories/outbox-payload-factory.registry";
+import { UserQueryPort } from "../../../user/application/ports/out/user-query.port";
+import { UserId } from "../../../user/domain/vo/user-id.vo";
 
 @Injectable()
 export class PickTodayMenuService implements PickTodayMenuUseCase {
@@ -29,6 +31,8 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
     private readonly todayMenuPersistencePort: TodayMenuPersistencePort,
     @Inject(DIToken.OutboxModule.OutboxPersistencePort)
     private readonly outboxPersistencePort: OutboxPersistencePort,
+    @Inject(DIToken.UserModule.UserQueryPort)
+    private readonly userQueryPort: UserQueryPort,
     public readonly transactionRunner: TransactionRunner,
   ) {}
 
@@ -56,6 +60,7 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
     await this.saveOutboxBy(
       pickedMenuId.toString(),
       candidates[forPickRandomIndex].getName,
+      candidates[forPickRandomIndex].getRegisterPerson.getId,
     );
 
     return pickedMenuId;
@@ -90,13 +95,19 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
     );
   }
 
-  private createTodayMenuOutboxEntity(
+  private async createTodayMenuOutboxEntity(
     todayMenuId: string,
     pickedName: string,
-  ): CreateOutboxEntity {
+    userId: UserId,
+  ): Promise<CreateOutboxEntity> {
+    const userInformation = await this.userQueryPort.findById(userId);
     const payload = OutboxPayloadFactoryRegistry.TODAY_MENU({
       todayMenuId: todayMenuId,
       name: pickedName,
+      username: userInformation.getUsername,
+      nickname: userInformation.getNickname,
+      email: userInformation.getEmail,
+      userId: userInformation.getId.toString(),
     });
     return CreateOutboxEntity.of(
       EventType.TODAY_MENU,
@@ -110,8 +121,13 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
   private async saveOutboxBy(
     todayMenuId: string,
     pickedName: string,
+    userId: UserId,
   ): Promise<void> {
-    const payload = this.createTodayMenuOutboxEntity(todayMenuId, pickedName);
+    const payload = await this.createTodayMenuOutboxEntity(
+      todayMenuId,
+      pickedName,
+      userId,
+    );
     await this.outboxPersistencePort.save(payload);
   }
 }

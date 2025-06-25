@@ -6,6 +6,10 @@ describe("OutboxPayloadFactoryRegistry", () => {
     const input = {
       todayMenuId: "1",
       name: "menu-name",
+      username: "user",
+      nickname: "nickname",
+      email: "email",
+      userId: "userId",
     };
 
     const factory = OutboxPayloadFactoryRegistry[EventType.TODAY_MENU];
@@ -15,6 +19,10 @@ describe("OutboxPayloadFactoryRegistry", () => {
     expect(payload).toEqual({
       todayMenuId: "1",
       name: "menu-name",
+      username: "user",
+      nickname: "nickname",
+      email: "email",
+      userId: "userId",
     });
   });
 

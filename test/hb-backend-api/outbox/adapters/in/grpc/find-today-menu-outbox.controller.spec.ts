@@ -41,6 +41,10 @@ describe("FindTodayMenuOutboxController", () => {
       payload: {
         todayMenuId: "menu-1",
         name: "food name",
+        username: "user",
+        nickname: "nickname",
+        email: "email",
+        userId: "userId",
       },
       status: OutboxStatus.PENDING,
       retryCount: 0,

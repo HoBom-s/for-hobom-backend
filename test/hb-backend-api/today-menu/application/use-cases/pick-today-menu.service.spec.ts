@@ -19,12 +19,15 @@ import { TodayMenuRelationEntity } from "../../../../../src/hb-backend-api/today
 import { TransactionRunner } from "../../../../../src/infra/mongo/transaction/transaction.runner";
 import { TodayMenuPersistencePort } from "../../../../../src/hb-backend-api/today-menu/application/ports/out/today-menu-persistence.port";
 import { OutboxPersistencePort } from "../../../../../src/hb-backend-api/outbox/application/ports/out/outbox-persistence.port";
+import { UserQueryPort } from "../../../../../src/hb-backend-api/user/application/ports/out/user-query.port";
+import { UserEntitySchema } from "../../../../../src/hb-backend-api/user/domain/entity/user.entity";
 
 describe("PickTodayMenuService", () => {
   let pickTodayMenuService: PickTodayMenuService;
   let todayMenuQueryPort: jest.Mocked<TodayMenuQueryPort>;
   let todayMenuPersistencePort: jest.Mocked<TodayMenuPersistencePort>;
   let outboxPersistencePort: jest.Mocked<OutboxPersistencePort>;
+  let userQueryPort: jest.Mocked<UserQueryPort>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -49,6 +52,12 @@ describe("PickTodayMenuService", () => {
           },
         },
         {
+          provide: DIToken.UserModule.UserQueryPort,
+          useValue: {
+            findById: jest.fn(),
+          },
+        },
+        {
           provide: TransactionRunner,
           useValue: {
             run: jest.fn((callback) => callback()),
@@ -65,6 +74,7 @@ describe("PickTodayMenuService", () => {
     outboxPersistencePort = module.get(
       DIToken.OutboxModule.OutboxPersistencePort,
     );
+    userQueryPort = module.get(DIToken.UserModule.UserQueryPort);
   });
 
   it("should pick a menu from candidates", async () => {
@@ -97,6 +107,15 @@ describe("PickTodayMenuService", () => {
       menuCandidates,
       YearMonthDayString.fromString("2025-06-07"),
     );
+    const user = UserEntitySchema.of(
+      new UserId(new Types.ObjectId()),
+      "user",
+      "email",
+      "nickname",
+      "password",
+      [new Types.ObjectId()],
+    );
+    userQueryPort.findById.mockResolvedValue(user);
     todayMenuQueryPort.findById.mockResolvedValue(todayMenu);
     // 0.9 * 2 = 1.8 → floor = 1
     jest.spyOn(Math, "random").mockReturnValue(0.9);
@@ -105,6 +124,7 @@ describe("PickTodayMenuService", () => {
 
     expect(result).toBe(secondMenuId);
     expect(todayMenuPersistencePort.upsert).toHaveBeenCalledTimes(1);
+    expect(userQueryPort.findById).toHaveBeenCalledTimes(1);
     expect(outboxPersistencePort.save).toHaveBeenCalledTimes(1);
   });
 

@@ -1,9 +1,16 @@
 import { EventType } from "../enum/event-type.enum";
-import { createTodayMenuPayload } from "./today-menu.payload";
+import { createTodayMenuPayload, TodayMenuPayload } from "./today-menu.payload";
 
-export const OutboxPayloadFactoryRegistry: Record<
-  EventType,
-  (input: any) => Record<string, string>
-> = {
+interface EventInputMap {
+  [EventType.TODAY_MENU]: TodayMenuPayload;
+}
+
+type OutboxPayloadFactory<T> = (input: T) => Record<string, string>;
+
+type OutboxPayloadFactoryRegistryType = {
+  [K in EventType]: OutboxPayloadFactory<EventInputMap[K]>;
+};
+
+export const OutboxPayloadFactoryRegistry: OutboxPayloadFactoryRegistryType = {
   [EventType.TODAY_MENU]: createTodayMenuPayload,
 };

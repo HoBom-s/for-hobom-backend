@@ -14,6 +14,7 @@ import { FindTodayMenuByIdController } from "./adapters/in/rest/find-today-menu-
 import { PickTodayMenuService } from "./application/use-cases/pick-today-menu.service";
 import { PickTodayMenuController } from "./adapters/in/rest/pick-today-menu.controller";
 import { OutboxModule } from "../outbox/outbox.module";
+import { UserModule } from "../user/user.module";
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { OutboxModule } from "../outbox/outbox.module";
     ]),
     MenuRecommendationModule,
     OutboxModule,
+    UserModule,
   ],
   controllers: [
     UpsertTodayMenuController,
