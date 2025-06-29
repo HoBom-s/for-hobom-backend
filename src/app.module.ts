@@ -8,6 +8,11 @@ import { TransactionModule } from "./infra/mongo/transaction/transaction.module"
 import { MenuRecommendationModule } from "./hb-backend-api/menu-recommendation/menu-recommendation.module";
 import { TodayMenuModule } from "./hb-backend-api/today-menu/today-menu.module";
 import { OutboxModule } from "./hb-backend-api/outbox/outbox.module";
+import { TraceContext } from "./shared/trace/trace.context";
+import { APP_INTERCEPTOR } from "@nestjs/core";
+import { TraceInterceptor } from "./shared/adpaters/in/rest/interceptors/trace.interceptor";
+import { HttpLogInterceptor } from "./shared/adpaters/in/rest/interceptors/log.interceptor";
+import { UserModule } from "./hb-backend-api/user/user.module";
 
 @Module({
   imports: [
@@ -21,7 +26,19 @@ import { OutboxModule } from "./hb-backend-api/outbox/outbox.module";
     MenuRecommendationModule,
     TodayMenuModule,
     OutboxModule,
+    UserModule,
     TransactionModule,
+  ],
+  providers: [
+    TraceContext,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TraceInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpLogInterceptor,
+    },
   ],
 })
 export class AppModule {}
