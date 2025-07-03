@@ -6,8 +6,11 @@ import { EventType } from "../../../domain/enum/event-type.enum";
 import { OutboxStatus } from "../../../domain/enum/outbox-status.enum";
 import { FindOutboxEntity } from "../../../domain/entity/find-outbox.entity";
 import { OutboxDocument } from "../../../domain/entity/outbox.schema";
-import type { TodayMenuPayload } from "../../../domain/factories/today-menu.payload";
 import { OutboxId } from "../../../domain/vo/outbox-id.vo";
+import {
+  payloadCaster,
+  PayloadMap,
+} from "../../../domain/entity/outbox-payload.parser";
 
 @Injectable()
 export class OutboxQueryAdapter implements OutboxQueryPort {
@@ -35,12 +38,13 @@ export class OutboxQueryAdapter implements OutboxQueryPort {
   }
 
   private toResult(outboxResults: OutboxDocument[]): FindOutboxEntity[] {
-    return outboxResults.map((item) =>
-      FindOutboxEntity.of({
+    return outboxResults.map((item) => {
+      const parsedPayload = this.parsePayload(item.eventType, item.payload);
+      return FindOutboxEntity.of({
         id: OutboxId.fromString(String(item._id)),
         eventId: item.eventId,
         eventType: item.eventType,
-        payload: item.payload as TodayMenuPayload,
+        payload: parsedPayload,
         status: item.status,
         retryCount: item.retryCount,
         sentAt: item.sentAt,
@@ -49,7 +53,14 @@ export class OutboxQueryAdapter implements OutboxQueryPort {
         version: item.version,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
-      }),
-    );
+      });
+    });
+  }
+
+  private parsePayload<T extends keyof PayloadMap>(
+    eventType: T,
+    payload: unknown,
+  ): PayloadMap[T] {
+    return payloadCaster[eventType](payload);
   }
 }

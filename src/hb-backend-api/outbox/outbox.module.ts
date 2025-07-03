@@ -10,6 +10,8 @@ import { FindOutboxByEventTypeAndStatusService } from "./application/use-cases/f
 import { FindTodayMenuOutboxController } from "./adapters/in/grpc/find-today-menu-outbox.controller";
 import { PatchOutboxMarkAsSentService } from "./application/use-cases/patch-outbox-mark-as-sent.service";
 import { PatchTodayMenuOutboxMarkAsSentController } from "./adapters/in/grpc/patch-today-menu-outbox-mark-as-sent.controller";
+import { FindLogOutboxByEventTypeAndStatusService } from "./application/use-cases/find-log-outbox-by-event-type-and-status.service";
+import { FindLogOutboxController } from "./adapters/in/grpc/find-log-outbox.controller";
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { PatchTodayMenuOutboxMarkAsSentController } from "./adapters/in/grpc/pat
   ],
   controllers: [
     FindTodayMenuOutboxController,
+    FindLogOutboxController,
     PatchTodayMenuOutboxMarkAsSentController,
   ],
   providers: [
@@ -42,6 +45,10 @@ import { PatchTodayMenuOutboxMarkAsSentController } from "./adapters/in/grpc/pat
       useClass: FindOutboxByEventTypeAndStatusService,
     },
     {
+      provide: DIToken.OutboxModule.FindLogOutboxByEventTypeAndStatusUseCase,
+      useClass: FindLogOutboxByEventTypeAndStatusService,
+    },
+    {
       provide: DIToken.OutboxModule.PatchOutboxMarkAsSentUseCase,
       useClass: PatchOutboxMarkAsSentService,
     },
@@ -53,6 +60,7 @@ import { PatchTodayMenuOutboxMarkAsSentController } from "./adapters/in/grpc/pat
     DIToken.OutboxModule.OutboxQueryPort,
     DIToken.OutboxModule.FindOutboxByEventTypeAndStatusUseCase,
     DIToken.OutboxModule.PatchOutboxMarkAsSentUseCase,
+    DIToken.OutboxModule.FindLogOutboxByEventTypeAndStatusUseCase,
   ],
 })
 export class OutboxModule {}

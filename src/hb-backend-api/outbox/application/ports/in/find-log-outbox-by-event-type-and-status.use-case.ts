@@ -1,10 +1,10 @@
 import { EventType } from "../../../domain/enum/event-type.enum";
 import { OutboxStatus } from "../../../domain/enum/outbox-status.enum";
-import { FindOutboxMenuQueryResult } from "../../result/find-outbox-menu-query.result";
+import { FindOutboxLogQueryResult } from "../../result/find-outbox-log-query.result";
 
-export interface FindOutboxByEventTypeAndStatusUseCase {
+export interface FindLogOutboxByEventTypeAndStatusUseCase {
   invoke(
     eventType: EventType,
     status: OutboxStatus,
-  ): Promise<FindOutboxMenuQueryResult[]>;
+  ): Promise<FindOutboxLogQueryResult[]>;
 }

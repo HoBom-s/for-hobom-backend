@@ -1,15 +1,15 @@
 import { OutboxId } from "../../domain/vo/outbox-id.vo";
 import { EventType } from "../../domain/enum/event-type.enum";
-import type { TodayMenuPayload } from "../../domain/factories/today-menu.payload";
 import { OutboxStatus } from "../../domain/enum/outbox-status.enum";
 import { FindOutboxEntity } from "../../domain/entity/find-outbox.entity";
+import { HoBomLogPayloadType } from "../../domain/factories/hobom-log.payload";
 
-export class FindOutboxQueryResult {
+export class FindOutboxLogQueryResult {
   constructor(
     private readonly id: OutboxId,
     private readonly eventId: string,
     private readonly eventType: EventType,
-    private readonly payload: TodayMenuPayload,
+    private readonly payload: HoBomLogPayloadType,
     private readonly status: OutboxStatus,
     private readonly retryCount: number,
     private readonly sentAt: Date | null,
@@ -34,11 +34,11 @@ export class FindOutboxQueryResult {
   }
 
   public static from(params: FindOutboxEntity) {
-    return new FindOutboxQueryResult(
+    return new FindOutboxLogQueryResult(
       params.getId,
       params.getEventId,
       params.getEventType,
-      params.getPayload,
+      params.getPayload as HoBomLogPayloadType,
       params.getStatus,
       params.getRetryCount,
       params.getSentAt,
@@ -62,7 +62,7 @@ export class FindOutboxQueryResult {
     return this.eventType;
   }
 
-  public get getPayload(): TodayMenuPayload {
+  public get getPayload(): HoBomLogPayloadType {
     return this.payload;
   }
 
