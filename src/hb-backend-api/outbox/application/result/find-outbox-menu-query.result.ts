@@ -1,14 +1,15 @@
-import { EventType } from "../enum/event-type.enum";
-import { OutboxStatus } from "../enum/outbox-status.enum";
-import { OutboxId } from "../vo/outbox-id.vo";
-import { OutboxPayloadType } from "./outbox-payload.parser";
+import { OutboxId } from "../../domain/vo/outbox-id.vo";
+import { EventType } from "../../domain/enum/event-type.enum";
+import type { TodayMenuPayload } from "../../domain/factories/today-menu.payload";
+import { OutboxStatus } from "../../domain/enum/outbox-status.enum";
+import { FindOutboxEntity } from "../../domain/entity/find-outbox.entity";
 
-export class FindOutboxEntity {
+export class FindOutboxMenuQueryResult {
   constructor(
     private readonly id: OutboxId,
     private readonly eventId: string,
     private readonly eventType: EventType,
-    private readonly payload: OutboxPayloadType,
+    private readonly payload: TodayMenuPayload,
     private readonly status: OutboxStatus,
     private readonly retryCount: number,
     private readonly sentAt: Date | null,
@@ -32,33 +33,20 @@ export class FindOutboxEntity {
     this.updatedAt = updatedAt;
   }
 
-  public static of(params: {
-    id: OutboxId;
-    eventId: string;
-    eventType: EventType;
-    payload: OutboxPayloadType;
-    status: OutboxStatus;
-    retryCount: number;
-    sentAt: Date | null;
-    failedAt: Date | null;
-    lastError: string | null;
-    version: number;
-    createdAt: Date | null;
-    updatedAt: Date | null;
-  }): FindOutboxEntity {
-    return new FindOutboxEntity(
-      params.id,
-      params.eventId,
-      params.eventType,
-      params.payload,
-      params.status,
-      params.retryCount,
-      params.sentAt,
-      params.failedAt,
-      params.lastError,
-      params.version,
-      params.createdAt,
-      params.updatedAt,
+  public static from(params: FindOutboxEntity) {
+    return new FindOutboxMenuQueryResult(
+      params.getId,
+      params.getEventId,
+      params.getEventType,
+      params.getPayload as TodayMenuPayload,
+      params.getStatus,
+      params.getRetryCount,
+      params.getSentAt,
+      params.getFailedAt,
+      params.getLastError,
+      params.getVersion,
+      params.getCreatedAt,
+      params.getUpdatedAt,
     );
   }
 
@@ -74,7 +62,7 @@ export class FindOutboxEntity {
     return this.eventType;
   }
 
-  public get getPayload(): OutboxPayloadType {
+  public get getPayload(): TodayMenuPayload {
     return this.payload;
   }
 

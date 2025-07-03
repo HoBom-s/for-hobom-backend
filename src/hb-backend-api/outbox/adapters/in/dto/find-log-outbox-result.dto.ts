@@ -1,14 +1,14 @@
 import { EventType } from "../../../domain/enum/event-type.enum";
-import type { TodayMenuPayload } from "../../../domain/factories/today-menu.payload";
 import { OutboxStatus } from "../../../domain/enum/outbox-status.enum";
-import { FindOutboxMenuQueryResult } from "../../../application/result/find-outbox-menu-query.result";
+import { HoBomLogPayloadType } from "../../../domain/factories/hobom-log.payload";
+import { FindOutboxLogQueryResult } from "../../../application/result/find-outbox-log-query.result";
 
-export class FindTodayMenuOutboxResultDto {
+export class FindLogOutboxResultDto {
   constructor(
     readonly id: string,
     readonly eventId: string,
     readonly eventType: EventType,
-    readonly payload: TodayMenuPayload,
+    readonly payload: HoBomLogPayloadType,
     readonly status: OutboxStatus,
     readonly retryCount: number,
     readonly sentAt: Date | null,
@@ -32,8 +32,8 @@ export class FindTodayMenuOutboxResultDto {
     this.updatedAt = updatedAt;
   }
 
-  public static from(params: FindOutboxMenuQueryResult) {
-    return new FindTodayMenuOutboxResultDto(
+  public static from(params: FindOutboxLogQueryResult) {
+    return new FindLogOutboxResultDto(
       params.getId.toString(),
       params.getEventId,
       params.getEventType,

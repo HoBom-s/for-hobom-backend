@@ -6,7 +6,7 @@ import { EventType } from "../../../../../../src/hb-backend-api/outbox/domain/en
 import { OutboxStatus } from "../../../../../../src/hb-backend-api/outbox/domain/enum/outbox-status.enum";
 import { DIToken } from "../../../../../../src/shared/di/token.di";
 import { OutboxId } from "../../../../../../src/hb-backend-api/outbox/domain/vo/outbox-id.vo";
-import { FindOutboxQueryResult } from "../../../../../../src/hb-backend-api/outbox/application/result/find-outbox-query.result";
+import { FindOutboxMenuQueryResult } from "../../../../../../src/hb-backend-api/outbox/application/result/find-outbox-menu-query.result";
 import { FindOutboxEntity } from "../../../../../../src/hb-backend-api/outbox/domain/entity/find-outbox.entity";
 import { FindTodayMenuOutboxResultDto } from "../../../../../../src/hb-backend-api/outbox/adapters/in/dto/find-today-menu-outbox-result.dto";
 
@@ -56,7 +56,7 @@ describe("FindTodayMenuOutboxController", () => {
       updatedAt: new Date(),
     });
     const mockFindOutboxQueryResult =
-      FindOutboxQueryResult.from(findOutboxEntity);
+      FindOutboxMenuQueryResult.from(findOutboxEntity);
     (useCase.invoke as jest.Mock).mockResolvedValue([
       mockFindOutboxQueryResult,
     ]);

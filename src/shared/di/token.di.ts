@@ -129,6 +129,9 @@ export class DIToken {
     public static FindOutboxByEventTypeAndStatusUseCase = this.register(
       "FindOutboxByEventTypeAndStatusUseCase",
     );
+    public static FindLogOutboxByEventTypeAndStatusUseCase = this.register(
+      "FindLogOutboxByEventTypeAndStatusUseCase",
+    );
     public static PatchOutboxMarkAsSentUseCase = this.register(
       "PatchOutboxMarkAsSentUseCase",
     );
