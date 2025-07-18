@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Skip check if Dependabot
         if: github.actor == 'dependabot[bot]'
-        run: echo "🔁 Dependabot PR - JIRA 체크 생략"
+        run: echo "🔁 Dependabot PR - JIRA 체크 생략!"
 
       - name: Validate JIRA ticket in PR title
         if: github.actor != 'dependabot[bot]'
