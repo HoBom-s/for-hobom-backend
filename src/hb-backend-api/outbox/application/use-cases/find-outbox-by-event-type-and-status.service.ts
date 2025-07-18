@@ -1,11 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { EventType } from "../../domain/enum/event-type.enum";
-import { OutboxStatus } from "../../domain/enum/outbox-status.enum";
-import { FindOutboxByEventTypeAndStatusUseCase } from "../ports/in/find-outbox-by-event-type-and-status.use-case";
-import { FindOutboxMenuQueryResult } from "../result/find-outbox-menu-query.result";
-import { FindOutboxEntity } from "../../domain/entity/find-outbox.entity";
+import { EventType } from "../../domain/model/event-type.enum";
+import { OutboxStatus } from "../../domain/model/outbox-status.enum";
+import { FindOutboxByEventTypeAndStatusUseCase } from "../../domain/ports/in/find-outbox-by-event-type-and-status.use-case";
+import { FindOutboxMenuQueryResult } from "../../domain/ports/out/find-outbox-menu-query.result";
+import { FindOutboxEntity } from "../../domain/model/find-outbox.entity";
 import { DIToken } from "../../../../shared/di/token.di";
-import { OutboxQueryPort } from "../ports/out/outbox-query.port";
+import { OutboxQueryPort } from "../../domain/ports/out/outbox-query.port";
 
 @Injectable()
 export class FindOutboxByEventTypeAndStatusService

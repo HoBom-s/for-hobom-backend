@@ -1,4 +1,4 @@
-import { UserRepository } from "../../src/hb-backend-api/user/domain/repositories/user.repository";
+import { UserRepository } from "../../src/hb-backend-api/user/domain/model/user.repository";
 
 export function createMockUserRepository(): jest.Mocked<UserRepository> {
   return {

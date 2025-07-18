@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { PatchOutboxMarkAsSentUseCase } from "../ports/in/patch-outbox-mark-as-sent.use-case";
+import { PatchOutboxMarkAsSentUseCase } from "../../domain/ports/in/patch-outbox-mark-as-sent.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
-import { EventId } from "../../domain/vo/event-id.vo";
+import { EventId } from "../../domain/model/event-id.vo";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
-import { OutboxPersistencePort } from "../ports/out/outbox-persistence.port";
+import { OutboxPersistencePort } from "../../domain/ports/out/outbox-persistence.port";
 
 @Injectable()
 export class PatchOutboxMarkAsSentService

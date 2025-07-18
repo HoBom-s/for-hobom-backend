@@ -3,7 +3,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { DIToken } from "../../../../shared/di/token.di";
 import { DailyTodoQueryPort } from "../ports/out/daily-todo-query.port";
 import { DailyTodoWithRelationEntity } from "../../domain/entity/daily-todo.retations";
-import { UserId } from "../../../user/domain/vo/user-id.vo";
+import { UserId } from "../../../user/domain/model/user-id.vo";
 import { DailyTodoWithRelationQueryResult } from "../result/daily-todo-query.result";
 import { YearMonthDayString } from "../../domain/vo/year-month-day-string.vo";
 

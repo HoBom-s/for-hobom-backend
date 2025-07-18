@@ -10,17 +10,17 @@ import {
 } from "@nestjs/common";
 import { TraceContext } from "../../../../trace/trace.context";
 import { DIToken } from "../../../../di/token.di";
-import { OutboxPersistencePort } from "../../../../../hb-backend-api/outbox/application/ports/out/outbox-persistence.port";
-import { OutboxPayloadFactoryRegistry } from "../../../../../hb-backend-api/outbox/domain/factories/outbox-payload-factory.registry";
+import { OutboxPersistencePort } from "../../../../../hb-backend-api/outbox/domain/ports/out/outbox-persistence.port";
+import { OutboxPayloadFactoryRegistry } from "../../../../../hb-backend-api/outbox/domain/model/outbox-payload-factory.registry";
 import { TraceInfoConstant } from "../../../../constants/trace-info.constant";
 import { HOBO_BACKEND_SERVICE_TYPE } from "../../../../constants/service-type.constant";
-import { CreateOutboxEntity } from "../../../../../hb-backend-api/outbox/domain/entity/create-outbox.entity";
-import { EventType } from "../../../../../hb-backend-api/outbox/domain/enum/event-type.enum";
-import { OutboxStatus } from "../../../../../hb-backend-api/outbox/domain/enum/outbox-status.enum";
+import { CreateOutboxEntity } from "../../../../../hb-backend-api/outbox/domain/model/create-outbox.entity";
+import { EventType } from "../../../../../hb-backend-api/outbox/domain/model/event-type.enum";
+import { OutboxStatus } from "../../../../../hb-backend-api/outbox/domain/model/outbox-status.enum";
 import { convertToHttpMethod } from "../../../../constants/http-method.contant";
 import { JwtAuthPayloadModel } from "../../../../../hb-backend-api/auth/domain/model/jwt-auth-payload.model";
-import { UserQueryPort } from "../../../../../hb-backend-api/user/application/ports/out/user-query.port";
-import { UserNickname } from "../../../../../hb-backend-api/user/domain/vo/user-nickname.vo";
+import { UserQueryPort } from "../../../../../hb-backend-api/user/domain/ports/out/user-query.port";
+import { UserNickname } from "../../../../../hb-backend-api/user/domain/model/user-nickname.vo";
 
 @Injectable()
 export class HttpLogInterceptor implements NestInterceptor {

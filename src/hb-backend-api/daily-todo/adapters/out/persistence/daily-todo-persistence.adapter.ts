@@ -6,7 +6,7 @@ import { DailyTodoCreateEntitySchema } from "src/hb-backend-api/daily-todo/domai
 import { DailyTodoCompleteStatus } from "src/hb-backend-api/daily-todo/domain/enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "src/hb-backend-api/daily-todo/domain/enums/daily-todo-cycle.enum";
 import { DailyTodoId } from "src/hb-backend-api/daily-todo/domain/vo/daily-todo-id.vo";
-import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
+import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
 import { Reaction } from "../../../domain/entity/daily-todo.retations";
 
 @Injectable()

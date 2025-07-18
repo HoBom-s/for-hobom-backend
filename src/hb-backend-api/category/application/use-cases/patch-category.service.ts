@@ -1,15 +1,15 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { PatchCategoryUseCase } from "../ports/in/patch-category.use-case";
+import { PatchCategoryUseCase } from "../../domain/ports/in/patch-category.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
-import { CategoryPersistencePort } from "../ports/out/category-persistence.port";
-import { CategoryId } from "../../domain/vo/category-id.vo";
-import { PatchCategoryCommand } from "../command/patch-category.command";
+import { CategoryPersistencePort } from "../../domain/ports/out/category-persistence.port";
+import { CategoryId } from "../../domain/model/category-id.vo";
+import { PatchCategoryCommand } from "../../domain/ports/out/patch-category.command";
 import {
   CategoryEntitySchema,
   CategoryUpdateEntitySchema,
-} from "../../domain/entity/category.entity";
-import { CategoryQueryPort } from "../ports/out/category-query.port";
-import { UserId } from "../../../user/domain/vo/user-id.vo";
+} from "../../domain/model/category.entity";
+import { CategoryQueryPort } from "../../domain/ports/out/category-query.port";
+import { UserId } from "../../../user/domain/model/user-id.vo";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 

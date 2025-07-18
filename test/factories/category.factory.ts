@@ -1,4 +1,4 @@
-import { CategoryDocument } from "../../src/hb-backend-api/category/domain/entity/category.schema";
+import { CategoryDocument } from "../../src/hb-backend-api/category/domain/model/category.schema";
 
 export function createMockCategory(
   overrides: Partial<CategoryDocument> = {},

@@ -1,9 +1,9 @@
-import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
-import { GetAllCategoryUseCase } from "../ports/in/get-all-category.use-case";
-import { CategoryQueryResult } from "../result/category-query.result";
+import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
+import { GetAllCategoryUseCase } from "../../domain/ports/in/get-all-category.use-case";
+import { CategoryQueryResult } from "../../domain/ports/out/category-query.result";
 import { Inject, Injectable } from "@nestjs/common";
 import { DIToken } from "../../../../shared/di/token.di";
-import { CategoryQueryPort } from "../ports/out/category-query.port";
+import { CategoryQueryPort } from "../../domain/ports/out/category-query.port";
 
 @Injectable()
 export class GetAllCategoryService implements GetAllCategoryUseCase {

@@ -1,18 +1,18 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { TodayMenuEntity } from "./domain/entity/today-menu.entity";
-import { TodayMenuSchema } from "./domain/entity/today-menu.schema";
+import { TodayMenuEntity } from "./domain/model/today-menu.entity";
+import { TodayMenuSchema } from "./domain/model/today-menu.schema";
 import { MenuRecommendationModule } from "../menu-recommendation/menu-recommendation.module";
 import { DIToken } from "../../shared/di/token.di";
-import { TodayMenuRepositoryImpl } from "./domain/repositories/today-menu.repository.impl";
-import { TodayMenuPersistenceAdapter } from "./adapters/out/persistence/today-menu-persistence.adapter";
+import { TodayMenuRepositoryImpl } from "./domain/model/today-menu.repository.impl";
+import { TodayMenuPersistenceAdapter } from "./adapters/out/today-menu-persistence.adapter";
 import { UpsertTodayMenuService } from "./application/use-cases/upsert-today-menu.service";
-import { UpsertTodayMenuController } from "./adapters/in/rest/upsert-today-menu.controller";
-import { TodayMenuQueryAdapter } from "./adapters/out/query/today-menu-query.adapter";
+import { UpsertTodayMenuController } from "./adapters/in/upsert-today-menu.controller";
+import { TodayMenuQueryAdapter } from "./adapters/out/today-menu-query.adapter";
 import { FindTodayMenuByIdService } from "./application/use-cases/find-today-menu-by-id.service";
-import { FindTodayMenuByIdController } from "./adapters/in/rest/find-today-menu-by-id.controller";
+import { FindTodayMenuByIdController } from "./adapters/in/find-today-menu-by-id.controller";
 import { PickTodayMenuService } from "./application/use-cases/pick-today-menu.service";
-import { PickTodayMenuController } from "./adapters/in/rest/pick-today-menu.controller";
+import { PickTodayMenuController } from "./adapters/in/pick-today-menu.controller";
 import { OutboxModule } from "../outbox/outbox.module";
 import { UserModule } from "../user/user.module";
 

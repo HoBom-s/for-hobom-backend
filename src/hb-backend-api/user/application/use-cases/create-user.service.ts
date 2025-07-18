@@ -1,8 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { CreateUserUseCase } from "../ports/in/create-user.use-case";
-import { UserPersistencePort } from "../ports/out/user-persistence.port";
-import { CreateUserCommand } from "../command/create-user.command";
-import { UserCreateEntitySchema } from "../../domain/entity/user.entity";
+import { CreateUserUseCase } from "../../domain/ports/in/create-user.use-case";
+import { UserPersistencePort } from "../../domain/ports/out/user-persistence.port";
+import { CreateUserCommand } from "../../domain/ports/out/create-user.command";
+import { UserCreateEntitySchema } from "../../domain/model/user.entity";
 import { DIToken } from "../../../../shared/di/token.di";
 
 @Injectable()

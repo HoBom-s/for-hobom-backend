@@ -2,7 +2,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Controller, Get, Inject, Param, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../../shared/di/token.di";
-import { GetUserByNicknameUseCase } from "../../../../user/application/ports/in/get-user-by-nickname.use-case";
+import { GetUserByNicknameUseCase } from "../../../../user/domain/ports/in/get-user-by-nickname.use-case";
 import { GetDailyTodoByDateUseCase } from "../../../application/ports/in/get-daily-todo-by-date.use-case";
 import { GetDailyTodoDto } from "../dto/get-daily-todo.dto";
 import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
@@ -12,7 +12,7 @@ import {
   NicknameAndAccessToken,
   TokenUserInformation,
 } from "../../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
-import { UserNickname } from "../../../../user/domain/vo/user-nickname.vo";
+import { UserNickname } from "../../../../user/domain/model/user-nickname.vo";
 
 @ApiTags("DailyTodos")
 @Controller(`${EndPointPrefixConstant}/daily-todos`)

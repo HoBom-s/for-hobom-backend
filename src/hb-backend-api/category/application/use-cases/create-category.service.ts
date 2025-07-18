@@ -1,12 +1,12 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-import { CreateCategoryUseCase } from "../ports/in/create-category.use-case";
+import { CreateCategoryUseCase } from "../../domain/ports/in/create-category.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
-import { CategoryPersistencePort } from "../ports/out/category-persistence.port";
-import { CreateCategoryCommand } from "../command/create-category.command";
-import { CategoryCreateEntitySchema } from "../../domain/entity/category.entity";
-import { CategoryQueryPort } from "../ports/out/category-query.port";
-import { CategoryTitle } from "../../domain/vo/category-title.vo";
-import { UserId } from "../../../user/domain/vo/user-id.vo";
+import { CategoryPersistencePort } from "../../domain/ports/out/category-persistence.port";
+import { CreateCategoryCommand } from "../../domain/ports/out/create-category.command";
+import { CategoryCreateEntitySchema } from "../../domain/model/category.entity";
+import { CategoryQueryPort } from "../../domain/ports/out/category-query.port";
+import { CategoryTitle } from "../../domain/model/category-title.vo";
+import { UserId } from "../../../user/domain/model/user-id.vo";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 

@@ -5,11 +5,11 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { AuthRepository } from "../../domain/repositories/auth.repository";
-import { AuthEntity, AuthEntitySchema } from "../../domain/entity/auth.entity";
-import { AuthDocument } from "../../domain/entity/auth.schema";
-import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
-import { RefreshToken } from "../../domain/vo/refresh-token.vo";
+import { AuthRepository } from "../../domain/model/auth.repository";
+import { AuthEntity, AuthEntitySchema } from "../../domain/model/auth.entity";
+import { AuthDocument } from "../../domain/model/auth.schema";
+import { UserNickname } from "../../../user/domain/model/user-nickname.vo";
+import { RefreshToken } from "../../domain/model/refresh-token.vo";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 
 @Injectable()

@@ -9,9 +9,9 @@ import {
   NicknameAndAccessToken,
   TokenUserInformation,
 } from "../../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
-import { UserNickname } from "../../../../user/domain/vo/user-nickname.vo";
+import { UserNickname } from "../../../../user/domain/model/user-nickname.vo";
 import { DIToken } from "../../../../../shared/di/token.di";
-import { GetUserByNicknameUseCase } from "../../../../user/application/ports/in/get-user-by-nickname.use-case";
+import { GetUserByNicknameUseCase } from "../../../../user/domain/ports/in/get-user-by-nickname.use-case";
 import { GetAllDailyTodoUseCase } from "../../../application/ports/in/get-all-daily-todo.use-case";
 
 @ApiTags("DailyTodos")

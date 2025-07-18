@@ -1,4 +1,4 @@
-import { AuthEntity } from "../../src/hb-backend-api/auth/domain/entity/auth.entity";
+import { AuthEntity } from "../../src/hb-backend-api/auth/domain/model/auth.entity";
 
 export function createMockAuth(
   overrides: Partial<AuthEntity> = {},

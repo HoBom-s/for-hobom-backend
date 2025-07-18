@@ -1,12 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { UpsertTodayMenuUseCase } from "../ports/in/upsert-today-menu.use-case";
-import { UpsertTodayMenuCommand } from "../command/upsert-today-menu.command";
+import { UpsertTodayMenuUseCase } from "../../domain/ports/in/upsert-today-menu.use-case";
+import { UpsertTodayMenuCommand } from "../../domain/ports/out/upsert-today-menu.command";
 import { DIToken } from "../../../../shared/di/token.di";
-import { TodayMenuPersistencePort } from "../ports/out/today-menu-persistence.port";
+import { TodayMenuPersistencePort } from "../../domain/ports/out/today-menu-persistence.port";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
-import { UpsertTodayMenuEntity } from "../../domain/entity/upsert-today-menu.entity";
-import { TodayMenuId } from "../../domain/vo/today-menu.vo";
+import { UpsertTodayMenuEntity } from "../../domain/model/upsert-today-menu.entity";
+import { TodayMenuId } from "../../domain/model/today-menu.vo";
 
 @Injectable()
 export class UpsertTodayMenuService implements UpsertTodayMenuUseCase {

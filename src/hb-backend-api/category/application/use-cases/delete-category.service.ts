@@ -1,11 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { DeleteCategoryUseCase } from "../ports/in/delete-category.use-case";
+import { DeleteCategoryUseCase } from "../../domain/ports/in/delete-category.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
-import { CategoryPersistencePort } from "../ports/out/category-persistence.port";
-import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
-import { CategoryId } from "../../domain/vo/category-id.vo";
-import { CategoryQueryPort } from "../ports/out/category-query.port";
-import { CategoryEntitySchema } from "../../domain/entity/category.entity";
+import { CategoryPersistencePort } from "../../domain/ports/out/category-persistence.port";
+import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
+import { CategoryId } from "../../domain/model/category-id.vo";
+import { CategoryQueryPort } from "../../domain/ports/out/category-query.port";
+import { CategoryEntitySchema } from "../../domain/model/category.entity";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 

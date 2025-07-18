@@ -1,8 +1,8 @@
-import { CreateOutboxEntity } from "../../domain/entity/create-outbox.entity";
-import { EventType } from "../../domain/enum/event-type.enum";
-import { OutboxStatus } from "../../domain/enum/outbox-status.enum";
-import { OutboxDocument } from "../../domain/entity/outbox.schema";
-import { EventId } from "../../domain/vo/event-id.vo";
+import { CreateOutboxEntity } from "../../domain/model/create-outbox.entity";
+import { EventType } from "../../domain/model/event-type.enum";
+import { OutboxStatus } from "../../domain/model/outbox-status.enum";
+import { OutboxDocument } from "../../domain/model/outbox.schema";
+import { EventId } from "../../domain/model/event-id.vo";
 
 export interface OutboxRepository {
   save(entity: CreateOutboxEntity): Promise<void>;

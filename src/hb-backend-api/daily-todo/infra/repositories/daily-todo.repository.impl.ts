@@ -16,7 +16,7 @@ import { YearMonthDayString } from "../../domain/vo/year-month-day-string.vo";
 import { DateHelper } from "../../../../shared/date/date.helper";
 import { DailyTodoId } from "../../domain/vo/daily-todo-id.vo";
 import { AggregateQuery } from "../../../../infra/mongo/query/aggregate.query";
-import { UserId } from "../../../user/domain/vo/user-id.vo";
+import { UserId } from "../../../user/domain/model/user-id.vo";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 import { DailyTodoCompleteStatus } from "../../domain/enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../../domain/enums/daily-todo-cycle.enum";

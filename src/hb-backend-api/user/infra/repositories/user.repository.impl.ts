@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { UserRepository } from "../../domain/repositories/user.repository";
-import { UserDocument } from "../../domain/entity/user.schema";
+import { UserRepository } from "../../domain/model/user.repository";
+import { UserDocument } from "../../domain/model/user.schema";
 import {
   UserCreateEntitySchema,
   UserEntity,
-} from "../../domain/entity/user.entity";
-import { UserId } from "../../domain/vo/user-id.vo";
-import { UserNickname } from "../../domain/vo/user-nickname.vo";
+} from "../../domain/model/user.entity";
+import { UserId } from "../../domain/model/user-id.vo";
+import { UserNickname } from "../../domain/model/user-nickname.vo";
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {

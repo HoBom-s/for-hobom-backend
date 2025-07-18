@@ -136,4 +136,30 @@ export class DIToken {
       "PatchOutboxMarkAsSentUseCase",
     );
   };
+
+  public static readonly FutureMessageModule = class extends DITokenRegister {
+    public static FutureMessagePersistenceRepository = this.register(
+      "FutureMessagePersistenceRepository",
+    );
+    public static FutureMessageQueryRepository = this.register(
+      "FutureMessageQueryRepository",
+    );
+
+    public static FutureMessagePersistencePort = this.register(
+      "FutureMessagePersistencePort",
+    );
+    public static FutureMessageQueryPort = this.register(
+      "FutureMessageQueryPort",
+    );
+
+    public static CreateFutureMessageUseCase = this.register(
+      "CreateFutureMessageUseCase",
+    );
+    public static FindAllFutureMessageByStatusUseCase = this.register(
+      "FindAllFutureMessageByStatusUseCase",
+    );
+    public static FindFutureMessageByIdUseCase = this.register(
+      "FindFutureMessageByIdUseCase",
+    );
+  };
 }

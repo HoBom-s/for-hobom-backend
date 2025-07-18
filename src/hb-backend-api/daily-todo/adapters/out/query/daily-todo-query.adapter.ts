@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { DailyTodoQueryPort } from "../../../application/ports/out/daily-todo-query.port";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { DailyTodoRepository } from "../../../domain/repositories/daily-todo.repository";
-import { UserId } from "../../../../user/domain/vo/user-id.vo";
+import { UserId } from "../../../../user/domain/model/user-id.vo";
 import {
   Category,
   DailyTodoWithRelationEntity,
@@ -10,7 +10,7 @@ import {
   Owner,
   Reaction,
 } from "../../../domain/entity/daily-todo.retations";
-import { CategoryId } from "../../../../category/domain/vo/category-id.vo";
+import { CategoryId } from "../../../../category/domain/model/category-id.vo";
 import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
 import { YearMonthDayString } from "../../../domain/vo/year-month-day-string.vo";
 

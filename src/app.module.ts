@@ -13,6 +13,7 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 import { TraceInterceptor } from "./shared/adpaters/in/rest/interceptors/trace.interceptor";
 import { HttpLogInterceptor } from "./shared/adpaters/in/rest/interceptors/log.interceptor";
 import { UserModule } from "./hb-backend-api/user/user.module";
+import { FutureMessageModule } from "./hb-backend-api/future-message/future-message.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UserModule } from "./hb-backend-api/user/user.module";
     OutboxModule,
     UserModule,
     TransactionModule,
+    FutureMessageModule,
   ],
   providers: [
     TraceContext,

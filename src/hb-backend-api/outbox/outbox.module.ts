@@ -1,17 +1,17 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { OutboxEntity } from "./domain/entity/outbox.entity";
-import { OutboxSchema } from "./domain/entity/outbox.schema";
+import { OutboxEntity } from "./domain/model/outbox.entity";
+import { OutboxSchema } from "./domain/model/outbox.schema";
 import { DIToken } from "../../shared/di/token.di";
-import { OutboxRepositoryImpl } from "./domain/repositories/outbox.repository.impl";
-import { OutboxPersistenceAdapter } from "./adapters/out/persistence/outbox-persistence.adapter";
-import { OutboxQueryAdapter } from "./adapters/out/query/outbox-query.adapter";
+import { OutboxRepositoryImpl } from "./domain/model/outbox.repository.impl";
+import { OutboxPersistenceAdapter } from "./adapters/out/outbox-persistence.adapter";
+import { OutboxQueryAdapter } from "./adapters/out/outbox-query.adapter";
 import { FindOutboxByEventTypeAndStatusService } from "./application/use-cases/find-outbox-by-event-type-and-status.service";
-import { FindTodayMenuOutboxController } from "./adapters/in/grpc/find-today-menu-outbox.controller";
+import { FindTodayMenuOutboxController } from "./adapters/in/find-today-menu-outbox.controller";
 import { PatchOutboxMarkAsSentService } from "./application/use-cases/patch-outbox-mark-as-sent.service";
-import { PatchTodayMenuOutboxMarkAsSentController } from "./adapters/in/grpc/patch-today-menu-outbox-mark-as-sent.controller";
+import { PatchTodayMenuOutboxMarkAsSentController } from "./adapters/in/patch-today-menu-outbox-mark-as-sent.controller";
 import { FindLogOutboxByEventTypeAndStatusService } from "./application/use-cases/find-log-outbox-by-event-type-and-status.service";
-import { FindLogOutboxController } from "./adapters/in/grpc/find-log-outbox.controller";
+import { FindLogOutboxController } from "./adapters/in/find-log-outbox.controller";
 
 @Module({
   imports: [
