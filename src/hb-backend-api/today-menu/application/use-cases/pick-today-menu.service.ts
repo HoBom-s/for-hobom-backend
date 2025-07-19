@@ -21,6 +21,7 @@ import { OutboxStatus } from "../../../outbox/domain/model/outbox-status.enum";
 import { OutboxPayloadFactoryRegistry } from "../../../outbox/domain/model/outbox-payload-factory.registry";
 import { UserQueryPort } from "../../../user/domain/ports/out/user-query.port";
 import { UserId } from "../../../user/domain/model/user-id.vo";
+import { MessageEnum } from "../../../outbox/domain/model/message.enum";
 
 @Injectable()
 export class PickTodayMenuService implements PickTodayMenuUseCase {
@@ -101,16 +102,16 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
     userId: UserId,
   ): Promise<CreateOutboxEntity> {
     const userInformation = await this.userQueryPort.findById(userId);
-    const payload = OutboxPayloadFactoryRegistry.TODAY_MENU({
-      todayMenuId: todayMenuId,
-      name: pickedName,
-      username: userInformation.getUsername,
-      nickname: userInformation.getNickname,
-      email: userInformation.getEmail,
-      userId: userInformation.getId.toString(),
+    const payload = OutboxPayloadFactoryRegistry.MESSAGE({
+      id: todayMenuId,
+      title: "오늘의 추천메뉴가 도착했어요.",
+      body: `오늘의 추천 메뉴는 ${pickedName} !\n ${userInformation.getUsername}님께서 추천하신 메뉴에요.`,
+      recipient: userInformation.getEmail,
+      senderId: userInformation.getId.toString(),
+      type: MessageEnum.MAIL_MESSAGE,
     });
     return CreateOutboxEntity.of(
-      EventType.TODAY_MENU,
+      EventType.MESSAGE,
       payload,
       OutboxStatus.PENDING,
       1,

@@ -7,9 +7,9 @@ import { OutboxRepositoryImpl } from "./domain/model/outbox.repository.impl";
 import { OutboxPersistenceAdapter } from "./adapters/out/outbox-persistence.adapter";
 import { OutboxQueryAdapter } from "./adapters/out/outbox-query.adapter";
 import { FindOutboxByEventTypeAndStatusService } from "./application/use-cases/find-outbox-by-event-type-and-status.service";
-import { FindTodayMenuOutboxController } from "./adapters/in/find-today-menu-outbox.controller";
+import { FindMessageOutboxController } from "./adapters/in/find-message-outbox.controller";
 import { PatchOutboxMarkAsSentService } from "./application/use-cases/patch-outbox-mark-as-sent.service";
-import { PatchTodayMenuOutboxMarkAsSentController } from "./adapters/in/patch-today-menu-outbox-mark-as-sent.controller";
+import { PatchMessageOutboxMarkAsSentController } from "./adapters/in/patch-message-outbox-mark-as-sent.controller";
 import { FindLogOutboxByEventTypeAndStatusService } from "./application/use-cases/find-log-outbox-by-event-type-and-status.service";
 import { FindLogOutboxController } from "./adapters/in/find-log-outbox.controller";
 
@@ -23,9 +23,9 @@ import { FindLogOutboxController } from "./adapters/in/find-log-outbox.controlle
     ]),
   ],
   controllers: [
-    FindTodayMenuOutboxController,
+    FindMessageOutboxController,
     FindLogOutboxController,
-    PatchTodayMenuOutboxMarkAsSentController,
+    PatchMessageOutboxMarkAsSentController,
   ],
   providers: [
     {
