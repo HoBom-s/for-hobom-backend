@@ -5,15 +5,15 @@ export const grpcOptions: MicroserviceOptions = {
   transport: Transport.GRPC,
   options: {
     url: "0.0.0.0:50051",
-    package: ["outbox.menu", "outbox.log"],
+    package: ["outbox.message", "outbox.log"],
     protoPath: [
       join(
         __dirname,
-        "../../../hobom-buf-proto/menu/outbox/v1/hobom-menu-outbox.proto",
+        "../../../hobom-buf-proto/message/outbox/v1/find-hobom-message-outbox.proto",
       ),
       join(
         __dirname,
-        "../../../hobom-buf-proto/menu/outbox/v1/patch-hobom-menu-outbox.proto",
+        "../../../hobom-buf-proto/message/outbox/v1/patch-hobom-message-outbox.proto",
       ),
       join(
         __dirname,
