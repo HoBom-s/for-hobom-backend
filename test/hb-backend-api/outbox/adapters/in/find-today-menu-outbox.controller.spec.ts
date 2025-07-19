@@ -1,22 +1,23 @@
 import { Test } from "@nestjs/testing";
 import { Types } from "mongoose";
-import { FindTodayMenuOutboxController } from "../../../../../src/hb-backend-api/outbox/adapters/in/find-today-menu-outbox.controller";
+import { FindMessageOutboxController } from "../../../../../src/hb-backend-api/outbox/adapters/in/find-message-outbox.controller";
 import { FindOutboxByEventTypeAndStatusUseCase } from "../../../../../src/hb-backend-api/outbox/domain/ports/in/find-outbox-by-event-type-and-status.use-case";
 import { EventType } from "../../../../../src/hb-backend-api/outbox/domain/model/event-type.enum";
 import { OutboxStatus } from "../../../../../src/hb-backend-api/outbox/domain/model/outbox-status.enum";
 import { DIToken } from "../../../../../src/shared/di/token.di";
 import { OutboxId } from "../../../../../src/hb-backend-api/outbox/domain/model/outbox-id.vo";
-import { FindOutboxMenuQueryResult } from "../../../../../src/hb-backend-api/outbox/domain/ports/out/find-outbox-menu-query.result";
+import { FindOutboxMessageQueryResult } from "../../../../../src/hb-backend-api/outbox/domain/ports/out/find-outbox-message-query.result";
 import { FindOutboxEntity } from "../../../../../src/hb-backend-api/outbox/domain/model/find-outbox.entity";
-import { FindTodayMenuOutboxResultDto } from "../../../../../src/hb-backend-api/outbox/adapters/in/find-today-menu-outbox-result.dto";
+import { FindMessageOutboxResultDto } from "../../../../../src/hb-backend-api/outbox/adapters/in/find-message-outbox-result.dto";
+import { MessageEnum } from "../../../../../src/hb-backend-api/outbox/domain/model/message.enum";
 
-describe("FindTodayMenuOutboxController", () => {
-  let controller: FindTodayMenuOutboxController;
+describe("FindMessageOutboxController", () => {
+  let controller: FindMessageOutboxController;
   let useCase: FindOutboxByEventTypeAndStatusUseCase;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      controllers: [FindTodayMenuOutboxController],
+      controllers: [FindMessageOutboxController],
       providers: [
         {
           provide: DIToken.OutboxModule.FindOutboxByEventTypeAndStatusUseCase,
@@ -27,7 +28,7 @@ describe("FindTodayMenuOutboxController", () => {
       ],
     }).compile();
 
-    controller = module.get(FindTodayMenuOutboxController);
+    controller = module.get(FindMessageOutboxController);
     useCase = module.get(
       DIToken.OutboxModule.FindOutboxByEventTypeAndStatusUseCase,
     );
@@ -37,14 +38,14 @@ describe("FindTodayMenuOutboxController", () => {
     const findOutboxEntity = FindOutboxEntity.of({
       id: new OutboxId(new Types.ObjectId()),
       eventId: "event-123",
-      eventType: EventType.TODAY_MENU,
+      eventType: EventType.MESSAGE,
       payload: {
-        todayMenuId: "menu-1",
-        name: "food name",
-        username: "user",
-        nickname: "nickname",
-        email: "email",
-        userId: "userId",
+        id: "1",
+        title: "today-menu",
+        body: "content",
+        recipient: "recipient",
+        senderId: "senderId",
+        type: MessageEnum.MAIL_MESSAGE,
       },
       status: OutboxStatus.PENDING,
       retryCount: 0,
@@ -56,18 +57,18 @@ describe("FindTodayMenuOutboxController", () => {
       updatedAt: new Date(),
     });
     const mockFindOutboxQueryResult =
-      FindOutboxMenuQueryResult.from(findOutboxEntity);
+      FindOutboxMessageQueryResult.from(findOutboxEntity);
     (useCase.invoke as jest.Mock).mockResolvedValue([
       mockFindOutboxQueryResult,
     ]);
 
-    const result: { items: FindTodayMenuOutboxResultDto[] } =
+    const result: { items: FindMessageOutboxResultDto[] } =
       await controller.findBy({
-        eventType: EventType.TODAY_MENU,
+        eventType: EventType.MESSAGE,
         status: OutboxStatus.PENDING,
       });
 
     expect(result.items.length).toBe(1);
-    expect(result.items[0].payload.name).toBe("food name");
+    expect(result.items[0].payload.title).toBe("today-menu");
   });
 });

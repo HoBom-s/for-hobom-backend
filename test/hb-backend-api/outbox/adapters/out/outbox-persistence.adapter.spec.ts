@@ -5,6 +5,7 @@ import { CreateOutboxEntity } from "../../../../../src/hb-backend-api/outbox/dom
 import { EventType } from "../../../../../src/hb-backend-api/outbox/domain/model/event-type.enum";
 import { OutboxPayloadFactoryRegistry } from "../../../../../src/hb-backend-api/outbox/domain/model/outbox-payload-factory.registry";
 import { OutboxStatus } from "../../../../../src/hb-backend-api/outbox/domain/model/outbox-status.enum";
+import { MessageEnum } from "../../../../../src/hb-backend-api/outbox/domain/model/message.enum";
 
 describe("OutboxPersistenceAdapter", () => {
   let outboxRepository: jest.Mocked<OutboxRepository>;
@@ -18,17 +19,17 @@ describe("OutboxPersistenceAdapter", () => {
   describe("save()", () => {
     it("should call outboxPersistenceAdapter.save with the given entity", async () => {
       const input = {
-        todayMenuId: "1",
-        name: "menu-name",
-        username: "user",
-        nickname: "nickname",
-        email: "email",
-        userId: "userId",
+        id: "1",
+        title: "today-menu",
+        body: "content",
+        recipient: "recipient",
+        senderId: "senderId",
+        type: MessageEnum.MAIL_MESSAGE,
       };
-      const factory = OutboxPayloadFactoryRegistry[EventType.TODAY_MENU];
+      const factory = OutboxPayloadFactoryRegistry[EventType.MESSAGE];
       const payload = factory(input);
       const entity = CreateOutboxEntity.of(
-        EventType.TODAY_MENU,
+        EventType.MESSAGE,
         payload,
         OutboxStatus.PENDING,
         1,

@@ -1,12 +1,12 @@
 import { EventType } from "./event-type.enum";
-import { createTodayMenuPayload, TodayMenuPayload } from "./today-menu.payload";
+import { createMessagePayload, MessagePayload } from "./message.payload";
 import {
   createHoBomLogPayload,
   HoBomLogPayloadType,
 } from "./hobom-log.payload";
 
 interface EventInputMap {
-  [EventType.TODAY_MENU]: TodayMenuPayload;
+  [EventType.MESSAGE]: MessagePayload;
   [EventType.HOBOM_LOG]: HoBomLogPayloadType;
 }
 
@@ -19,6 +19,6 @@ type OutboxPayloadFactoryRegistryType = {
 };
 
 export const OutboxPayloadFactoryRegistry: OutboxPayloadFactoryRegistryType = {
-  [EventType.TODAY_MENU]: createTodayMenuPayload,
+  [EventType.MESSAGE]: createMessagePayload,
   [EventType.HOBOM_LOG]: createHoBomLogPayload,
 };
