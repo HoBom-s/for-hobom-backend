@@ -9,6 +9,7 @@ import { FutureMessageDocument } from "./future-message.schema";
 import { UserId } from "../../../user/domain/model/user-id.vo";
 import { CreateFutureMessageEntity } from "./create-future-message.entity";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
+import { SendStatus } from "./send-status.enum";
 
 @Injectable()
 export class FutureMessagePersistenceRepositoryImpl
@@ -56,6 +57,20 @@ export class FutureMessagePersistenceRepositoryImpl
       {
         session: session,
       },
+    );
+  }
+
+  public async markAsSent(id: FutureMessageId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.futureMessageModel.findOneAndUpdate(
+      { _id: id.raw },
+      {
+        $set: {
+          sendStatus: SendStatus.SENT,
+          updatedAt: new Date(),
+        },
+      },
+      { session: session },
     );
   }
 }
