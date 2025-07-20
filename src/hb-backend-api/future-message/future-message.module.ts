@@ -14,6 +14,9 @@ import { FindAllFutureMessageByStatusService } from "./application/use-cases/fin
 import { FindAllFutureMessageByStatusController } from "./adapters/in/find-all-future-message-by-status.controller";
 import { FindFutureMessageByIdService } from "./application/use-cases/find-future-message-by-id.service";
 import { FindFutureMessageByIdController } from "./adapters/in/find-future-message-by-id.controller";
+import { ProcessScheduleFutureMessageService } from "./application/use-cases/process-schedule-future-message.service";
+import { ProcessFutureMessageScheduler } from "./adapters/in/process-future-message.scheduler";
+import { OutboxModule } from "../outbox/outbox.module";
 
 @Module({
   imports: [
@@ -24,8 +27,10 @@ import { FindFutureMessageByIdController } from "./adapters/in/find-future-messa
       },
     ]),
     UserModule,
+    OutboxModule,
   ],
   providers: [
+    ProcessFutureMessageScheduler,
     {
       provide: DIToken.FutureMessageModule.FutureMessagePersistenceRepository,
       useClass: FutureMessagePersistenceRepositoryImpl,
@@ -54,6 +59,10 @@ import { FindFutureMessageByIdController } from "./adapters/in/find-future-messa
       provide: DIToken.FutureMessageModule.FindFutureMessageByIdUseCase,
       useClass: FindFutureMessageByIdService,
     },
+    {
+      provide: DIToken.FutureMessageModule.ProcessScheduleFutureMessageUseCase,
+      useClass: ProcessScheduleFutureMessageService,
+    },
   ],
   controllers: [
     CreateFutureMessageController,
@@ -69,6 +78,7 @@ import { FindFutureMessageByIdController } from "./adapters/in/find-future-messa
     DIToken.FutureMessageModule.CreateFutureMessageUseCase,
     DIToken.FutureMessageModule.FindAllFutureMessageByStatusUseCase,
     DIToken.FutureMessageModule.FindFutureMessageByIdUseCase,
+    DIToken.FutureMessageModule.ProcessScheduleFutureMessageUseCase,
   ],
 })
 export class FutureMessageModule {}

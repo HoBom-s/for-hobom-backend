@@ -14,6 +14,17 @@ export class FutureMessageQueryAdapter implements FutureMessageQueryPort {
     private readonly futureMessageQueryRepository: FutureMessageQueryRepository,
   ) {}
 
+  public async findAllBySendStatusWithoutSenderId(
+    sendStatus: SendStatus,
+  ): Promise<FutureMessageQueryResult[]> {
+    const foundItems =
+      await this.futureMessageQueryRepository.findAllBySendStatusWithoutSenderId(
+        sendStatus,
+      );
+
+    return foundItems.map(FutureMessageQueryResult.from);
+  }
+
   public async findAllBySendStatus(
     sendStatus: SendStatus,
     senderId: UserId,

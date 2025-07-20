@@ -22,4 +22,8 @@ export class FutureMessagePersistenceAdapter
   public async save(entity: CreateFutureMessageEntity): Promise<void> {
     await this.futureMessagePersistenceRepository.save(entity);
   }
+
+  public async markAsSent(id: FutureMessageId): Promise<void> {
+    await this.futureMessagePersistenceRepository.markAsSent(id);
+  }
 }

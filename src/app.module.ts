@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ScheduleModule } from "@nestjs/schedule";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule } from "@nestjs/config";
 import { DailyTodoModule } from "./hb-backend-api/daily-todo/daily-todo.module";
@@ -20,6 +21,7 @@ import { FutureMessageModule } from "./hb-backend-api/future-message/future-mess
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     MongooseModule.forRoot(String(process.env.HOBOM_SYSTEM_BACKEND_LION_DB)),
     DailyTodoModule,
     CategoryModule,

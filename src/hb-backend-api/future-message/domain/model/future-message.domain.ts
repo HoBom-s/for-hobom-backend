@@ -57,8 +57,13 @@ export class FutureMessageDomain {
     return this.sendStatus === SendStatus.PENDING;
   }
 
-  public isSameScheduledAtFromDate(todayDateString: string): boolean {
-    return this.scheduledAt === todayDateString;
+  public isDueToSend(now: Date): boolean {
+    if (this.isSentMessage()) return false;
+
+    const scheduledDate = new Date(this.scheduledAt);
+    const isScheduledTimeReached = scheduledDate <= now;
+
+    return isScheduledTimeReached && this.isPendingMessage();
   }
 
   public get getId(): FutureMessageId {

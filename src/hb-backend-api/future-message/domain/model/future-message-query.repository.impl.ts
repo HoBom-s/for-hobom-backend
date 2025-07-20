@@ -18,6 +18,28 @@ export class FutureMessageQueryRepositoryImpl
     private readonly futureMessageModel: Model<FutureMessageDocument>,
   ) {}
 
+  public async findAllBySendStatusWithoutSenderId(
+    sendStatus: SendStatus,
+  ): Promise<FutureMessageDomain[]> {
+    const foundItems = await this.futureMessageModel
+      .find({ sendStatus: sendStatus })
+      .exec();
+
+    return foundItems.map((found) =>
+      FutureMessageDomain.of(
+        FutureMessageId.fromString(found.id),
+        UserId.fromString(found.senderId),
+        UserId.fromString(found.recipientId),
+        found.title,
+        found.content,
+        found.sendStatus,
+        found.scheduledAt,
+        found.createdAt,
+        found.updatedAt,
+      ),
+    );
+  }
+
   public async findAllBySendStatus(
     sendStatus: SendStatus,
     senderId: UserId,

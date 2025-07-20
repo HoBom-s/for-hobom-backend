@@ -161,5 +161,8 @@ export class DIToken {
     public static FindFutureMessageByIdUseCase = this.register(
       "FindFutureMessageByIdUseCase",
     );
+    public static ProcessScheduleFutureMessageUseCase = this.register(
+      "ProcessScheduleFutureMessageUseCase",
+    );
   };
 }
