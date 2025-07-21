@@ -5,6 +5,8 @@ import * as cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";
 import { ResponseWrapInterceptor } from "./shared/adpaters/in/rest/interceptors/wrapeed-response.interceptor";
 import { grpcOptions } from "./infra/grpc/options.grpc";
+import { GlobalExceptionFilter } from "./shared/adpaters/in/rest/filters/global-exception.filter";
+import { DiscordWebhookService } from "./shared/discord/discord-webhook.service";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,6 +30,9 @@ async function bootstrap() {
     }),
   );
   app.useGlobalInterceptors(new ResponseWrapInterceptor());
+  app.useGlobalFilters(
+    new GlobalExceptionFilter(app.get(DiscordWebhookService)),
+  );
 
   app.connectMicroservice(grpcOptions);
 

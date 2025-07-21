@@ -15,6 +15,7 @@ import { TraceInterceptor } from "./shared/adpaters/in/rest/interceptors/trace.i
 import { HttpLogInterceptor } from "./shared/adpaters/in/rest/interceptors/log.interceptor";
 import { UserModule } from "./hb-backend-api/user/user.module";
 import { FutureMessageModule } from "./hb-backend-api/future-message/future-message.module";
+import { DiscordWebhookService } from "./shared/discord/discord-webhook.service";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { FutureMessageModule } from "./hb-backend-api/future-message/future-mess
   ],
   providers: [
     TraceContext,
+    DiscordWebhookService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TraceInterceptor,
