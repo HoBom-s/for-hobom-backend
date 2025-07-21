@@ -3,7 +3,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { DIToken } from "../../../../shared/di/token.di";
 import { DailyTodoPersistencePort } from "../ports/out/daily-todo-persistence.port";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
-import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
+import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
 import { DailyTodoId } from "../../domain/vo/daily-todo-id.vo";
 import { UpdateDailyTodoCycleCommand } from "../command/update-daily-todo-cycle.command";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";

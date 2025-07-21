@@ -4,14 +4,19 @@ on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
     branches:
-      - develop # Target branch, we cannot check develop to main.
+      - develop
 
 jobs:
   jira-ticket-check:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Skip check if Dependabot
+        if: github.actor == 'dependabot[bot]'
+        run: echo "🔁 Dependabot PR - JIRA 체크 생략!"
+
       - name: Validate JIRA ticket in PR title
+        if: github.actor != 'dependabot[bot]'
         uses: actions/github-script@v7
         env:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}

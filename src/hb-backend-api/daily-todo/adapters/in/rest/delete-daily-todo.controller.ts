@@ -2,7 +2,7 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Controller, Delete, Inject, Param, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../../shared/di/token.di";
-import { GetUserByNicknameUseCase } from "../../../../user/application/ports/in/get-user-by-nickname.use-case";
+import { GetUserByNicknameUseCase } from "../../../../user/domain/ports/in/get-user-by-nickname.use-case";
 import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
 import { DeleteDailyTodoUseCase } from "src/hb-backend-api/daily-todo/application/ports/in/delete-daily-todo.use-case";
 import {
@@ -11,7 +11,7 @@ import {
 } from "../../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
 import { ParseDailyTodoIdPipe } from "../pipe/daily-todo-id.pipe";
 import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
-import { UserNickname } from "../../../../user/domain/vo/user-nickname.vo";
+import { UserNickname } from "../../../../user/domain/model/user-nickname.vo";
 
 @ApiTags("DailyTodos")
 @Controller(`${EndPointPrefixConstant}/daily-todos`)

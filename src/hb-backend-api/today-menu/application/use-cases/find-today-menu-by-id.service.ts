@@ -1,15 +1,15 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { FindTodayMenuByIdUseCase } from "../ports/in/find-today-menu-by-id.use-case";
+import { FindTodayMenuByIdUseCase } from "../../domain/ports/in/find-today-menu-by-id.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
-import { TodayMenuQueryPort } from "../ports/out/today-menu-query.port";
-import { TodayMenuId } from "../../domain/vo/today-menu.vo";
+import { TodayMenuQueryPort } from "../../domain/ports/out/today-menu-query.port";
+import { TodayMenuId } from "../../domain/model/today-menu.vo";
 import {
   GetTodayMenuQueryResult,
   MenuItem,
   RegisterPerson,
-} from "../result/get-today-menu-query.result";
-import { TodayMenuRelationEntity } from "../../domain/entity/today-menu-with-relations.entity";
-import { MenuRecommendationRelationEntity } from "../../../menu-recommendation/domain/entity/menu-recommendation-with-relations.entity";
+} from "../../domain/ports/out/get-today-menu-query.result";
+import { TodayMenuRelationEntity } from "../../domain/model/today-menu-with-relations.entity";
+import { MenuRecommendationRelationEntity } from "../../../menu-recommendation/domain/model/menu-recommendation-with-relations.entity";
 
 @Injectable()
 export class FindTodayMenuByIdService implements FindTodayMenuByIdUseCase {

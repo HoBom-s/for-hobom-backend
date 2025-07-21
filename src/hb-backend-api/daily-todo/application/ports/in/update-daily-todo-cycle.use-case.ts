@@ -1,5 +1,5 @@
 import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
-import { UserId } from "../../../../user/domain/vo/user-id.vo";
+import { UserId } from "../../../../user/domain/model/user-id.vo";
 import { UpdateDailyTodoCycleCommand } from "../../command/update-daily-todo-cycle.command";
 
 export interface UpdateDailyTodoCycleUseCase {

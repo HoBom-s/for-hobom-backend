@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { CategoryRepository } from "../../domain/repositories/category.repository";
-import { CategoryDocument } from "../../domain/entity/category.schema";
+import { CategoryRepository } from "../../domain/model/category.repository";
+import { CategoryDocument } from "../../domain/model/category.schema";
 import {
   CategoryCreateEntitySchema,
   CategoryEntity,
   CategoryUpdateEntitySchema,
-} from "../../domain/entity/category.entity";
-import { CategoryId } from "../../domain/vo/category-id.vo";
-import { UserId } from "../../../user/domain/vo/user-id.vo";
-import { CategoryTitle } from "../../domain/vo/category-title.vo";
+} from "../../domain/model/category.entity";
+import { CategoryId } from "../../domain/model/category-id.vo";
+import { UserId } from "../../../user/domain/model/user-id.vo";
+import { CategoryTitle } from "../../domain/model/category-title.vo";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 
 @Injectable()

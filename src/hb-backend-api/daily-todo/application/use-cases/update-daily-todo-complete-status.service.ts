@@ -1,4 +1,4 @@
-import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
+import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
 import { DailyTodoId } from "../../domain/vo/daily-todo-id.vo";
 import { UpdateDailyTodoCompleteStatusCommand } from "../command/update-daily-todo-complete-status.command";
 import { UpdateDailyTodoCompleteStatusUseCase } from "../ports/in/update-daily-todo-complete-status.use-case";

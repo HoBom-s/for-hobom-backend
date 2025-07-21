@@ -1,4 +1,4 @@
-import { UserId } from "../../../../user/domain/vo/user-id.vo";
+import { UserId } from "../../../../user/domain/model/user-id.vo";
 import { YearMonthDayString } from "../../../domain/vo/year-month-day-string.vo";
 import { DailyTodoWithRelationQueryResult } from "../../result/daily-todo-query.result";
 

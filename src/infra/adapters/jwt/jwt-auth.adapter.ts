@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { JwtAuthPayloadModel } from "src/hb-backend-api/auth/domain/model/jwt-auth-payload.model";
-import { JwtAuthPort } from "../../../hb-backend-api/auth/application/ports/out/jwt-auth.port";
-import { RefreshToken } from "../../../hb-backend-api/auth/domain/vo/refresh-token.vo";
+import { JwtAuthPort } from "../../../hb-backend-api/auth/domain/ports/out/jwt-auth.port";
+import { RefreshToken } from "../../../hb-backend-api/auth/domain/model/refresh-token.vo";
 
 @Injectable()
 export class JwtAuthAdapter implements JwtAuthPort {

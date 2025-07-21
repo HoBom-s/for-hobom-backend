@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { FindAllMenuRecommendationUseCase } from "../ports/in/find-all-menu-recommendation.use-case";
-import { GetMenuRecommendationQueryResult } from "../result/get-menu-recommendation-query.result";
+import { FindAllMenuRecommendationUseCase } from "../../domain/ports/in/find-all-menu-recommendation.use-case";
+import { GetMenuRecommendationQueryResult } from "../../domain/ports/out/get-menu-recommendation-query.result";
 import { DIToken } from "../../../../shared/di/token.di";
-import { MenuRecommendationQueryPort } from "../ports/out/menu-recommendation-query.port";
-import { MenuRecommendationRelationEntity } from "../../domain/entity/menu-recommendation-with-relations.entity";
+import { MenuRecommendationQueryPort } from "../../domain/ports/out/menu-recommendation-query.port";
+import { MenuRecommendationRelationEntity } from "../../domain/model/menu-recommendation-with-relations.entity";
 
 @Injectable()
 export class FindAllMenuRecommendationService

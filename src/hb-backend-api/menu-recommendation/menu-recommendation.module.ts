@@ -1,16 +1,16 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { MenuRecommendationEntity } from "./domain/entity/menu-recommendation.entity";
-import { MenuRecommendationSchema } from "./domain/entity/menu-recommendation.schema";
+import { MenuRecommendationEntity } from "./domain/model/menu-recommendation.entity";
+import { MenuRecommendationSchema } from "./domain/model/menu-recommendation.schema";
 import { UserModule } from "../user/user.module";
 import { DIToken } from "../../shared/di/token.di";
-import { MenuRecommendationRepositoryImpl } from "./domain/repositories/menu-recommendation.repository.impl";
-import { MenuRecommendationPersistenceAdapter } from "./adapters/out/persistence/menu-recommendation-persistence.adapter";
+import { MenuRecommendationRepositoryImpl } from "./domain/model/menu-recommendation.repository.impl";
+import { MenuRecommendationPersistenceAdapter } from "./adapters/out/menu-recommendation-persistence.adapter";
 import { CreateMenuRecommendationService } from "./application/use-cases/create-menu-recommendation.service";
-import { CreateMenuRecommendationController } from "./adapters/in/rest/create-menu-recommendation.controller";
-import { MenuRecommendationQueryAdapter } from "./adapters/out/query/menu-recommendation-query.adapter";
+import { CreateMenuRecommendationController } from "./adapters/in/create-menu-recommendation.controller";
+import { MenuRecommendationQueryAdapter } from "./adapters/out/menu-recommendation-query.adapter";
 import { FindAllMenuRecommendationService } from "./application/use-cases/find-all-menu-recommendation.service";
-import { FindAllMenuRecommendationController } from "./adapters/in/rest/find-all-menu-recommendation.controller";
+import { FindAllMenuRecommendationController } from "./adapters/in/find-all-menu-recommendation.controller";
 
 @Module({
   imports: [

@@ -1,4 +1,4 @@
-import { UserDocument } from "../../src/hb-backend-api/user/domain/entity/user.schema";
+import { UserDocument } from "../../src/hb-backend-api/user/domain/model/user.schema";
 
 export function createMockUser(
   overrides: Partial<UserDocument> = {},

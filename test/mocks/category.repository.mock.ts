@@ -1,4 +1,4 @@
-import { CategoryRepository } from "../../src/hb-backend-api/category/domain/repositories/category.repository";
+import { CategoryRepository } from "../../src/hb-backend-api/category/domain/model/category.repository";
 
 export function createCategoryRepository(): jest.Mocked<CategoryRepository> {
   return {

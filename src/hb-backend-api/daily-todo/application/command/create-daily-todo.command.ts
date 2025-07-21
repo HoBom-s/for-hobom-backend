@@ -1,4 +1,4 @@
-import { CategoryId } from "../../../category/domain/vo/category-id.vo";
+import { CategoryId } from "../../../category/domain/model/category-id.vo";
 
 export class CreateDailyTodoCommand {
   constructor(

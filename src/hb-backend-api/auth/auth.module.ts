@@ -4,18 +4,18 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { PassportModule } from "@nestjs/passport";
 import { JwtAuthAdapter } from "../../infra/adapters/jwt/jwt-auth.adapter";
-import { AuthEntity } from "./domain/entity/auth.entity";
-import { AuthSchema } from "./domain/entity/auth.schema";
-import { AuthRefreshTokenController } from "./adapters/in/rest/auth-refresh-token.controller";
-import { AuthPersistenceAdapter } from "./adapters/out/persistence/auth-persistence.adapter";
-import { AuthQueryAdapter } from "./adapters/out/query/auth-query.adapter";
+import { AuthEntity } from "./domain/model/auth.entity";
+import { AuthSchema } from "./domain/model/auth.schema";
+import { AuthRefreshTokenController } from "./adapters/in/auth-refresh-token.controller";
+import { AuthPersistenceAdapter } from "./adapters/out/auth-persistence.adapter";
+import { AuthQueryAdapter } from "./adapters/out/auth-query.adapter";
 import { LoginAuthService } from "./application/use-cases/login-auth.service";
 import { UserModule } from "../user/user.module";
 import { RefreshTokenAuthService } from "./application/use-cases/refresh-token-auth.service";
 import { JwtStrategy } from "../../shared/adpaters/in/rest/strategy/jwt.strategy";
 import { AuthRepositoryImpl } from "./infra/repositories/auth.repository.impl";
 import { DIToken } from "../../shared/di/token.di";
-import { AuthLoginController } from "./adapters/in/rest/auth-login.controller";
+import { AuthLoginController } from "./adapters/in/auth-login.controller";
 
 @Module({
   imports: [

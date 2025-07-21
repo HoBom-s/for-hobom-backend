@@ -18,30 +18,6 @@
 
 ---
 
-## 📦 Modules
-
-### 1. User Module
-
-- **Responsibilities**:
-    - User registration and login
-    - User profile management
-
-### 2. Auth Module
-- **Responsibilities**:
-    - Managing JWT Tokens 
-
-### 3. DailyTodo Module
-
-- **Responsibilities**:
-    - Daily task (todo) management for users
-
-### 4. Category Module
-
-- **Responsibilities**:
-    - Managing user-defined categories
-
----
-
 ## 🧱 Hexagonal Architecture
 
 - **Domain Layer**:
@@ -82,10 +58,3 @@
 
 - Uses NestJS `ValidationPipe` and `class-validator` for DTO validation
 - JWT-based authentication
-
----
-
-## 🛣️ Future Plans
-
-- Redis caching and performance optimization
-- Multi-tenancy or user-group-based expansion

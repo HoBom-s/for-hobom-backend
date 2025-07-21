@@ -1,23 +1,23 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { CategoryEntity } from "./domain/entity/category.entity";
-import { CategorySchema } from "./domain/entity/category.schema";
+import { CategoryEntity } from "./domain/model/category.entity";
+import { CategorySchema } from "./domain/model/category.schema";
 import { DailyTodoModule } from "../daily-todo/daily-todo.module";
 import { DIToken } from "../../shared/di/token.di";
 import { CategoryRepositoryImpl } from "./infra/repositories/category.repository.impl";
-import { CategoryPersistenceAdapter } from "./adapters/out/persistence/category-persistence.adapter";
-import { DeleteCategoryByIdController } from "./adapters/in/rest/delete-category-by-id.controller";
+import { CategoryPersistenceAdapter } from "./adapters/out/category-persistence.adapter";
+import { DeleteCategoryByIdController } from "./adapters/in/delete-category-by-id.controller";
 import { CreateCategoryService } from "./application/use-cases/create-category.service";
-import { CategoryQueryAdapter } from "./adapters/out/query/category-query.adapter";
+import { CategoryQueryAdapter } from "./adapters/out/category-query.adapter";
 import { UserModule } from "../user/user.module";
 import { GetAllCategoryService } from "./application/use-cases/get-all-category.service";
 import { PatchCategoryService } from "./application/use-cases/patch-category.service";
 import { GetCategoryService } from "./application/use-cases/get-category.service";
 import { DeleteCategoryService } from "./application/use-cases/delete-category.service";
-import { CreateCategoryController } from "./adapters/in/rest/create-category.controller";
-import { GetAllCategoryController } from "./adapters/in/rest/get-all-category.controller";
-import { GetCategoryByIdController } from "./adapters/in/rest/get-category-by-id.controller";
-import { UpdateCategoryTitleController } from "./adapters/in/rest/update-category-title.controller";
+import { CreateCategoryController } from "./adapters/in/create-category.controller";
+import { GetAllCategoryController } from "./adapters/in/get-all-category.controller";
+import { GetCategoryByIdController } from "./adapters/in/get-category-by-id.controller";
+import { UpdateCategoryTitleController } from "./adapters/in/update-category-title.controller";
 
 @Module({
   imports: [

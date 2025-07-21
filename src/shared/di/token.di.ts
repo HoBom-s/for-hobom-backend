@@ -117,4 +117,52 @@ export class DIToken {
     );
     public static PickTodayMenuUseCase = this.register("PickTodayMenuUseCase");
   };
+
+  public static readonly OutboxModule = class extends DITokenRegister {
+    public static OutboxRepository = this.register("OutboxRepository");
+
+    public static OutboxPersistencePort = this.register(
+      "OutboxPersistencePort",
+    );
+    public static OutboxQueryPort = this.register("OutboxQueryPort");
+
+    public static FindOutboxByEventTypeAndStatusUseCase = this.register(
+      "FindOutboxByEventTypeAndStatusUseCase",
+    );
+    public static FindLogOutboxByEventTypeAndStatusUseCase = this.register(
+      "FindLogOutboxByEventTypeAndStatusUseCase",
+    );
+    public static PatchOutboxMarkAsSentUseCase = this.register(
+      "PatchOutboxMarkAsSentUseCase",
+    );
+  };
+
+  public static readonly FutureMessageModule = class extends DITokenRegister {
+    public static FutureMessagePersistenceRepository = this.register(
+      "FutureMessagePersistenceRepository",
+    );
+    public static FutureMessageQueryRepository = this.register(
+      "FutureMessageQueryRepository",
+    );
+
+    public static FutureMessagePersistencePort = this.register(
+      "FutureMessagePersistencePort",
+    );
+    public static FutureMessageQueryPort = this.register(
+      "FutureMessageQueryPort",
+    );
+
+    public static CreateFutureMessageUseCase = this.register(
+      "CreateFutureMessageUseCase",
+    );
+    public static FindAllFutureMessageByStatusUseCase = this.register(
+      "FindAllFutureMessageByStatusUseCase",
+    );
+    public static FindFutureMessageByIdUseCase = this.register(
+      "FindFutureMessageByIdUseCase",
+    );
+    public static ProcessScheduleFutureMessageUseCase = this.register(
+      "ProcessScheduleFutureMessageUseCase",
+    );
+  };
 }

@@ -1,4 +1,4 @@
-import { AuthRepository } from "../../src/hb-backend-api/auth/domain/repositories/auth.repository";
+import { AuthRepository } from "../../src/hb-backend-api/auth/domain/model/auth.repository";
 
 export function createMockAuthRepository(): jest.Mocked<AuthRepository> {
   return {

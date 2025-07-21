@@ -2,7 +2,7 @@ import { CreateDailyTodoUseCase } from "../ports/in/create-daily-todo.use-case";
 import { Inject, Injectable } from "@nestjs/common";
 import { DIToken } from "../../../../shared/di/token.di";
 import { DailyTodoPersistencePort } from "../ports/out/daily-todo-persistence.port";
-import { UserId } from "src/hb-backend-api/user/domain/vo/user-id.vo";
+import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
 import { CreateDailyTodoCommand } from "../command/create-daily-todo.command";
 import { DailyTodoCreateEntitySchema } from "../../domain/entity/daily-todo.entity";
 import { DailyTodoCompleteStatus } from "../../domain/enums/daily-todo-complete-status.enum";

@@ -3,8 +3,8 @@ import { Types } from "mongoose";
 import { BaseEntity } from "../../../../shared/base/base.entity";
 import { DailyTodoCompleteStatus } from "../enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../enums/daily-todo-cycle.enum";
-import { UserId } from "../../../user/domain/vo/user-id.vo";
-import { CategoryId } from "../../../category/domain/vo/category-id.vo";
+import { UserId } from "../../../user/domain/model/user-id.vo";
+import { CategoryId } from "../../../category/domain/model/category-id.vo";
 
 @Schema({ collection: "daily-todo" })
 export class DailyTodoEntity extends BaseEntity {

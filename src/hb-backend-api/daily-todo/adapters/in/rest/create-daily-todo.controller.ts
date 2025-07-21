@@ -2,15 +2,15 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Body, Controller, Inject, Post, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../../shared/di/token.di";
-import { GetUserByNicknameUseCase } from "../../../../user/application/ports/in/get-user-by-nickname.use-case";
+import { GetUserByNicknameUseCase } from "../../../../user/domain/ports/in/get-user-by-nickname.use-case";
 import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
 import {
   NicknameAndAccessToken,
   TokenUserInformation,
 } from "../../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
 import { CreateDailyTodoDto } from "../dto/create-daily-todo.dto";
-import { UserNickname } from "../../../../user/domain/vo/user-nickname.vo";
-import { CategoryId } from "../../../../category/domain/vo/category-id.vo";
+import { UserNickname } from "../../../../user/domain/model/user-nickname.vo";
+import { CategoryId } from "../../../../category/domain/model/category-id.vo";
 import { CreateDailyTodoCommand } from "../../../application/command/create-daily-todo.command";
 import { DateHelper } from "../../../../../shared/date/date.helper";
 import { CreateDailyTodoUseCase } from "../../../application/ports/in/create-daily-todo.use-case";

@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { GetUserUseCase } from "../ports/in/get-user.use-case";
-import { UserQueryPort } from "../ports/out/user-query.port";
-import { UserQueryResult } from "../result/user-query.result";
+import { GetUserUseCase } from "../../domain/ports/in/get-user.use-case";
+import { UserQueryPort } from "../../domain/ports/out/user-query.port";
+import { UserQueryResult } from "../../domain/ports/out/user-query.result";
 import { DIToken } from "../../../../shared/di/token.di";
-import { UserId } from "../../domain/vo/user-id.vo";
+import { UserId } from "../../domain/model/user-id.vo";
 
 @Injectable()
 export class GetUserService implements GetUserUseCase {

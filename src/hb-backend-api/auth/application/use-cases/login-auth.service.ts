@@ -1,18 +1,18 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { compare } from "bcrypt";
-import { LoginAuthUseCase } from "../ports/in/login-auth.use-case";
-import { UserQueryPort } from "../../../user/application/ports/out/user-query.port";
-import { LoginAuthResult } from "../result/login-auth.result";
-import { LoginAuthCommand } from "../command/login-auth.command";
-import { JwtAuthPort } from "../ports/out/jwt-auth.port";
-import { UserEntitySchema } from "../../../user/domain/entity/user.entity";
-import { AuthPersistencePort } from "../ports/out/auth-persistence.port";
-import { AuthEntitySchema } from "../../domain/entity/auth.entity";
+import { LoginAuthUseCase } from "../../domain/ports/in/login-auth.use-case";
+import { UserQueryPort } from "../../../user/domain/ports/out/user-query.port";
+import { LoginAuthResult } from "../../domain/ports/out/login-auth.result";
+import { LoginAuthCommand } from "../../domain/ports/out/login-auth.command";
+import { JwtAuthPort } from "../../domain/ports/out/jwt-auth.port";
+import { UserEntitySchema } from "../../../user/domain/model/user.entity";
+import { AuthPersistencePort } from "../../domain/ports/out/auth-persistence.port";
+import { AuthEntitySchema } from "../../domain/model/auth.entity";
 import { DIToken } from "../../../../shared/di/token.di";
-import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
+import { UserNickname } from "../../../user/domain/model/user-nickname.vo";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
-import { AuthQueryPort } from "../ports/out/auth-query.port";
+import { AuthQueryPort } from "../../domain/ports/out/auth-query.port";
 
 @Injectable()
 export class LoginAuthService implements LoginAuthUseCase {

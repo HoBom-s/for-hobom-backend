@@ -1,13 +1,13 @@
 import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { TokenExpiredError } from "jsonwebtoken";
-import { RefreshAuthTokenUseCase } from "../ports/in/refresh-auth-token.use-case";
-import { JwtAuthPort } from "../ports/out/jwt-auth.port";
-import { AuthQueryPort } from "../ports/out/auth-query.port";
-import { AuthPersistencePort } from "../ports/out/auth-persistence.port";
-import { LoginAuthResult } from "../result/login-auth.result";
+import { RefreshAuthTokenUseCase } from "../../domain/ports/in/refresh-auth-token.use-case";
+import { JwtAuthPort } from "../../domain/ports/out/jwt-auth.port";
+import { AuthQueryPort } from "../../domain/ports/out/auth-query.port";
+import { AuthPersistencePort } from "../../domain/ports/out/auth-persistence.port";
+import { LoginAuthResult } from "../../domain/ports/out/login-auth.result";
 import { DIToken } from "../../../../shared/di/token.di";
-import { RefreshToken } from "../../domain/vo/refresh-token.vo";
-import { UserNickname } from "../../../user/domain/vo/user-nickname.vo";
+import { RefreshToken } from "../../domain/model/refresh-token.vo";
+import { UserNickname } from "../../../user/domain/model/user-nickname.vo";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
