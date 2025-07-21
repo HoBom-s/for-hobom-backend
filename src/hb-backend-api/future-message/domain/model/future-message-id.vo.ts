@@ -7,7 +7,7 @@ export class FutureMessageId {
 
   public static fromString(id: string): FutureMessageId {
     if (!Types.ObjectId.isValid(id)) {
-      throw new Error(`올바르지 않은 Menu Recommendation Id 형식이에요. ${id}`);
+      throw new Error(`올바르지 않은 Future Message Id 형식이에요. ${id}`);
     }
 
     return new FutureMessageId(new Types.ObjectId(id));
