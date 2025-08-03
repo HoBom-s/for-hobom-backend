@@ -20,6 +20,12 @@ export class FutureMessageEntity extends BaseEntity {
     type: String,
     required: true,
   })
+  title: string;
+
+  @Prop({
+    type: String,
+    required: true,
+  })
   content: string;
 
   @Prop({
