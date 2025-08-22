@@ -119,7 +119,7 @@ pipeline {
 
     # 🔒 .env 권한/소유권 보강
     chmod 600 ${env.DEPLOY_DIR}/.env
-    chown ${env.DEPLOY_USER}:${env.DEPLOY_USER} ${env.DEPLOY_DIR}/.env
+    sh "chown ${env.DEPLOY_USER}:${env.DEPLOY_USER} ${env.DEPLOY_DIR}/.env"
 
     # 3) prod deps 설치
     npm ci --omit=dev
