@@ -96,7 +96,7 @@ pipeline {
       }
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
-          sh """
+          sh '''
             scp -o StrictHostKeyChecking=no -P ${env.DEPLOY_PORT} deploy.tgz ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/${env.APP_NAME}.tgz
 
             ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} << 'EOF'
@@ -185,7 +185,7 @@ pipeline {
     sudo systemctl status ${SERVICE_NAME} --no-pager -l || true
     exit 1
     EOF
-          """
+          '''
         }
       }
     }
