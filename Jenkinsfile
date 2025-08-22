@@ -141,7 +141,7 @@ pipeline {
             # 7) systemd 유닛 생성/갱신
             NODE_BIN="\$(command -v node || true)"
             if [ -z "\$NODE_BIN" ]; then echo "node not found"; exit 1; fi
-            if [ ! -f "\$DEPLOY_DIR/.env" ]; then echo "ERROR: $DEPLOY_DIR/.env not found"; exit 1; fi
+            if [ ! -f "$DEPLOY_DIR/.env" ]; then echo "ERROR: $DEPLOY_DIR/.env not found"; exit 1; fi
 
             sudo tee /etc/systemd/system/"\$SERVICE_NAME".service >/dev/null <<SERVICE
             [Unit]
