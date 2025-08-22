@@ -64,8 +64,13 @@ export class ProcessScheduleFutureMessageService
   }
 
   private async sendAndMarkAsSent(message: FutureMessageDomain): Promise<void> {
-    await this.send(message);
-    await this.markAsSent(message.getId);
+    try {
+      await this.send(message);
+      await this.markAsSent(message.getId);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      await this.createOutboxFailFromMessage(message);
+    }
   }
 
   private async send(message: FutureMessageDomain): Promise<void> {
@@ -111,6 +116,29 @@ export class ProcessScheduleFutureMessageService
       EventType.MESSAGE,
       payload,
       OutboxStatus.PENDING,
+      1,
+      1,
+    );
+  }
+
+  private async createOutboxFailFromMessage(
+    message: FutureMessageDomain,
+  ): Promise<CreateOutboxEntity> {
+    const recipientId = message.getRecipientId;
+    const recipient = await this.userQueryPort.findById(recipientId);
+    const payload = OutboxPayloadFactoryRegistry.MESSAGE({
+      id: message.getId.toString(),
+      title: message.getTitle,
+      body: message.getContent,
+      recipient: recipient.getEmail,
+      senderId: message.getSenderId.toString(),
+      type: MessageEnum.MAIL_MESSAGE,
+    });
+
+    return CreateOutboxEntity.of(
+      EventType.MESSAGE,
+      payload,
+      OutboxStatus.FAILED,
       1,
       1,
     );
