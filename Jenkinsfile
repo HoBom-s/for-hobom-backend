@@ -137,8 +137,8 @@ pipeline {
     npm ci --omit=dev
 
     # 4) systemd 유닛 설정
-    NODE_BIN="\\$(command -v node || true)"
-    if [ -z "\\$NODE_BIN" ]; then echo "node not found"; exit 1; fi
+    NODE_BIN="$(command -v node || true)"
+    if [ -z "$NODE_BIN" ]; then echo "node not found"; exit 1; fi
 
     # 안전: .env 확인
     if [ ! -f "${DEPLOY_DIR}/.env" ]; then
@@ -160,7 +160,7 @@ pipeline {
     Environment=NODE_ENV=production
     EnvironmentFile=${DEPLOY_DIR}/.env
     Environment=PATH=/usr/local/bin:/usr/bin:/bin
-    ExecStart=\\$NODE_BIN ${DEPLOY_DIR}/${ENTRY_FILE}
+    ExecStart=$NODE_BIN ${DEPLOY_DIR}/${ENTRY_FILE}
     Restart=always
     RestartSec=3
 
