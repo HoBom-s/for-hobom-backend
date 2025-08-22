@@ -15,8 +15,8 @@ pipeline {
     SERVICE_NAME    = 'for-hobom-backend'
     ENTRY_FILE      = 'dist/main.js'
 
-    DEPLOY_HOST     = 'your.server.ip.or.hostname'
-    DEPLOY_USER     = 'ubuntu'
+    DEPLOY_HOST     = 'ishisha.iptime.org'
+    DEPLOY_USER     = 'infra-admin'
     DEPLOY_DIR      = '/srv/for-hobom-backend'
 
     SSH_CRED_ID     = 'deploy-ssh-key'     // SSH private key (서버 접속)
