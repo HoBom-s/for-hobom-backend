@@ -19,7 +19,7 @@ pipeline {
     DEPLOY_USER    = 'ubuntu'
     DEPLOY_DIR     = '/srv/for-hobom-backend'
     SSH_CRED_ID    = 'deploy-ssh-key'
-    ENV_FILE_CRED  = 'env-file-cred'
+    ENV_FILE_CRED  = 'hobom-infra-signin'
   }
 
   stages {
