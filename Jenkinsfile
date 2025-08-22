@@ -15,7 +15,7 @@ pipeline {
     SERVICE_NAME    = 'for-hobom-backend'
     ENTRY_FILE      = 'dist/main.js'
 
-    DEPLOY_HOST     = 'ishisha.iptime.org'
+    DEPLOY_HOST     = 'ishisha.iptime.org -p 7777'
     DEPLOY_USER     = 'infra-admin'
     DEPLOY_DIR      = '/srv/for-hobom-backend'
 
