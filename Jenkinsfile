@@ -128,12 +128,12 @@ pipeline {
             sudo chown -R "$DEPLOY_USER:$DEPLOY_USER" "$DEPLOY_DIR"
 
             # 4) 산출물 전개 (.env 포함)
-            tar -xzf "/tmp/\$APP_NAME.tgz" -C "$DEPLOY_DIR"
-            cd "$DEPLOY_DIR"
+            tar -xzf "/tmp/\$APP_NAME.tgz" -C "\$DEPLOY_DIR"
+            cd "\$DEPLOY_DIR"
 
             # 5) .env 권한/소유권 보강
-            chmod 600 "$DEPLOY_DIR/.env"
-            chown "$DEPLOY_USER:$DEPLOY_USER" "$DEPLOY_DIR/.env"
+            chmod 600 "\$DEPLOY_DIR/.env"
+            chown "\$DEPLOY_USER:\$DEPLOY_USER" "\$DEPLOY_DIR/.env"
 
             # 6) prod deps 설치
             npm ci --omit=dev
