@@ -80,6 +80,16 @@ pipeline {
       }
     }
 
+    stage('Verify SSH to target') {
+      steps {
+        sshagent (credentials: [env.SSH_CRED_ID]) {
+          sh """
+            ssh -o StrictHostKeyChecking=no ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'echo OK && whoami && hostname'
+          """
+        }
+      }
+    }
+
     stage('Deploy to server (systemd)') {
       when {
         allOf {
