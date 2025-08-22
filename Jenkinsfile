@@ -96,7 +96,7 @@ stage('Deploy to server (systemd)') {
   }
   steps {
     sshagent (credentials: [env.SSH_CRED_ID]) {
-      sh """
+      sh '''
         # 0) 원격 실행 스크립트/환경파일을 로컬에 생성
         cat > remote_deploy.sh <<'BASH'
         #!/usr/bin/env bash
@@ -202,7 +202,7 @@ stage('Deploy to server (systemd)') {
 
         # 2) 원격 실행 (bash 엄격모드로 실행, 실패 지점 라인까지 출력됨)
         ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'bash -euxo pipefail /tmp/remote_deploy.sh'
-      """
+      '''
     }
   }
 }
