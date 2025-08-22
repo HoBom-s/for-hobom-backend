@@ -100,13 +100,21 @@ pipeline {
       }
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
-          sh """
-            # 1) 설정 읽기
+
+          // 1) 원격에서 실행할 스크립트를 로컬에 생성 (작은따옴표: $ 보간 안 됨)
+          sh '''
+            cat > remote_deploy.sh <<'BASH'
+            #!/usr/bin/env bash
+            set -Eeuo pipefail
+            trap 'echo "[REMOTE][ERROR] line $LINENO: ${BASH_COMMAND}" >&2' ERR
+            PS4='+ [REMOTE] line %L: '; set -x
+
+            # 1) Jenkins가 보낸 /tmp/deploy.env 읽기
             set -a
             source /tmp/deploy.env
             set +a
 
-            # 2) Node 없으면 설치 (대비용)
+            # 2) Node 20+ 없으면 설치 (배포용 안전장치)
             if ! command -v node >/dev/null 2>&1; then
               if [ -f /etc/debian_version ]; then
                 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
@@ -123,29 +131,29 @@ pipeline {
               fi
             fi
 
-            # 3) 배포 디렉토리 준비
+            # 3) 배포 디렉토리
             sudo mkdir -p "$DEPLOY_DIR"
             sudo chown -R "$DEPLOY_USER:$DEPLOY_USER" "$DEPLOY_DIR"
 
-            # 4) 산출물 전개 (.env 포함)
-            tar -xzf "/tmp/\$APP_NAME.tgz" -C "\$DEPLOY_DIR"
-            cd "\$DEPLOY_DIR"
+            # 4) 산출물 전개 (.env 포함) — 파일명 고정: /tmp/deploy.tgz
+            tar -xzf "/tmp/deploy.tgz" -C "$DEPLOY_DIR"
+            cd "$DEPLOY_DIR"
 
             # 5) .env 권한/소유권 보강
-            chmod 600 "\$DEPLOY_DIR/.env"
-            chown "\$DEPLOY_USER:\$DEPLOY_USER" "\$DEPLOY_DIR/.env"
+            chmod 600 "$DEPLOY_DIR/.env"
+            chown "$DEPLOY_USER:$DEPLOY_USER" "$DEPLOY_DIR/.env"
 
             # 6) prod deps 설치
             npm ci --omit=dev
 
             # 7) systemd 유닛 생성/갱신
-            NODE_BIN="\$(command -v node || true)"
-            if [ -z "\$NODE_BIN" ]; then echo "node not found"; exit 1; fi
+            NODE_BIN="$(command -v node || true)"
+            if [ -z "$NODE_BIN" ]; then echo "node not found"; exit 1; fi
+            if [ ! -f "$DEPLOY_DIR/.env" ]; then echo "ERROR: $DEPLOY_DIR/.env not found"; exit 1; fi
 
-
-            sudo tee /etc/systemd/system/"\$SERVICE_NAME".service >/dev/null <<SERVICE
+            sudo tee /etc/systemd/system/"$SERVICE_NAME".service >/dev/null <<SERVICE
             [Unit]
-            Description=\$APP_NAME service
+            Description=$APP_NAME service
             After=network-online.target
             Wants=network-online.target
 
@@ -157,7 +165,7 @@ pipeline {
             Environment=NODE_ENV=production
             EnvironmentFile=$DEPLOY_DIR/.env
             Environment=PATH=/usr/local/bin:/usr/bin:/bin
-            ExecStart=\$NODE_BIN \$DEPLOY_DIR/\$ENTRY_FILE
+            ExecStart=$NODE_BIN $DEPLOY_DIR/$ENTRY_FILE
             Restart=always
             RestartSec=3
 
@@ -182,10 +190,12 @@ pipeline {
             sudo systemctl status "$SERVICE_NAME" --no-pager -l || true
             exit 1
             BASH
-                        chmod +x remote_deploy.sh
+                    chmod +x remote_deploy.sh
+                  '''
 
-                        # 0-2) 원격에서 읽을 환경파일 생성 (여긴 Groovy가 값 치환)
-                        cat > deploy.env <<EOF
+                  // 2) 원격에서 읽을 환경파일 생성 (여긴 Groovy 치환 필요 → 큰따옴표)
+                  sh """
+                    cat > deploy.env <<EOF
             APP_NAME=${env.APP_NAME}
             SERVICE_NAME=${env.SERVICE_NAME}
             ENTRY_FILE=${env.ENTRY_FILE}
@@ -193,10 +203,8 @@ pipeline {
             DEPLOY_USER=${env.DEPLOY_USER}
             EOF
 
-            # 1) 비밀 포함 배포 패키지 전송 + 원격 스크립트/환경파일 전송
+            # 3) 파일 전송(포트 포함) + 원격 실행
             scp -o StrictHostKeyChecking=no -P ${env.DEPLOY_PORT} deploy.tgz remote_deploy.sh deploy.env ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/
-
-            # 2) 원격 실행 (bash 엄격모드로 실행, 실패 지점 라인까지 출력)
             ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'bash -euxo pipefail /tmp/remote_deploy.sh'
           """
         }
