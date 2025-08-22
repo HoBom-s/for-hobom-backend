@@ -100,8 +100,6 @@ pipeline {
             scp -o StrictHostKeyChecking=no -P ${env.DEPLOY_PORT} deploy.tgz ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/${env.APP_NAME}.tgz
 
             ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} << 'EOF'
-          '''
-sh """
     set -e
 
     # 0) Node 없으면 설치 (대비용)
@@ -187,7 +185,7 @@ sh """
     sudo systemctl status ${SERVICE_NAME} --no-pager -l || true
     exit 1
     EOF
-          """
+          '''
         }
       }
     }
