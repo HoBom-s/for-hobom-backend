@@ -101,7 +101,7 @@ pipeline {
 
             ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} << 'EOF'
           '''
-sh '''
+sh """
     set -e
 
     # 0) Node 없으면 설치 (대비용)
@@ -187,7 +187,7 @@ sh '''
     sudo systemctl status ${SERVICE_NAME} --no-pager -l || true
     exit 1
     EOF
-          '''
+          """
         }
       }
     }
