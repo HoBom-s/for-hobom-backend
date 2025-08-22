@@ -85,7 +85,7 @@ pipeline {
       }
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
-          sh """
+          sh '''
             # 비밀 포함 배포 패키지 전송
             scp -o StrictHostKeyChecking=no deploy.tgz ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/${env.APP_NAME}.tgz
 
@@ -173,7 +173,7 @@ pipeline {
     sudo systemctl status ${env.SERVICE_NAME} --no-pager -l || true
     exit 1
     EOF
-          """
+          '''
         }
       }
     }
