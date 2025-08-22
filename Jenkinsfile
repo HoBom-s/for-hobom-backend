@@ -87,109 +87,125 @@ pipeline {
       }
     }
 
-    stage('Deploy to server (systemd)') {
-      when {
-        allOf {
-          anyOf { branch 'develop'; branch 'main' }
-          not { changeRequest() }
-        }
-      }
-      steps {
-        sshagent (credentials: [env.SSH_CRED_ID]) {
-          sh '''
-            scp -o StrictHostKeyChecking=no -P ${env.DEPLOY_PORT} deploy.tgz ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/${env.APP_NAME}.tgz
-
-            ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} << 'EOF'
-    set -e
-
-    # 0) Node 없으면 설치 (대비용)
-    if ! command -v node >/dev/null 2>&1; then
-      if [ -f /etc/debian_version ]; then
-        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-        sudo apt-get update -y && sudo apt-get install -y nodejs
-      elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ] || [ -f /etc/rocky-release ]; then
-        curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-        sudo yum install -y nodejs
-      elif [ -f /etc/amazon-linux-release ]; then
-        curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-        sudo dnf install -y nodejs || sudo yum install -y nodejs
-      else
-        echo "Unsupported distro: please pre-install Node 20+"
-        exit 1
-      fi
-    fi
-
-    # 1) 배포 디렉토리
-    sudo mkdir -p ${DEPLOY_DIR}
-    sudo chown -R ${DEPLOY_USER}:${DEPLOY_USER} ${DEPLOY_DIR}
-
-    # 2) 패키지 전개 (.env 포함)
-    tar -xzf /tmp/${APP_NAME}.tgz -C ${DEPLOY_DIR}
-    cd ${DEPLOY_DIR}
-
-    # 🔒 .env 권한/소유권 보강
-    chmod 600 ${DEPLOY_DIR}/.env
-    
-    # ★★★ 수정됨: 셸 스크립트 문법 오류 수정 ★★★
-    chown ${DEPLOY_USER}:${DEPLOY_USER} ${DEPLOY_DIR}/.env
-
-    # 3) prod deps 설치
-    npm ci --omit=dev
-
-    # 4) systemd 유닛 설정
-    NODE_BIN="$(command -v node || true)"
-    if [ -z "$NODE_BIN" ]; then echo "node not found"; exit 1; fi
-
-    # 안전: .env 확인
-    if [ ! -f "${DEPLOY_DIR}/.env" ]; then
-      echo "ERROR: ${DEPLOY_DIR}/.env not found"
-      exit 1
-    fi
-
-    sudo bash -c 'cat > /etc/systemd/system/${SERVICE_NAME}.service' <<SERVICE
-    [Unit]
-    Description=${APP_NAME} service
-    After=network-online.target
-    Wants=network-online.target
-
-    [Service]
-    Type=simple
-    User=${DEPLOY_USER}
-    Group=${DEPLOY_USER}
-    WorkingDirectory=${DEPLOY_DIR}
-    Environment=NODE_ENV=production
-    EnvironmentFile=${DEPLOY_DIR}/.env
-    Environment=PATH=/usr/local/bin:/usr/bin:/bin
-    ExecStart=$NODE_BIN ${DEPLOY_DIR}/${ENTRY_FILE}
-    Restart=always
-    RestartSec=3
-
-    [Install]
-    WantedBy=multi-user.target
-    SERVICE
-
-    sudo systemctl daemon-reload
-    sudo systemctl enable ${SERVICE_NAME}
-    sudo systemctl restart ${SERVICE_NAME}
-
-    # 상태 확인
-    for i in 1 2 3 4 5; do
-      sleep 2
-      if systemctl is-active --quiet ${SERVICE_NAME}; then
-        echo "Service ${SERVICE_NAME} is active."
-        exit 0
-      fi
-    done
-
-    echo "Service ${SERVICE_NAME} failed to become active."
-    sudo systemctl status ${SERVICE_NAME} --no-pager -l || true
-    exit 1
-    EOF
-          '''
-        }
-      }
+stage('Deploy to server (systemd)') {
+  when {
+    allOf {
+      anyOf { branch 'develop'; branch 'main' }
+      not { changeRequest() }
     }
   }
+  steps {
+    sshagent (credentials: [env.SSH_CRED_ID]) {
+      sh """
+        # 0) 원격 실행 스크립트/환경파일을 로컬에 생성
+        cat > remote_deploy.sh <<'BASH'
+        #!/usr/bin/env bash
+        set -Eeuo pipefail
+        trap 'echo "[REMOTE][ERROR] line \$LINENO: \${BASH_COMMAND}" >&2' ERR
+        PS4='+ [REMOTE] line %L: '
+        set -x
+
+        # 1) 설정 읽기
+        set -a
+        source /tmp/deploy.env
+        set +a
+
+        # 2) Node 없으면 설치 (대비용)
+        if ! command -v node >/dev/null 2>&1; then
+          if [ -f /etc/debian_version ]; then
+            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+            sudo apt-get update -y && sudo apt-get install -y nodejs
+          elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ] || [ -f /etc/rocky-release ]; then
+            curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+            sudo yum install -y nodejs
+          elif [ -f /etc/amazon-linux-release ]; then
+            curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+            sudo dnf install -y nodejs || sudo yum install -y nodejs
+          else
+            echo "Unsupported distro: pre-install Node 20+"
+            exit 1
+          fi
+        fi
+
+        # 3) 배포 디렉토리 준비
+        sudo mkdir -p "\$DEPLOY_DIR"
+        sudo chown -R "\$DEPLOY_USER:\$DEPLOY_USER" "\$DEPLOY_DIR"
+
+        # 4) 산출물 전개 (.env 포함)
+        tar -xzf "/tmp/\$APP_NAME.tgz" -C "\$DEPLOY_DIR"
+        cd "\$DEPLOY_DIR"
+
+        # 5) .env 권한/소유권 보강
+        chmod 600 "\$DEPLOY_DIR/.env"
+        chown "\$DEPLOY_USER:\$DEPLOY_USER" "\$DEPLOY_DIR/.env"
+
+        # 6) prod deps 설치
+        npm ci --omit=dev
+
+        # 7) systemd 유닛 생성/갱신
+        NODE_BIN="$(command -v node || true)"
+        if [ -z "\$NODE_BIN" ]; then echo "node not found"; exit 1; fi
+        if [ ! -f "\$DEPLOY_DIR/.env" ]; then echo "ERROR: \$DEPLOY_DIR/.env not found"; exit 1; fi
+
+        sudo tee /etc/systemd/system/"\$SERVICE_NAME".service >/dev/null <<SERVICE
+        [Unit]
+        Description=\$APP_NAME service
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        Type=simple
+        User=\$DEPLOY_USER
+        Group=\$DEPLOY_USER
+        WorkingDirectory=\$DEPLOY_DIR
+        Environment=NODE_ENV=production
+        EnvironmentFile=\$DEPLOY_DIR/.env
+        Environment=PATH=/usr/local/bin:/usr/bin:/bin
+        ExecStart=\$NODE_BIN \$DEPLOY_DIR/\$ENTRY_FILE
+        Restart=always
+        RestartSec=3
+
+        [Install]
+        WantedBy=multi-user.target
+        SERVICE
+
+        sudo systemctl daemon-reload
+        sudo systemctl enable "\$SERVICE_NAME"
+        sudo systemctl restart "\$SERVICE_NAME"
+
+        # 8) 상태 확인
+        for i in 1 2 3 4 5; do
+          sleep 2
+          if systemctl is-active --quiet "\$SERVICE_NAME"; then
+            echo "Service \$SERVICE_NAME is active."
+            exit 0
+          fi
+        done
+
+        echo "Service \$SERVICE_NAME failed to become active."
+        sudo systemctl status "\$SERVICE_NAME" --no-pager -l || true
+        exit 1
+        BASH
+                chmod +x remote_deploy.sh
+
+                # 0-2) 원격에서 읽을 환경파일 생성 (여긴 Groovy가 값 치환)
+                cat > deploy.env <<EOF
+        APP_NAME=${env.APP_NAME}
+        SERVICE_NAME=${env.SERVICE_NAME}
+        ENTRY_FILE=${env.ENTRY_FILE}
+        DEPLOY_DIR=${env.DEPLOY_DIR}
+        DEPLOY_USER=${env.DEPLOY_USER}
+        EOF
+
+        # 1) 비밀 포함 배포 패키지 전송 + 원격 스크립트/환경파일 전송
+        scp -o StrictHostKeyChecking=no -P ${env.DEPLOY_PORT} deploy.tgz remote_deploy.sh deploy.env ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/
+
+        # 2) 원격 실행 (bash 엄격모드로 실행, 실패 지점 라인까지 출력됨)
+        ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'bash -euxo pipefail /tmp/remote_deploy.sh'
+      """
+    }
+  }
+}
 
   post {
     success {
