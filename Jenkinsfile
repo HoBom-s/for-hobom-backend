@@ -80,7 +80,9 @@ pipeline {
     stage('Verify SSH to target') {
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
-          sh "ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'echo OK && whoami && hostname'"
+          sh """
+            ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'echo OK && whoami && hostname'
+          """
         }
       }
     }
