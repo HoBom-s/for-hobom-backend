@@ -42,7 +42,7 @@ pipeline {
       steps {
         sh '''
           npm run lint || true
-          npm run test:ci || npm run test || true
+          npm run test || true
         '''
       }
       post {
