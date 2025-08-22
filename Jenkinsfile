@@ -15,8 +15,8 @@ pipeline {
     DEPLOY_USER     = 'ubuntu'
     DEPLOY_DIR      = '/srv/for-hobom-backend'
 
-    SSH_CRED_ID     = 'deploy-ssh-key'          // SSH private key (서버 접속)
-    ENV_FILE_CRED   = 'hobom-infra-env'      // ✅ Jenkins Secret file (서버용 .env)
+    SSH_CRED_ID     = 'deploy-ssh-key'     // SSH private key (서버 접속)
+    ENV_FILE_CRED   = 'hobom-infra-env'    // Jenkins Secret file (.env 업로드)
   }
 
   stages {
@@ -65,13 +65,13 @@ pipeline {
           [ -d prisma ] && cp -r prisma deploy/prisma || true
           [ -d public ] && cp -r public deploy/public || true
         '''
-        // ✅ Jenkins Secret file -> deploy/.env (로그에 절대 echo 하지 말 것!)
+        // Jenkins Secret file(.env) → deploy/.env
         withCredentials([file(credentialsId: env.ENV_FILE_CRED, variable: 'ENV_FILE')]) {
           sh '''
             install -m 600 "$ENV_FILE" deploy/.env
           '''
         }
-        // 🔒 배포용 tgz (비밀 포함) — 아카이브하지 않음
+        // 비밀 포함 패키지 (아카이브 금지)
         sh 'tar -C deploy -czf deploy.tgz .'
       }
     }
@@ -79,20 +79,20 @@ pipeline {
     stage('Deploy to server (systemd)') {
       when {
         allOf {
-          anyOf { branch 'develop'; branch 'main' } // 멀티브랜치 기준 배포 브랜치
-          not { changeRequest() }                   // PR 배포 차단
+          anyOf { branch 'develop'; branch 'main' }
+          not { changeRequest() }
         }
       }
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
           sh """
-            # 비밀 포함 배포 패키지 전송 (아카이브 금지)
+            # 비밀 포함 배포 패키지 전송
             scp -o StrictHostKeyChecking=no deploy.tgz ${DEPLOY_USER}@${DEPLOY_HOST}:/tmp/${APP_NAME}.tgz
 
             ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} << 'EOF'
 set -e
 
-# 0) Node 없으면(대비) 설치 — 원치 않으면 블록 삭제 가능
+# 0) Node 없으면(대비) 설치 — 원치 않으면 이 블록 삭제 가능
 if ! command -v node >/dev/null 2>&1; then
   if [ -f /etc/debian_version ]; then
     curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
@@ -109,13 +109,17 @@ if ! command -v node >/dev/null 2>&1; then
   fi
 fi
 
-# 1) 배포 디렉토리
+# 1) 배포 디렉토리 준비
 sudo mkdir -p ${DEPLOY_DIR}
 sudo chown -R ${DEPLOY_USER}:${DEPLOY_USER} ${DEPLOY_DIR}
 
-# 2) 패키지 전개 (여기에는 deploy/.env 포함)
+# 2) 패키지 전개 (deploy/.env 포함)
 tar -xzf /tmp/${APP_NAME}.tgz -C ${DEPLOY_DIR}
 cd ${DEPLOY_DIR}
+
+# 🔒 .env 권한/소유권 보강
+chmod 600 ${DEPLOY_DIR}/.env
+chown ${DEPLOY_USER}:${DEPLOY_USER} ${DEPLOY_DIR}/.env
 
 # 3) prod deps 설치
 npm ci --omit=dev
@@ -156,6 +160,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable ${SERVICE_NAME}
 sudo systemctl restart ${SERVICE_NAME}
 
+# 상태 확인
 for i in 1 2 3 4 5; do
   sleep 2
   if systemctl is-active --quiet ${SERVICE_NAME}; then
