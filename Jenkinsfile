@@ -15,14 +15,13 @@ pipeline {
     SERVICE_NAME    = 'for-hobom-backend'
     ENTRY_FILE      = 'dist/main.js'
 
-    // ★★★ 수정됨: DEPLOY_HOST와 DEPLOY_PORT 분리 ★★★
     DEPLOY_HOST     = 'ishisha.iptime.org'
     DEPLOY_PORT     = '22223'
     DEPLOY_USER     = 'infra-admin'
     DEPLOY_DIR      = '/srv/for-hobom-backend'
 
-    SSH_CRED_ID     = 'deploy-ssh-key'     // SSH private key (서버 접속)
-    ENV_FILE_CRED   = 'hobom-infra-env'    // ✅ Jenkins Secret file (서버용 .env)
+    SSH_CRED_ID     = 'deploy-ssh-key'
+    ENV_FILE_CRED   = 'hobom-infra-env'
   }
 
   stages {
@@ -35,7 +34,6 @@ pipeline {
 
     stage('Install dependencies') {
       steps {
-        // tools 블록이 Node.js를 PATH에 추가해주므로 node -v && npm -v는 필요 없습니다.
         sh 'npm ci'
       }
     }
@@ -82,7 +80,6 @@ pipeline {
     stage('Verify SSH to target') {
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
-          // ★★★ 수정됨: -p 옵션 추가 및 DEPLOY_HOST 분리 ★★★
           sh "ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'echo OK && whoami && hostname'"
         }
       }
@@ -98,7 +95,6 @@ pipeline {
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
           sh '''
-            # ★★★ 수정됨: ssh 명령어에 -p 옵션 추가 ★★★
             scp -o StrictHostKeyChecking=no -P ${env.DEPLOY_PORT} deploy.tgz ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/${env.APP_NAME}.tgz
 
             ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} << 'EOF'
