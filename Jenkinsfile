@@ -101,14 +101,6 @@ pipeline {
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
           sh """
-            # 0) 원격 실행 스크립트/환경파일을 로컬에 생성
-            cat > remote_deploy.sh <<'BASH'
-            #!/usr/bin/env bash
-            set -Eeuo pipefail
-            trap 'echo "[REMOTE][ERROR] line $LINENO: ${BASH_COMMAND}" >&2' ERR
-            PS4='+ [REMOTE] line %L: '
-            set -x
-
             # 1) 설정 읽기
             set -a
             source /tmp/deploy.env
@@ -165,7 +157,7 @@ pipeline {
             Environment=NODE_ENV=production
             EnvironmentFile=$DEPLOY_DIR/.env
             Environment=PATH=/usr/local/bin:/usr/bin:/bin
-            ExecStart=$NODE_BIN $DEPLOY_DIR/$ENTRY_FILE
+            ExecStart=\$NODE_BIN \$DEPLOY_DIR/\$ENTRY_FILE
             Restart=always
             RestartSec=3
 
