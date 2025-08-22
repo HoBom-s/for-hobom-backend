@@ -90,89 +90,89 @@ pipeline {
             scp -o StrictHostKeyChecking=no deploy.tgz ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/${env.APP_NAME}.tgz
 
             ssh -o StrictHostKeyChecking=no ${env.DEPLOY_USER}@${env.DEPLOY_HOST} << 'EOF'
-        set -e
+    set -e
 
-        # 0) Node 없으면(대비) 설치 — 원치 않으면 이 블록 삭제 가능
-        if ! command -v node >/dev/null 2>&1; then
-          if [ -f /etc/debian_version ]; then
-            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-            sudo apt-get update -y && sudo apt-get install -y nodejs
-          elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ] || [ -f /etc/rocky-release ]; then
-            curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-            sudo yum install -y nodejs
-          elif [ -f /etc/amazon-linux-release ]; then
-            curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-            sudo dnf install -y nodejs || sudo yum install -y nodejs
-          else
-            echo "Unsupported distro: please pre-install Node 20+"
-            exit 1
-          fi
-        fi
-
-        # 1) 배포 디렉토리 준비
-        sudo mkdir -p ${env.DEPLOY_DIR}
-        sudo chown -R ${env.DEPLOY_USER}:${env.DEPLOY_USER} ${env.DEPLOY_DIR}
-
-        # 2) 패키지 전개 (deploy/.env 포함)
-        tar -xzf /tmp/${env.APP_NAME}.tgz -C ${env.DEPLOY_DIR}
-        cd ${env.DEPLOY_DIR}
-
-        # 🔒 .env 권한/소유권 보강
-        chmod 600 ${env.DEPLOY_DIR}/.env
-        chown ${env.DEPLOY_USER}:${env.DEPLOY_USER} ${env.DEPLOY_DIR}/.env
-
-        # 3) prod deps 설치
-        npm ci --omit=dev
-
-        # 4) systemd 유닛 (DEPLOY_DIR/.env 사용)
-        NODE_BIN="\\$(command -v node || true)"
-        if [ -z "\\$NODE_BIN" ]; then echo "node not found"; exit 1; fi
-
-        # 안전: .env 존재 검증 (없으면 실패)
-        if [ ! -f "${env.DEPLOY_DIR}/.env" ]; then
-          echo "ERROR: ${env.DEPLOY_DIR}/.env not found"
-          exit 1
-        fi
-
-        sudo bash -c 'cat > /etc/systemd/system/${env.SERVICE_NAME}.service' <<SERVICE
-        [Unit]
-        Description=${env.APP_NAME} service
-        After=network-online.target
-        Wants=network-online.target
-
-        [Service]
-        Type=simple
-        User=${env.DEPLOY_USER}
-        Group=${env.DEPLOY_USER}
-        WorkingDirectory=${env.DEPLOY_DIR}
-        Environment=NODE_ENV=production
-        EnvironmentFile=${env.DEPLOY_DIR}/.env
-        Environment=PATH=/usr/local/bin:/usr/bin:/bin
-        ExecStart=\\$NODE_BIN ${env.DEPLOY_DIR}/${env.ENTRY_FILE}
-        Restart=always
-        RestartSec=3
-
-        [Install]
-        WantedBy=multi-user.target
-        SERVICE
-
-        sudo systemctl daemon-reload
-        sudo systemctl enable ${env.SERVICE_NAME}
-        sudo systemctl restart ${env.SERVICE_NAME}
-
-        # 상태 확인
-        for i in 1 2 3 4 5; do
-          sleep 2
-          if systemctl is-active --quiet ${env.SERVICE_NAME}; then
-            echo "Service ${env.SERVICE_NAME} is active."
-            exit 0
-          fi
-        done
-
-        echo "Service ${env.SERVICE_NAME} failed to become active."
-        sudo systemctl status ${env.SERVICE_NAME} --no-pager -l || true
+    # 0) Node 없으면 설치 (원치 않으면 삭제 가능)
+    if ! command -v node >/dev/null 2>&1; then
+      if [ -f /etc/debian_version ]; then
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+        sudo apt-get update -y && sudo apt-get install -y nodejs
+      elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ] || [ -f /etc/rocky-release ]; then
+        curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+        sudo yum install -y nodejs
+      elif [ -f /etc/amazon-linux-release ]; then
+        curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+        sudo dnf install -y nodejs || sudo yum install -y nodejs
+      else
+        echo "Unsupported distro: please pre-install Node 20+"
         exit 1
-        EOF
+      fi
+    fi
+
+    # 1) 배포 디렉토리
+    sudo mkdir -p ${env.DEPLOY_DIR}
+    sudo chown -R ${env.DEPLOY_USER}:${env.DEPLOY_USER} ${env.DEPLOY_DIR}
+
+    # 2) 패키지 전개 (.env 포함)
+    tar -xzf /tmp/${env.APP_NAME}.tgz -C ${env.DEPLOY_DIR}
+    cd ${env.DEPLOY_DIR}
+
+    # 🔒 .env 권한/소유권 보강
+    chmod 600 ${env.DEPLOY_DIR}/.env
+    chown ${env.DEPLOY_USER}:${env.DEPLOY_USER} ${env.DEPLOY_DIR}/.env
+
+    # 3) prod deps 설치
+    npm ci --omit=dev
+
+    # 4) systemd 유닛 설정
+    NODE_BIN="\\$(command -v node || true)"
+    if [ -z "\\$NODE_BIN" ]; then echo "node not found"; exit 1; fi
+
+    # 안전: .env 확인
+    if [ ! -f "${env.DEPLOY_DIR}/.env" ]; then
+      echo "ERROR: ${env.DEPLOY_DIR}/.env not found"
+      exit 1
+    fi
+
+    sudo bash -c 'cat > /etc/systemd/system/${env.SERVICE_NAME}.service' <<SERVICE
+    [Unit]
+    Description=${env.APP_NAME} service
+    After=network-online.target
+    Wants=network-online.target
+
+    [Service]
+    Type=simple
+    User=${env.DEPLOY_USER}
+    Group=${env.DEPLOY_USER}
+    WorkingDirectory=${env.DEPLOY_DIR}
+    Environment=NODE_ENV=production
+    EnvironmentFile=${env.DEPLOY_DIR}/.env
+    Environment=PATH=/usr/local/bin:/usr/bin:/bin
+    ExecStart=\\$NODE_BIN ${env.DEPLOY_DIR}/${env.ENTRY_FILE}
+    Restart=always
+    RestartSec=3
+
+    [Install]
+    WantedBy=multi-user.target
+    SERVICE
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable ${env.SERVICE_NAME}
+    sudo systemctl restart ${env.SERVICE_NAME}
+
+    # 상태 확인
+    for i in 1 2 3 4 5; do
+      sleep 2
+      if systemctl is-active --quiet ${env.SERVICE_NAME}; then
+        echo "Service ${env.SERVICE_NAME} is active."
+        exit 0
+      fi
+    done
+
+    echo "Service ${env.SERVICE_NAME} failed to become active."
+    sudo systemctl status ${env.SERVICE_NAME} --no-pager -l || true
+    exit 1
+    EOF
           """
         }
       }
