@@ -128,7 +128,7 @@ pipeline {
             sudo chown -R "$DEPLOY_USER:$DEPLOY_USER" "$DEPLOY_DIR"
 
             # 4) 산출물 전개 (.env 포함)
-            tar -xzf "/tmp/$APP_NAME.tgz" -C "$DEPLOY_DIR"
+            tar -xzf "/tmp/\$APP_NAME.tgz" -C "$DEPLOY_DIR"
             cd "$DEPLOY_DIR"
 
             # 5) .env 권한/소유권 보강
@@ -194,10 +194,10 @@ pipeline {
             EOF
 
             # 1) 비밀 포함 배포 패키지 전송 + 원격 스크립트/환경파일 전송
-            scp -o StrictHostKeyChecking=no -P \${env.DEPLOY_PORT} deploy.tgz remote_deploy.sh deploy.env \${env.DEPLOY_USER}@\${env.DEPLOY_HOST}:/tmp/
+            scp -o StrictHostKeyChecking=no -P ${env.DEPLOY_PORT} deploy.tgz remote_deploy.sh deploy.env ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/
 
             # 2) 원격 실행 (bash 엄격모드로 실행, 실패 지점 라인까지 출력)
-            ssh -o StrictHostKeyChecking=no -p \${env.DEPLOY_PORT} \${env.DEPLOY_USER}@\${env.DEPLOY_HOST} 'bash -euxo pipefail /tmp/remote_deploy.sh'
+            ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'bash -euxo pipefail /tmp/remote_deploy.sh'
           """
         }
       }
