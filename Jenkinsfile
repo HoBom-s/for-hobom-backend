@@ -205,15 +205,13 @@ stage('Deploy to server (systemd)') {
       '''
     }
   }
-}
 
   post {
     success {
       echo "✅ Build #${env.BUILD_NUMBER} OK (${env.BRANCH_NAME})"
-      echo "🚀 Deployed to ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:${env.DEPLOY_DIR} (systemd: ${env.SERVICE_NAME})"
+      echo "🚀 Deployed to ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:${env.DEPLOY_DIR} (systemd: ${env.SERVICE_NAME}) "
     }
     failure {
       echo "❌ Build failed (${env.BRANCH_NAME})"
     }
   }
-}
