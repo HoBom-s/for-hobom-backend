@@ -92,54 +92,51 @@ CFG
         sshagent (credentials: [env.SSH_CRED_ID]) {
           withCredentials([usernamePassword(credentialsId: env.READ_CRED_ID, usernameVariable: 'PULL_USER', passwordVariable: 'PULL_PASS')]) {
             sh '''
-              set -eux
-              ssh -o StrictHostKeyChecking=no -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
-                APP_NAME="$APP_NAME" \
-                IMAGE="$IMAGE_LATEST" \
-                CONTAINER="$APP_NAME" \
-                ENV_PATH="/etc/$APP_NAME/.env" \
-                HOST_PORT="8080" \
-                CONTAINER_PORT="8080" \
-                PULL_USER="$PULL_USER" \
-                PULL_PASS="$PULL_PASS" \
-                bash -s <<'EOF'
-                set -euo pipefail
-                echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
+    set -eux
 
-                # Docker 설치 여부만 확인 (설치까지 시도하지 않음)
-                if ! command -v docker >/dev/null 2>&1; then
-                  echo "[REMOTE][ERROR] docker not found. Please install Docker and add $USER to docker group."
-                  exit 1
-                fi
+    ssh -o StrictHostKeyChecking=no -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+      APP_NAME="$APP_NAME" \
+      IMAGE="$IMAGE_LATEST" \
+      CONTAINER="$APP_NAME" \
+      ENV_PATH="/etc/$APP_NAME/.env" \
+      HOST_PORT="8080" \
+      CONTAINER_PORT="8080" \
+      PULL_USER="$PULL_USER" \
+      PULL_PASS="$PULL_PASS" \
+      bash -s <<'EOF'
+    set -euo pipefail
+    echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
 
-                # Private 레포 로그인 (sudo 없이)
-                echo "$PULL_PASS" | docker login docker.io -u "$PULL_USER" --password-stdin
+    # docker 필요 (sudo 없이 쓰는 구성이 권장)
+    if ! command -v docker >/dev/null 2>&1; then
+      echo "[REMOTE][ERROR] docker not found. Install docker and add $USER to docker group."
+      exit 1
+    fi
 
-                # 서버 .env 확인
-                if [ ! -f "$ENV_PATH" ]; then
-                  echo "[REMOTE][ERROR] $ENV_PATH not found. Create it on the server."
-                  exit 1
-                fi
+    # Private 레포 로그인
+    echo "$PULL_PASS" | docker login docker.io -u "$PULL_USER" --password-stdin
 
-                # 최신 이미지 pull
-                docker pull "$IMAGE"
+    # .env 확인
+    if [ ! -f "$ENV_PATH" ]; then
+      echo "[REMOTE][ERROR] $ENV_PATH not found. Create it first."
+      exit 1
+    fi
 
-                # 기존 컨테이너 정리
-                if docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
-                  docker stop "$CONTAINER" || true
-                  docker rm "$CONTAINER" || true
-                fi
+    # 최신 이미지 pull + 재기동
+    docker pull "$IMAGE"
+    if docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
+      docker stop "$CONTAINER" || true
+      docker rm "$CONTAINER" || true
+    fi
 
-                # 새 컨테이너 실행
-                docker run -d --name "$CONTAINER" \
-                  --restart unless-stopped \
-                  --env-file "$ENV_PATH" \
-                  -p "${HOST_PORT}:${CONTAINER_PORT}" \
-                  "$IMAGE"
+    docker run -d --name "$CONTAINER" \
+      --restart unless-stopped \
+      --env-file "$ENV_PATH" \
+      -p "${HOST_PORT}:${CONTAINER_PORT}" \
+      "$IMAGE"
 
-                # 상태 출력
-                docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
-                EOF
+    docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
+    EOF
             '''
           }
         }
