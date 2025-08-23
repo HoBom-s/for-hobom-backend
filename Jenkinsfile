@@ -1,16 +1,8 @@
 pipeline {
-  agent any
-
-  tools {
-    nodejs 'node-20'
-  }
-
-  options {
-    timestamps()
-    disableConcurrentBuilds()
-  }
+  agent none
 
   environment {
+    // Docker Hub
     REGISTRY      = 'docker.io'
     IMAGE_REPO    = 'jjockrod/hobom-system'
     SERVICE_NAME  = 'for-hobom-backend'
@@ -28,64 +20,55 @@ pipeline {
   }
 
   stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-        sh 'git --no-pager log -1 --pretty=oneline'
-      }
-    }
 
-    stage('Install / Lint / Test / Build') {
-      steps {
-        sh '''
-          set -eux
-          node -v
-          npm -v
-          npm ci
-          npm run lint || true
-          npm run test || true
-          npm run build
-        '''
-      }
-      post {
-        success {
-          archiveArtifacts artifacts: 'dist/**/*', onlyIfSuccessful: true
-        }
-      }
-    }
-
-    // ⬇⬇⬇ 여기: Docker 대신 Kaniko 사용 ⬇⬇⬇
-    stage('Docker build & push (kaniko)') {
-      // Jenkins Kubernetes plugin이 필요합니다.
+    stage('Build & Push (K8s + Kaniko)') {
       agent {
         kubernetes {
           yaml """
-            apiVersion: v1
-            kind: Pod
-            spec:
-              containers:
-                - name: kaniko
-                  image: gcr.io/kaniko-project/executor:latest
-                  tty: true
-                  command: ["cat"]   # 파이프라인이 실행 명령을 넣기 위해 대기
-                  volumeMounts:
-                    - name: kaniko-docker-config
-                      mountPath: /kaniko/.docker
-              volumes:
-                - name: kaniko-docker-config
-                  emptyDir: {}
-        """
+apiVersion: v1
+kind: Pod
+spec:
+  volumes:
+    - name: docker-config
+      emptyDir: {}
+  containers:
+    - name: node
+      image: node:20
+      tty: true
+      command: ["/bin/sh","-c"]
+      args: ["sleep infinity"]
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:debug
+      tty: true
+      command: ["/busybox/sh","-c"]
+      args: ["sleep infinity"]
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+"""
         }
       }
       steps {
+        container('node') {
+          sh '''
+            set -eux
+            node -v
+            npm -v
+            npm ci
+            npm run lint || true
+            npm run test || true
+            npm run build
+          '''
+        }
         container('kaniko') {
           withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
             sh '''
               set -eux
-              # Kaniko용 Docker config.json 생성 (Docker Hub 인증)
-              AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 | tr -d '\n')"
+              # Kaniko가 쓸 Docker Hub 인증파일 생성
+              AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 | tr -d '\n' || true)"
+              if [ -z "$AUTH" ]; then AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 -w0)"; fi
               cat > /kaniko/.docker/config.json <<CFG
-              { "auths": { "https://index.docker.io/v1/": { "auth": "$AUTH" } } }
+{"auths":{"https://index.docker.io/v1/":{"auth":"$AUTH"}}}
 CFG
 
               /kaniko/executor \
@@ -94,7 +77,8 @@ CFG
                 --destination "${IMAGE_TAG}" \
                 --destination "${IMAGE_LATEST}" \
                 --cache=true \
-                --verbosity=info
+                --verbosity=info \
+                --cleanup
             '''
           }
         }
@@ -103,6 +87,7 @@ CFG
 
     stage('Deploy container to server') {
       when { anyOf { branch 'develop'; branch 'main' } }
+      agent any
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
           withCredentials([usernamePassword(credentialsId: env.READ_CRED_ID, usernameVariable: 'PULL_USER', passwordVariable: 'PULL_PASS')]) {
@@ -137,7 +122,7 @@ CFG
                   fi
                 fi
 
-                # Private pull 로그인
+                # Private 레포 pull 위해 로그인
                 echo "$PULL_PASS" | sudo docker login docker.io -u "$PULL_USER" --password-stdin
 
                 # 서버 .env 확인
@@ -146,7 +131,7 @@ CFG
                   exit 1
                 fi
 
-                # 최신 이미지 pull & 컨테이너 재기동
+                # 최신 이미지 pull & 재기동
                 sudo docker pull "$IMAGE"
                 if sudo docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
                   sudo docker stop "$CONTAINER" || true
@@ -169,6 +154,7 @@ CFG
 
     stage('Smoke check (optional)') {
       when { anyOf { branch 'develop'; branch 'main' } }
+      agent any
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
           sh """
