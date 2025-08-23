@@ -55,17 +55,38 @@ pipeline {
       }
     }
 
+    stage('Install Docker on agent (once)') {
+      steps {
+        sh '''
+          set -eux
+          if ! command -v docker >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y ca-certificates curl gnupg
+            sudo install -m 0755 -d /etc/apt/keyrings
+            curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+    https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+    $(. /etc/os-release; echo "$VERSION_CODENAME") stable" \
+    | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+            sudo apt-get update -y
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          fi
+          docker version
+        '''
+      }
+    }
+
     stage('Docker build & push') {
       steps {
         withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
-          sh """
+          sh '''
             set -eux
-            docker build -t ${env.IMAGE_TAG} -t ${env.IMAGE_LATEST} .
-            echo "$REG_PASS" | docker login ${env.REGISTRY} -u "$REG_USER" --password-stdin
-            docker push ${env.IMAGE_TAG}
-            docker push ${env.IMAGE_LATEST}
-            docker logout ${env.REGISTRY}
-          """
+            docker build -t "$IMAGE_TAG" -t "$IMAGE_LATEST" .
+            echo "$REG_PASS" | docker login "$REGISTRY" -u "$REG_USER" --password-stdin
+            docker push "$IMAGE_TAG"
+            docker push "$IMAGE_LATEST"
+            docker logout "$REGISTRY"
+          '''
         }
       }
     }
