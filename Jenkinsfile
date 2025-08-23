@@ -1,6 +1,11 @@
 pipeline {
   agent none
 
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+  }
+
   environment {
     // Docker Hub
     REGISTRY      = 'docker.io'
@@ -19,58 +24,63 @@ pipeline {
     SSH_CRED_ID   = 'deploy-ssh-key'
   }
 
-  stage('Build & Push (K8s + Kaniko)') {
-    agent {
-      kubernetes {
-        yaml """
-          apiVersion: v1
-          kind: Pod
-          spec:
-            containers:
-              - name: node
-                image: node:20
-                command: ["bash", "-lc", "sleep 9999999"]
-              - name: kaniko
-                image: gcr.io/kaniko-project/executor:debug
-                command: ["/busybox/sh", "-c", "sleep 9999999"]
-                volumeMounts:
-                  - name: kaniko-docker-config
-                    mountPath: /kaniko/.docker
-            volumes:
-              - name: kaniko-docker-config
-                emptyDir: {}
-        """
+  stages {
+    stage('Build & Push (K8s + Kaniko)') {
+      agent {
+        kubernetes {
+          yaml """
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+                - name: node
+                  image: node:20
+                  # bash 없는 이미지 대비 sh 로 대기
+                  command: ["sh", "-lc", "sleep 9999999"]
+                - name: kaniko
+                  image: gcr.io/kaniko-project/executor:debug
+                  command: ["/busybox/sh", "-c", "sleep 9999999"]
+                  volumeMounts:
+                    - name: kaniko-docker-config
+                      mountPath: /kaniko/.docker
+              volumes:
+                - name: kaniko-docker-config
+                  emptyDir: {}
+          """
+        }
       }
-    }
-    steps {
-      checkout scm
+      steps {
+        // checkout 은 기본 jnlp 컨테이너에서 수행 (보통 git 포함)
+        checkout scm
 
-      container('node') {
-        sh '''
-          set -eux
-          node -v
-          npm ci
-          npm run build
-        '''
-      }
-      container('kaniko') {
-        withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
+        container('node') {
           sh '''
             set -eux
-            # base64 구현 차이 대비(-w0 없으면 두번째로 fallback)
-            AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 -w0 2>/dev/null || printf '%s' "$REG_USER:$REG_PASS" | base64)"
-            cat > /kaniko/.docker/config.json <<CFG
-            { "auths": { "https://index.docker.io/v1/": { "auth": "$AUTH" } } }
-  CFG
-
-            /kaniko/executor \
-              --context "$WORKSPACE" \
-              --dockerfile "$WORKSPACE/Dockerfile" \
-              --destination "${IMAGE_TAG}" \
-              --destination "${IMAGE_LATEST}" \
-              --cache=true \
-              --verbosity=info
+            node -v
+            npm ci
+            npm run build
           '''
+        }
+
+        container('kaniko') {
+          withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
+            sh '''
+              set -eux
+              # base64 옵션 차이(-w0) 대응
+              AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 -w0 2>/dev/null || printf '%s' "$REG_USER:$REG_PASS" | base64)"
+              cat > /kaniko/.docker/config.json <<CFG
+              { "auths": { "https://index.docker.io/v1/": { "auth": "$AUTH" } } }
+CFG
+
+              /kaniko/executor \
+                --context "$WORKSPACE" \
+                --dockerfile "$WORKSPACE/Dockerfile" \
+                --destination "${IMAGE_TAG}" \
+                --destination "${IMAGE_LATEST}" \
+                --cache=true \
+                --verbosity=info
+            '''
+          }
         }
       }
     }
