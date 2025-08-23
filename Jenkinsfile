@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   tools {
-    nodejs 'node-20'  // Jenkins에 NodeJS 설치 항목(node-20) 등록되어 있어야 함
+    nodejs 'node-20'
   }
 
   options {
@@ -11,21 +11,20 @@ pipeline {
   }
 
   environment {
-    // Docker Hub
     REGISTRY      = 'docker.io'
-    IMAGE_REPO    = 'jjockrod/hobom-system'          // Docker Hub
-    SERVICE_NAME  = 'for-hobom-backend'              // Tag
+    IMAGE_REPO    = 'jjockrod/hobom-system'
+    SERVICE_NAME  = 'for-hobom-backend'
     IMAGE_TAG     = "${REGISTRY}/${IMAGE_REPO}:${SERVICE_NAME}-${env.BUILD_NUMBER}"
     IMAGE_LATEST  = "${REGISTRY}/${IMAGE_REPO}:${SERVICE_NAME}-latest"
-    REGISTRY_CRED = 'dockerhub-cred'                 // Push only
-    READ_CRED_ID  = 'dockerhub-readonly'             // Private pull only
+    REGISTRY_CRED = 'dockerhub-cred'          // Docker Hub (push)
+    READ_CRED_ID  = 'dockerhub-readonly'      // Remote pull (private)
 
-    // Remote Server
+    // Remote server
     APP_NAME      = 'for-hobom-backend'
     DEPLOY_HOST   = 'ishisha.iptime.org'
     DEPLOY_PORT   = '22223'
     DEPLOY_USER   = 'infra-admin'
-    SSH_CRED_ID   = 'deploy-ssh-key'                 // SSH private key
+    SSH_CRED_ID   = 'deploy-ssh-key'
   }
 
   stages {
@@ -55,17 +54,49 @@ pipeline {
       }
     }
 
-    stage('Docker build & push') {
+    // ⬇⬇⬇ 여기: Docker 대신 Kaniko 사용 ⬇⬇⬇
+    stage('Docker build & push (kaniko)') {
+      // Jenkins Kubernetes plugin이 필요합니다.
+      agent {
+        kubernetes {
+          yaml """
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+                - name: kaniko
+                  image: gcr.io/kaniko-project/executor:latest
+                  tty: true
+                  command: ["cat"]   # 파이프라인이 실행 명령을 넣기 위해 대기
+                  volumeMounts:
+                    - name: kaniko-docker-config
+                      mountPath: /kaniko/.docker
+              volumes:
+                - name: kaniko-docker-config
+                  emptyDir: {}
+        """
+        }
+      }
       steps {
-        withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
-          sh '''
-            set -eux
-            docker build -t "$IMAGE_TAG" -t "$IMAGE_LATEST" .
-            echo "$REG_PASS" | docker login "$REGISTRY" -u "$REG_USER" --password-stdin
-            docker push "$IMAGE_TAG"
-            docker push "$IMAGE_LATEST"
-            docker logout "$REGISTRY"
-          '''
+        container('kaniko') {
+          withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
+            sh '''
+              set -eux
+              # Kaniko용 Docker config.json 생성 (Docker Hub 인증)
+              AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 | tr -d '\n')"
+              cat > /kaniko/.docker/config.json <<CFG
+              { "auths": { "https://index.docker.io/v1/": { "auth": "$AUTH" } } }
+CFG
+
+              /kaniko/executor \
+                --context "$WORKSPACE" \
+                --dockerfile "$WORKSPACE/Dockerfile" \
+                --destination "${IMAGE_TAG}" \
+                --destination "${IMAGE_LATEST}" \
+                --cache=true \
+                --verbosity=info
+            '''
+          }
         }
       }
     }
@@ -76,7 +107,7 @@ pipeline {
         sshagent (credentials: [env.SSH_CRED_ID]) {
           withCredentials([usernamePassword(credentialsId: env.READ_CRED_ID, usernameVariable: 'PULL_USER', passwordVariable: 'PULL_PASS')]) {
             sh '''
-              # 원격에 환경 변수 넘기고 Here-doc으로 스크립트 실행 (Groovy 보간 off)
+              set -eux
               ssh -o StrictHostKeyChecking=no -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
                 APP_NAME="$APP_NAME" \
                 IMAGE="$IMAGE_LATEST" \
@@ -97,10 +128,7 @@ pipeline {
                     sudo apt-get install -y ca-certificates curl gnupg
                     sudo install -m 0755 -d /etc/apt/keyrings
                     curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-                https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-                $(. /etc/os-release; echo "$VERSION_CODENAME") stable" | \
-                sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(. /etc/os-release; echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
                     sudo apt-get update -y
                     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
                   else
@@ -109,7 +137,7 @@ pipeline {
                   fi
                 fi
 
-                # Private 레포 → pull 전 로그인
+                # Private pull 로그인
                 echo "$PULL_PASS" | sudo docker login docker.io -u "$PULL_USER" --password-stdin
 
                 # 서버 .env 확인
@@ -118,23 +146,19 @@ pipeline {
                   exit 1
                 fi
 
-                # 최신 이미지 pull
+                # 최신 이미지 pull & 컨테이너 재기동
                 sudo docker pull "$IMAGE"
-
-                # 기존 컨테이너 정리
                 if sudo docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
                   sudo docker stop "$CONTAINER" || true
                   sudo docker rm "$CONTAINER" || true
                 fi
 
-                # 새 컨테이너 실행
                 sudo docker run -d --name "$CONTAINER" \
                   --restart unless-stopped \
                   --env-file "$ENV_PATH" \
                   -p "${HOST_PORT}:${CONTAINER_PORT}" \
                   "$IMAGE"
 
-                # 상태 출력
                 sudo docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
                 EOF
             '''
