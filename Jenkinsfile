@@ -106,24 +106,14 @@ CFG
                 set -euo pipefail
                 echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
 
-                # Docker 없으면 설치 (Debian/Ubuntu)
+                # Docker 설치 여부만 확인 (설치까지 시도하지 않음)
                 if ! command -v docker >/dev/null 2>&1; then
-                  if [ -f /etc/debian_version ]; then
-                    sudo apt-get update -y
-                    sudo apt-get install -y ca-certificates curl gnupg
-                    sudo install -m 0755 -d /etc/apt/keyrings
-                    curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(. /etc/os-release; echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-                    sudo apt-get update -y
-                    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-                  else
-                    echo "[REMOTE] Please install Docker manually for this distro"
-                    exit 1
-                  fi
+                  echo "[REMOTE][ERROR] docker not found. Please install Docker and add $USER to docker group."
+                  exit 1
                 fi
 
-                # Private 레포 pull 위해 로그인
-                echo "$PULL_PASS" | sudo docker login docker.io -u "$PULL_USER" --password-stdin
+                # Private 레포 로그인 (sudo 없이)
+                echo "$PULL_PASS" | docker login docker.io -u "$PULL_USER" --password-stdin
 
                 # 서버 .env 확인
                 if [ ! -f "$ENV_PATH" ]; then
@@ -131,20 +121,24 @@ CFG
                   exit 1
                 fi
 
-                # 최신 이미지 pull & 재기동
-                sudo docker pull "$IMAGE"
-                if sudo docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
-                  sudo docker stop "$CONTAINER" || true
-                  sudo docker rm "$CONTAINER" || true
+                # 최신 이미지 pull
+                docker pull "$IMAGE"
+
+                # 기존 컨테이너 정리
+                if docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
+                  docker stop "$CONTAINER" || true
+                  docker rm "$CONTAINER" || true
                 fi
 
-                sudo docker run -d --name "$CONTAINER" \
+                # 새 컨테이너 실행
+                docker run -d --name "$CONTAINER" \
                   --restart unless-stopped \
                   --env-file "$ENV_PATH" \
                   -p "${HOST_PORT}:${CONTAINER_PORT}" \
                   "$IMAGE"
 
-                sudo docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
+                # 상태 출력
+                docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
                 EOF
             '''
           }
