@@ -103,17 +103,17 @@ CFG
       CONTAINER_PORT="8080" \
       PULL_USER="$PULL_USER" \
       PULL_PASS="$PULL_PASS" \
-      bash -s <<'EOF'
+      bash -s <<'EOS'
     set -euo pipefail
     echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
 
-    # docker 필요 (sudo 없이 쓰는 구성이 권장)
+    # docker 설치/권한은 사전에 구성되어 있다고 가정 (sudo 없이)
     if ! command -v docker >/dev/null 2>&1; then
       echo "[REMOTE][ERROR] docker not found. Install docker and add $USER to docker group."
       exit 1
     fi
 
-    # Private 레포 로그인
+    # private pull 로그인
     echo "$PULL_PASS" | docker login docker.io -u "$PULL_USER" --password-stdin
 
     # .env 확인
@@ -122,7 +122,7 @@ CFG
       exit 1
     fi
 
-    # 최신 이미지 pull + 재기동
+    # 최신 이미지 pull + 컨테이너 교체
     docker pull "$IMAGE"
     if docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
       docker stop "$CONTAINER" || true
@@ -136,8 +136,8 @@ CFG
       "$IMAGE"
 
     docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
-    EOF
-            '''
+    EOS
+    '''
           }
         }
       }
