@@ -75,17 +75,17 @@ pipeline {
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
           withCredentials([usernamePassword(credentialsId: env.READ_CRED_ID, usernameVariable: 'PULL_USER', passwordVariable: 'PULL_PASS')]) {
-            sh """
-              # 원격에 환경 변수 넘기고 Here-doc으로 스크립트 실행
-              ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} \\
-                APP_NAME='${env.APP_NAME}' \\
-                IMAGE='${env.IMAGE_LATEST}' \\
-                CONTAINER='${env.APP_NAME}' \\
-                ENV_PATH='/etc/${env.APP_NAME}/.env' \\
-                HOST_PORT='8080' \\
-                CONTAINER_PORT='8080' \\
-                PULL_USER="$PULL_USER" \\
-                PULL_PASS="$PULL_PASS" \\
+            sh '''
+              # 원격에 환경 변수 넘기고 Here-doc으로 스크립트 실행 (Groovy 보간 off)
+              ssh -o StrictHostKeyChecking=no -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+                APP_NAME="$APP_NAME" \
+                IMAGE="$IMAGE_LATEST" \
+                CONTAINER="$APP_NAME" \
+                ENV_PATH="/etc/$APP_NAME/.env" \
+                HOST_PORT="8080" \
+                CONTAINER_PORT="8080" \
+                PULL_USER="$PULL_USER" \
+                PULL_PASS="$PULL_PASS" \
                 bash -s <<'EOF'
                 set -euo pipefail
                 echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
@@ -97,9 +97,9 @@ pipeline {
                     sudo apt-get install -y ca-certificates curl gnupg
                     sudo install -m 0755 -d /etc/apt/keyrings
                     curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \\
-                https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \\
-                $(. /etc/os-release; echo "$VERSION_CODENAME") stable" | \\
+                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+                https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+                $(. /etc/os-release; echo "$VERSION_CODENAME") stable" | \
                 sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
                     sudo apt-get update -y
                     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -128,16 +128,16 @@ pipeline {
                 fi
 
                 # 새 컨테이너 실행
-                sudo docker run -d --name "$CONTAINER" \\
-                  --restart unless-stopped \\
-                  --env-file "$ENV_PATH" \\
-                  -p "${HOST_PORT}:${CONTAINER_PORT}" \\
+                sudo docker run -d --name "$CONTAINER" \
+                  --restart unless-stopped \
+                  --env-file "$ENV_PATH" \
+                  -p "${HOST_PORT}:${CONTAINER_PORT}" \
                   "$IMAGE"
 
                 # 상태 출력
                 sudo docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
                 EOF
-            """
+            '''
           }
         }
       }
