@@ -56,6 +56,15 @@ pipeline {
         container('node') {
           sh '''
             set -eux
+            # node:20에 git이 없을 수도 있으므로..
+            if command -v apt-get >/dev/null 2>&1; then
+              apt-get update && apt-get install -y git
+            fi
+
+            # git submodule
+            git submodule sync --recursive
+            git submodule update --init --recursive
+
             node -v
             npm ci
             npm run build

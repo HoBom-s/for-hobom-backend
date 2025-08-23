@@ -22,6 +22,9 @@ RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
+# proto for gRPC
+COPY hobom-buf-proto ./hobom-buf-proto
+
 EXPOSE 8080
 
 CMD ["node", "dist/main.js"]
