@@ -92,51 +92,51 @@ CFG
         sshagent (credentials: [env.SSH_CRED_ID]) {
           withCredentials([usernamePassword(credentialsId: env.READ_CRED_ID, usernameVariable: 'PULL_USER', passwordVariable: 'PULL_PASS')]) {
             sh '''
-    set -eux
+set -eux
 
-    ssh -o StrictHostKeyChecking=no -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
-      APP_NAME="$APP_NAME" \
-      IMAGE="$IMAGE_LATEST" \
-      CONTAINER="$APP_NAME" \
-      ENV_PATH="/etc/$APP_NAME/.env" \
-      HOST_PORT="8080" \
-      CONTAINER_PORT="8080" \
-      PULL_USER="$PULL_USER" \
-      PULL_PASS="$PULL_PASS" \
-      bash -s <<'EOS'
-    set -euo pipefail
-    echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
+ssh -o StrictHostKeyChecking=no -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+  APP_NAME="$APP_NAME" \
+  IMAGE="$IMAGE_LATEST" \
+  CONTAINER="$APP_NAME" \
+  ENV_PATH="/etc/$APP_NAME/.env" \
+  HOST_PORT="8080" \
+  CONTAINER_PORT="8080" \
+  PULL_USER="$PULL_USER" \
+  PULL_PASS="$PULL_PASS" \
+  bash -s <<'EOS'
+set -euo pipefail
+echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
 
-    # docker 설치/권한은 사전에 구성되어 있다고 가정 (sudo 없이)
-    if ! command -v docker >/dev/null 2>&1; then
-      echo "[REMOTE][ERROR] docker not found. Install docker and add $USER to docker group."
-      exit 1
-    fi
+# docker 설치/권한은 사전에 구성되어 있다고 가정 (sudo 없이)
+if ! command -v docker >/dev/null 2>&1; then
+  echo "[REMOTE][ERROR] docker not found. Install docker and add $USER to docker group."
+  exit 1
+fi
 
-    # private pull 로그인
-    echo "$PULL_PASS" | docker login docker.io -u "$PULL_USER" --password-stdin
+# private pull 로그인
+echo "$PULL_PASS" | docker login docker.io -u "$PULL_USER" --password-stdin
 
-    # .env 확인
-    if [ ! -f "$ENV_PATH" ]; then
-      echo "[REMOTE][ERROR] $ENV_PATH not found. Create it first."
-      exit 1
-    fi
+# .env 확인
+if [ ! -f "$ENV_PATH" ]; then
+  echo "[REMOTE][ERROR] $ENV_PATH not found. Create it first."
+  exit 1
+fi
 
-    # 최신 이미지 pull + 컨테이너 교체
-    docker pull "$IMAGE"
-    if docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
-      docker stop "$CONTAINER" || true
-      docker rm "$CONTAINER" || true
-    fi
+# 최신 이미지 pull + 컨테이너 교체
+docker pull "$IMAGE"
+if docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
+  docker stop "$CONTAINER" || true
+  docker rm "$CONTAINER" || true
+fi
 
-    docker run -d --name "$CONTAINER" \
-      --restart unless-stopped \
-      --env-file "$ENV_PATH" \
-      -p "${HOST_PORT}:${CONTAINER_PORT}" \
-      "$IMAGE"
+docker run -d --name "$CONTAINER" \
+  --restart unless-stopped \
+  --env-file "$ENV_PATH" \
+  -p "${HOST_PORT}:${CONTAINER_PORT}" \
+  "$IMAGE"
 
-    docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
-    EOS
+docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
+EOS
     '''
           }
         }
