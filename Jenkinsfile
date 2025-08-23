@@ -56,12 +56,17 @@ pipeline {
         container('node') {
           sh '''
             set -eux
-            # node:20에 git이 없을 수도 있으므로..
+
             if command -v apt-get >/dev/null 2>&1; then
               apt-get update && apt-get install -y git
             fi
 
-            # git submodule
+            # Jenkins workspace git
+            git config --global --add safe.directory "$WORKSPACE"
+
+            # git submodule path
+            git config --global --add safe.directory "$WORKSPACE/*"
+
             git submodule sync --recursive
             git submodule update --init --recursive
 
