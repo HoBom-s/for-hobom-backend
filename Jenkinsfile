@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   tools {
-    nodejs 'node-20'
+    nodejs 'node-20'  // Jenkins에 NodeJS 설치 항목(node-20) 등록되어 있어야 함
   }
 
   options {
@@ -11,17 +11,21 @@ pipeline {
   }
 
   environment {
-    APP_NAME        = 'for-hobom-backend'
-    SERVICE_NAME    = 'for-hobom-backend'
-    ENTRY_FILE      = 'dist/main.js'
+    // Docker Hub
+    REGISTRY      = 'docker.io'
+    IMAGE_REPO    = 'jjockrod/hobom-system'          // Docker Hub
+    SERVICE_NAME  = 'for-hobom-backend'              // Tag
+    IMAGE_TAG     = "${REGISTRY}/${IMAGE_REPO}:${SERVICE_NAME}-${env.BUILD_NUMBER}"
+    IMAGE_LATEST  = "${REGISTRY}/${IMAGE_REPO}:${SERVICE_NAME}-latest"
+    REGISTRY_CRED = 'dockerhub-cred'                 // Push only
+    READ_CRED_ID  = 'dockerhub-readonly'             // Private pull only
 
-    DEPLOY_HOST     = 'ishisha.iptime.org'
-    DEPLOY_PORT     = '22223'
-    DEPLOY_USER     = 'infra-admin'
-    DEPLOY_DIR      = '/srv/for-hobom-backend'
-
-    SSH_CRED_ID     = 'deploy-ssh-key'
-    ENV_FILE_CRED   = 'hobom-infra-env'
+    // Remote Server
+    APP_NAME      = 'for-hobom-backend'
+    DEPLOY_HOST   = 'ishisha.iptime.org'
+    DEPLOY_PORT   = '22223'
+    DEPLOY_USER   = 'infra-admin'
+    SSH_CRED_ID   = 'deploy-ssh-key'                 // SSH private key
   }
 
   stages {
@@ -32,29 +36,17 @@ pipeline {
       }
     }
 
-    stage('Install dependencies') {
-      steps {
-        sh 'npm ci'
-      }
-    }
-
-    stage('Lint & Test') {
+    stage('Install / Lint / Test / Build') {
       steps {
         sh '''
+          set -eux
+          node -v
+          npm -v
+          npm ci
           npm run lint || true
           npm run test || true
+          npm run build
         '''
-      }
-      post {
-        always {
-          junit allowEmptyResults: true, testResults: 'reports/junit/**/*.xml'
-        }
-      }
-    }
-
-    stage('Build') {
-      steps {
-        sh 'npm run build'
       }
       post {
         success {
@@ -63,149 +55,100 @@ pipeline {
       }
     }
 
-    stage('Package for deploy (include .env from credentials)') {
+    stage('Docker build & push') {
       steps {
-        sh '''
-          rm -rf deploy && mkdir -p deploy
-          cp -r dist deploy/dist
-          cp package.json package-lock.json deploy/
-          [ -d prisma ] && cp -r prisma deploy/prisma || true
-          [ -d public ] && cp -r public deploy/public || true
-        '''
-        withCredentials([file(credentialsId: env.ENV_FILE_CRED, variable: 'ENV_FILE')]) {
-          sh '''
-            install -m 600 "$ENV_FILE" deploy/.env
-          '''
-        }
-        sh 'tar -C deploy -czf deploy.tgz .'
-      }
-    }
-
-    stage('Verify SSH to target') {
-      steps {
-        sshagent (credentials: [env.SSH_CRED_ID]) {
+        withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
           sh """
-            ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'echo OK && whoami && hostname'
+            set -eux
+            docker build -t ${env.IMAGE_TAG} -t ${env.IMAGE_LATEST} .
+            echo "$REG_PASS" | docker login ${env.REGISTRY} -u "$REG_USER" --password-stdin
+            docker push ${env.IMAGE_TAG}
+            docker push ${env.IMAGE_LATEST}
+            docker logout ${env.REGISTRY}
           """
         }
       }
     }
 
-    stage('Deploy to server (systemd)') {
-      when {
-        allOf {
-          anyOf { branch 'develop'; branch 'main' }
-          not { changeRequest() }
-        }
-      }
+    stage('Deploy container to server') {
+      when { anyOf { branch 'develop'; branch 'main' } }
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
+          withCredentials([usernamePassword(credentialsId: env.READ_CRED_ID, usernameVariable: 'PULL_USER', passwordVariable: 'PULL_PASS')]) {
+            sh """
+              # 원격에 환경 변수 넘기고 Here-doc으로 스크립트 실행
+              ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} \\
+                APP_NAME='${env.APP_NAME}' \\
+                IMAGE='${env.IMAGE_LATEST}' \\
+                CONTAINER='${env.APP_NAME}' \\
+                ENV_PATH='/etc/${env.APP_NAME}/.env' \\
+                HOST_PORT='8080' \\
+                CONTAINER_PORT='8080' \\
+                PULL_USER="$PULL_USER" \\
+                PULL_PASS="$PULL_PASS" \\
+                bash -s <<'EOF'
+                set -euo pipefail
+                echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
 
-          // 1) 원격에서 실행할 스크립트를 로컬에 생성 (작은따옴표: $ 보간 안 됨)
-          sh '''
-            cat > remote_deploy.sh <<'BASH'
-            #!/usr/bin/env bash
-            set -Eeuo pipefail
-            trap 'echo "[REMOTE][ERROR] line $LINENO: ${BASH_COMMAND}" >&2' ERR
-            PS4='+ [REMOTE] line %L: '; set -x
+                # Docker 없으면 설치 (Debian/Ubuntu)
+                if ! command -v docker >/dev/null 2>&1; then
+                  if [ -f /etc/debian_version ]; then
+                    sudo apt-get update -y
+                    sudo apt-get install -y ca-certificates curl gnupg
+                    sudo install -m 0755 -d /etc/apt/keyrings
+                    curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \\
+                https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \\
+                $(. /etc/os-release; echo "$VERSION_CODENAME") stable" | \\
+                sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+                    sudo apt-get update -y
+                    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+                  else
+                    echo "[REMOTE] Please install Docker manually for this distro"
+                    exit 1
+                  fi
+                fi
 
-            # 1) Jenkins가 보낸 /tmp/deploy.env 읽기
-            set -a
-            source /tmp/deploy.env
-            set +a
+                # Private 레포 → pull 전 로그인
+                echo "$PULL_PASS" | sudo docker login docker.io -u "$PULL_USER" --password-stdin
 
-            # 2) Node 20+ 없으면 설치 (배포용 안전장치)
-            if ! command -v node >/dev/null 2>&1; then
-              if [ -f /etc/debian_version ]; then
-                curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-                sudo apt-get update -y && sudo apt-get install -y nodejs
-              elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ] || [ -f /etc/rocky-release ]; then
-                curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-                sudo yum install -y nodejs
-              elif [ -f /etc/amazon-linux-release ]; then
-                curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-                sudo dnf install -y nodejs || sudo yum install -y nodejs
-              else
-                echo "Unsupported distro: pre-install Node 20+"
-                exit 1
-              fi
-            fi
+                # 서버 .env 확인
+                if [ ! -f "$ENV_PATH" ]; then
+                  echo "[REMOTE][ERROR] $ENV_PATH not found. Create it on the server."
+                  exit 1
+                fi
 
-            # 3) 배포 디렉토리
-            sudo mkdir -p "$DEPLOY_DIR"
-            sudo chown -R "$DEPLOY_USER:$DEPLOY_USER" "$DEPLOY_DIR"
+                # 최신 이미지 pull
+                sudo docker pull "$IMAGE"
 
-            # 4) 산출물 전개 (.env 포함) — 파일명 고정: /tmp/deploy.tgz
-            tar -xzf "/tmp/deploy.tgz" -C "$DEPLOY_DIR"
-            cd "$DEPLOY_DIR"
+                # 기존 컨테이너 정리
+                if sudo docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
+                  sudo docker stop "$CONTAINER" || true
+                  sudo docker rm "$CONTAINER" || true
+                fi
 
-            # 5) .env 권한/소유권 보강
-            chmod 600 "$DEPLOY_DIR/.env"
-            chown "$DEPLOY_USER:$DEPLOY_USER" "$DEPLOY_DIR/.env"
+                # 새 컨테이너 실행
+                sudo docker run -d --name "$CONTAINER" \\
+                  --restart unless-stopped \\
+                  --env-file "$ENV_PATH" \\
+                  -p "${HOST_PORT}:${CONTAINER_PORT}" \\
+                  "$IMAGE"
 
-            # 6) prod deps 설치
-            npm ci --omit=dev
+                # 상태 출력
+                sudo docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
+                EOF
+            """
+          }
+        }
+      }
+    }
 
-            # 7) systemd 유닛 생성/갱신
-            NODE_BIN="$(command -v node || true)"
-            if [ -z "$NODE_BIN" ]; then echo "node not found"; exit 1; fi
-            if [ ! -f "$DEPLOY_DIR/.env" ]; then echo "ERROR: $DEPLOY_DIR/.env not found"; exit 1; fi
-
-            sudo tee /etc/systemd/system/"$SERVICE_NAME".service >/dev/null <<SERVICE
-            [Unit]
-            Description=$APP_NAME service
-            After=network-online.target
-            Wants=network-online.target
-
-            [Service]
-            Type=simple
-            User=$DEPLOY_USER
-            Group=$DEPLOY_USER
-            WorkingDirectory=$DEPLOY_DIR
-            Environment=NODE_ENV=production
-            EnvironmentFile=$DEPLOY_DIR/.env
-            Environment=PATH=/usr/local/bin:/usr/bin:/bin
-            ExecStart=$NODE_BIN $DEPLOY_DIR/$ENTRY_FILE
-            Restart=always
-            RestartSec=3
-
-            [Install]
-            WantedBy=multi-user.target
-            SERVICE
-
-            sudo systemctl daemon-reload
-            sudo systemctl enable "$SERVICE_NAME"
-            sudo systemctl restart "$SERVICE_NAME"
-
-            # 8) 상태 확인
-            for i in 1 2 3 4 5; do
-              sleep 2
-              if systemctl is-active --quiet "$SERVICE_NAME"; then
-                echo "Service $SERVICE_NAME is active."
-                exit 0
-              fi
-            done
-
-            echo "Service $SERVICE_NAME failed to become active."
-            sudo systemctl status "$SERVICE_NAME" --no-pager -l || true
-            exit 1
-            BASH
-                    chmod +x remote_deploy.sh
-                  '''
-
-                  // 2) 원격에서 읽을 환경파일 생성 (여긴 Groovy 치환 필요 → 큰따옴표)
-                  sh """
-                    cat > deploy.env <<EOF
-            APP_NAME=${env.APP_NAME}
-            SERVICE_NAME=${env.SERVICE_NAME}
-            ENTRY_FILE=${env.ENTRY_FILE}
-            DEPLOY_DIR=${env.DEPLOY_DIR}
-            DEPLOY_USER=${env.DEPLOY_USER}
-            EOF
-
-            # 3) 파일 전송(포트 포함) + 원격 실행
-            scp -o StrictHostKeyChecking=no -P ${env.DEPLOY_PORT} deploy.tgz remote_deploy.sh deploy.env ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:/tmp/
-            ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'bash -euxo pipefail /tmp/remote_deploy.sh'
+    stage('Smoke check (optional)') {
+      when { anyOf { branch 'develop'; branch 'main' } }
+      steps {
+        sshagent (credentials: [env.SSH_CRED_ID]) {
+          sh """
+            ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} 'curl -fsS http://localhost:8080/ || true'
           """
         }
       }
@@ -214,8 +157,7 @@ pipeline {
 
   post {
     success {
-      echo "✅ Build #${env.BUILD_NUMBER} OK (${env.BRANCH_NAME})"
-      echo "🚀 Deployed to ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:${env.DEPLOY_DIR} (systemd: ${env.SERVICE_NAME})"
+      echo "✅ Build #${env.BUILD_NUMBER} → pushed ${env.IMAGE_LATEST} & deployed on ${env.DEPLOY_HOST}"
     }
     failure {
       echo "❌ Build failed (${env.BRANCH_NAME})"
