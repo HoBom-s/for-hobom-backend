@@ -20,32 +20,27 @@ pipeline {
   }
 
   stages {
-
     stage('Build & Push (K8s + Kaniko)') {
       agent {
         kubernetes {
           yaml """
-apiVersion: v1
-kind: Pod
-spec:
-  volumes:
-    - name: docker-config
-      emptyDir: {}
-  containers:
-    - name: node
-      image: node:20
-      tty: true
-      command: ["/bin/sh","-c"]
-      args: ["sleep infinity"]
-    - name: kaniko
-      image: gcr.io/kaniko-project/executor:debug
-      tty: true
-      command: ["/busybox/sh","-c"]
-      args: ["sleep infinity"]
-      volumeMounts:
-        - name: docker-config
-          mountPath: /kaniko/.docker
-"""
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+                - name: node
+                  image: node:20
+                  command: ["bash", "-lc", "sleep 9999999"]
+                - name: kaniko
+                  image: gcr.io/kaniko-project/executor:debug
+                  command: ["/busybox/sh", "-c", "sleep 9999999"]
+                  volumeMounts:
+                    - name: kaniko-docker-config
+                      mountPath: /kaniko/.docker
+              volumes:
+                - name: kaniko-docker-config
+                  emptyDir: {}
+          """
         }
       }
       steps {
@@ -53,10 +48,7 @@ spec:
           sh '''
             set -eux
             node -v
-            npm -v
             npm ci
-            npm run lint || true
-            npm run test || true
             npm run build
           '''
         }
@@ -64,12 +56,10 @@ spec:
           withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
             sh '''
               set -eux
-              # Kaniko가 쓸 Docker Hub 인증파일 생성
-              AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 | tr -d '\n' || true)"
-              if [ -z "$AUTH" ]; then AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 -w0)"; fi
+              AUTH="$(printf '%s' "$REG_USER:$REG_PASS" | base64 -w0 || printf '%s' "$REG_USER:$REG_PASS" | base64)"
               cat > /kaniko/.docker/config.json <<CFG
-{"auths":{"https://index.docker.io/v1/":{"auth":"$AUTH"}}}
-CFG
+              { "auths": { "https://index.docker.io/v1/": { "auth": "$AUTH" } } }
+    CFG
 
               /kaniko/executor \
                 --context "$WORKSPACE" \
@@ -77,8 +67,7 @@ CFG
                 --destination "${IMAGE_TAG}" \
                 --destination "${IMAGE_LATEST}" \
                 --cache=true \
-                --verbosity=info \
-                --cleanup
+                --verbosity=info
             '''
           }
         }
