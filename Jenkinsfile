@@ -74,7 +74,6 @@ pipeline {
         }
       }
     }
-  }
 
     stage('Deploy container to server') {
       when { anyOf { branch 'develop'; branch 'main' } }
