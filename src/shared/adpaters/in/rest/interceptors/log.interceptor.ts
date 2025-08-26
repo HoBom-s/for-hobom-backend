@@ -34,7 +34,7 @@ export class HttpLogInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest<Request>();
-    if (req.originalUrl.includes("/auth")) {
+    if (req.originalUrl.includes("/auth") || req.path === "/") {
       return next.handle();
     }
     const res = context.switchToHttp().getResponse<Response>();

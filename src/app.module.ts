@@ -16,6 +16,7 @@ import { HttpLogInterceptor } from "./shared/adpaters/in/rest/interceptors/log.i
 import { UserModule } from "./hb-backend-api/user/user.module";
 import { FutureMessageModule } from "./hb-backend-api/future-message/future-message.module";
 import { DiscordWebhookService } from "./shared/discord/discord-webhook.service";
+import { HealthModule } from "./hb-backend-api/health/health.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { DiscordWebhookService } from "./shared/discord/discord-webhook.service"
     UserModule,
     TransactionModule,
     FutureMessageModule,
+    HealthModule,
   ],
   providers: [
     TraceContext,
