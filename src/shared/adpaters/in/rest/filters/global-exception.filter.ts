@@ -20,10 +20,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const message =
       exception instanceof HttpException ? exception.getResponse() : exception;
 
-    await this.discord.sendErrorMessage(
-      `🚨 오류가 발생했어요 ! ${req.method} ${req.url} 🚨\n${req.headers.traceId ? `TraceId: ${String(req.headers.traceId)}` : ""}`,
-      `\`\`\`json\n${JSON.stringify(exception, null, 2)}\n\`\`\``,
-    );
+    // await this.discord.sendErrorMessage(
+    //   `🚨 오류가 발생했어요 ! ${req.method} ${req.url} 🚨\n${req.headers.traceId ? `TraceId: ${String(req.headers.traceId)}` : ""}`,
+    //   `\`\`\`json\n${JSON.stringify(exception, null, 2)}\n\`\`\``,
+    // );
 
     res.status(status).json({
       statusCode: status,
