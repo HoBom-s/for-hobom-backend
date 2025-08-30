@@ -4,7 +4,7 @@ import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 export const grpcOptions: MicroserviceOptions = {
   transport: Transport.GRPC,
   options: {
-    url: "host.docker.internal:50051",
+    url: "0.0.0.0:50051",
     package: ["outbox.message", "outbox.log"],
     protoPath: [
       join(
