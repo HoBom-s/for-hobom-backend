@@ -112,7 +112,7 @@ docker run -d --name "$CONTAINER" \
   --network hobom-net \
   --restart unless-stopped \
   --env-file "$ENV_PATH" \
-  --add-host=host.docker.internal:host-gateway
+  --add-host=host.docker.internal:host-gateway \
   -p "${HOST_PORT}:${CONTAINER_PORT}" \
   "$IMAGE"
 
