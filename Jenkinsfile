@@ -34,6 +34,12 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
+        sh '''
+            set -eux
+            git config --global --add safe.directory "$WORKSPACE" || true
+            git submodule sync --recursive
+            git submodule update --init --recursive
+        '''
       }
     }
 
