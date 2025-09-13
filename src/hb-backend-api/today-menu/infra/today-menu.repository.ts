@@ -6,4 +6,8 @@ export interface TodayMenuRepository {
   upsert(entity: UpsertTodayMenuEntity): Promise<TodayMenuId>;
 
   findById(id: TodayMenuId): Promise<TodayMenuWithRelationsEntity>;
+
+  findRecommendedMenuById(
+    id: TodayMenuId,
+  ): Promise<TodayMenuWithRelationsEntity>;
 }

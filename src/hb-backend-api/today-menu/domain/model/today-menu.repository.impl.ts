@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { TodayMenuRepository } from "../../infra/today-menu.repository";
@@ -14,7 +14,7 @@ import { TodayMenuAggregator } from "../today-menu-aggregator.helper";
 export class TodayMenuRepositoryImpl implements TodayMenuRepository {
   constructor(
     @InjectModel(TodayMenuEntity.name)
-    private readonly todayMenuModal: Model<TodayMenuDocument>,
+    private readonly todayMenuModel: Model<TodayMenuDocument>,
   ) {}
 
   public async upsert(entity: UpsertTodayMenuEntity): Promise<TodayMenuId> {
@@ -22,7 +22,7 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
     const id = entity.getTodayMenuId?.raw;
 
     if (id == null) {
-      const [todayMenuDocument] = await this.todayMenuModal.create(
+      const [todayMenuDocument] = await this.todayMenuModel.create(
         [
           {
             recommendedMenu:
@@ -43,7 +43,7 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
 
       return TodayMenuId.fromSting(String(todayMenuDocument._id));
     } else {
-      const todayMenuDocument = await this.todayMenuModal.findOneAndUpdate(
+      const todayMenuDocument = await this.todayMenuModel.findOneAndUpdate(
         {
           _id: id,
         },
@@ -75,13 +75,35 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
   public async findById(
     id: TodayMenuId,
   ): Promise<TodayMenuWithRelationsEntity> {
-    const result = await this.todayMenuModal
+    const result = await this.todayMenuModel
       .aggregate([
         { $match: { _id: id.raw } },
         ...TodayMenuAggregator.buildPipeline(),
         { $limit: 1 },
       ])
       .exec();
+
+    return result[0];
+  }
+
+  public async findRecommendedMenuById(
+    id: TodayMenuId,
+  ): Promise<TodayMenuWithRelationsEntity> {
+    const result = await this.todayMenuModel
+      .aggregate([
+        {
+          $match: {
+            recommendedMenu: id.raw,
+          },
+        },
+        ...TodayMenuAggregator.buildPipeline(),
+      ])
+      .exec();
+    if (!result.length) {
+      throw new NotFoundException(
+        `TodayMenu recommended by ${id.toString()} not found`,
+      );
+    }
 
     return result[0];
   }

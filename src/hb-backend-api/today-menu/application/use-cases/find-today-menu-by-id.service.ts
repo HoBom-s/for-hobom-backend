@@ -24,7 +24,7 @@ export class FindTodayMenuByIdService implements FindTodayMenuByIdUseCase {
   }
 
   private async getBy(id: TodayMenuId): Promise<TodayMenuRelationEntity> {
-    return this.todayMenuQueryPort.findById(id);
+    return this.todayMenuQueryPort.findRecommendedMenuById(id);
   }
 
   private toQueryResult(
