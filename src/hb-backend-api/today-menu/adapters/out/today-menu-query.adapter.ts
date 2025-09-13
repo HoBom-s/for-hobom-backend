@@ -28,8 +28,21 @@ export class TodayMenuQueryAdapter implements TodayMenuQueryPort {
     return this.toRelationEntity(todayMenu);
   }
 
+  public async findRecommendedMenuById(
+    id: TodayMenuId,
+  ): Promise<TodayMenuRelationEntity> {
+    const recommendedMenu = await this.getRecommendedMenuBy(id);
+    return this.toRelationEntity(recommendedMenu);
+  }
+
   private async getBy(id: TodayMenuId): Promise<TodayMenuWithRelationsEntity> {
     return await this.todayMenuRepository.findById(id);
+  }
+
+  private async getRecommendedMenuBy(
+    id: TodayMenuId,
+  ): Promise<TodayMenuWithRelationsEntity> {
+    return await this.todayMenuRepository.findRecommendedMenuById(id);
   }
 
   private toRelationEntity(

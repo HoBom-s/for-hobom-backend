@@ -3,4 +3,6 @@ import { TodayMenuRelationEntity } from "../../model/today-menu-with-relations.e
 
 export interface TodayMenuQueryPort {
   findById(id: TodayMenuId): Promise<TodayMenuRelationEntity>;
+
+  findRecommendedMenuById(id: TodayMenuId): Promise<TodayMenuRelationEntity>;
 }

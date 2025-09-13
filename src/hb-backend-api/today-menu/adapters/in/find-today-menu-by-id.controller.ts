@@ -1,11 +1,12 @@
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Controller, Get, Inject, Param } from "@nestjs/common";
+import { Controller, Get, Inject, Param, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { FindTodayMenuByIdUseCase } from "../../domain/ports/in/find-today-menu-by-id.use-case";
 import { GetTodayMenuDto } from "./get-today-menu.dto";
 import { TodayMenuId } from "../../domain/model/today-menu.vo";
 import { ParseTodayMenuIdPipe } from "./today-menu-id.pipe";
+import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
 
 @ApiTags("TodayMenu")
 @Controller(`${EndPointPrefixConstant}/today-menu`)
@@ -21,6 +22,7 @@ export class FindTodayMenuByIdController {
   })
   @ApiResponse({ type: GetTodayMenuDto })
   @Get("/:id")
+  @UseGuards(JwtAuthGuard)
   public async findById(
     @Param("id", ParseTodayMenuIdPipe) id: TodayMenuId,
   ): Promise<GetTodayMenuDto> {
