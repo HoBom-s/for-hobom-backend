@@ -5,5 +5,7 @@ import { UserNickname } from "../../model/user-nickname.vo";
 export interface UserQueryPort {
   findById(id: UserId): Promise<UserEntitySchema>;
 
+  findAll(): Promise<UserEntitySchema[]>;
+
   findByNickname(nickname: UserNickname): Promise<UserEntitySchema>;
 }
