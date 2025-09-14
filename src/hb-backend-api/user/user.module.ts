@@ -11,6 +11,8 @@ import { UserRepositoryImpl } from "./infra/repositories/user.repository.impl";
 import { DIToken } from "../../shared/di/token.di";
 import { GetUserByNicknameService } from "./application/use-cases/get-user-by-nickname.service";
 import { GetUserByIdController } from "./adapters/in/get-user-by-id.controller";
+import { GetAllUserService } from "./application/use-cases/get-all-user.service";
+import { GetAllUserController } from "./adapters/in/get-all-user.controller";
 
 @Module({
   imports: [
@@ -21,7 +23,11 @@ import { GetUserByIdController } from "./adapters/in/get-user-by-id.controller";
       },
     ]),
   ],
-  controllers: [CreateUserController, GetUserByIdController],
+  controllers: [
+    CreateUserController,
+    GetUserByIdController,
+    GetAllUserController,
+  ],
   providers: [
     {
       provide: DIToken.UserModule.UserRepository,
@@ -47,6 +53,10 @@ import { GetUserByIdController } from "./adapters/in/get-user-by-id.controller";
       provide: DIToken.UserModule.GetUserByNicknameUseCase,
       useClass: GetUserByNicknameService,
     },
+    {
+      provide: DIToken.UserModule.GetAllUserUseCase,
+      useClass: GetAllUserService,
+    },
   ],
   exports: [
     MongooseModule,
@@ -56,6 +66,7 @@ import { GetUserByIdController } from "./adapters/in/get-user-by-id.controller";
     DIToken.UserModule.CreateUserUseCase,
     DIToken.UserModule.GetUserUseCase,
     DIToken.UserModule.GetUserByNicknameUseCase,
+    DIToken.UserModule.GetAllUserUseCase,
   ],
 })
 export class UserModule {}

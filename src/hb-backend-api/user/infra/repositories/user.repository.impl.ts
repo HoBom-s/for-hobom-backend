@@ -37,6 +37,15 @@ export class UserRepositoryImpl implements UserRepository {
     return foundUser;
   }
 
+  public async findAll(): Promise<UserDocument[]> {
+    const founds = await this.userModel.find().exec();
+    if (founds == null) {
+      throw new NotFoundException(`유저가 없어요.`);
+    }
+
+    return founds;
+  }
+
   public async findByNickname(nickname: UserNickname): Promise<UserDocument> {
     const foundUser = await this.userModel
       .findOne({
