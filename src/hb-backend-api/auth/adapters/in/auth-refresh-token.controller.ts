@@ -11,7 +11,7 @@ import { RefreshToken } from "../../domain/model/refresh-token.vo";
 export class AuthRefreshTokenController {
   private ACCESS_TOKEN = "accessToken";
   private REFRESH_TOKEN = "refreshToken";
-  private ACCESS_TOKEN_EXPIRATION = 24 * 60 * 60 * 1000;
+  private ACCESS_TOKEN_EXPIRATION = 15 * 60 * 1000;
   private REFRESH_TOKEN_EXPIRATION = 30 * 24 * 60 * 60 * 1000;
 
   constructor(

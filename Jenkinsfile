@@ -7,167 +7,131 @@ pipeline {
   }
 
   environment {
-    APP_NAME        = 'for-hobom-backend'
-    SERVICE_NAME    = 'for-hobom-backend'
-    ENTRY_FILE      = 'dist/main.js'
+    // Docker Hub
+    REGISTRY      = 'docker.io'
+    IMAGE_REPO    = 'jjockrod/hobom-system'
+    SERVICE_NAME  = 'dev-for-hobom-backend'
+    IMAGE_TAG     = "${REGISTRY}/${IMAGE_REPO}:${SERVICE_NAME}-${env.BUILD_NUMBER}"
+    IMAGE_LATEST  = "${REGISTRY}/${IMAGE_REPO}:${SERVICE_NAME}-latest"
+    REGISTRY_CRED = 'dockerhub-cred'          // Docker Hub (push)
+    READ_CRED_ID  = 'dockerhub-readonly'      // Remote pull (private)
 
-    DEPLOY_HOST     = 'your.server.ip.or.hostname'
-    DEPLOY_USER     = 'ubuntu'
-    DEPLOY_DIR      = '/srv/for-hobom-backend'
+    // Remote server
+    APP_NAME      = 'dev-for-hobom-backend'
+    DEPLOY_HOST   = 'ishisha.iptime.org'
+    DEPLOY_PORT   = '22223'
+    DEPLOY_USER   = 'infra-admin'
+    SSH_CRED_ID   = 'deploy-ssh-key'
 
-    SSH_CRED_ID     = 'deploy-ssh-key'          // SSH private key (서버 접속)
-    ENV_FILE_CRED   = 'hobom-infra-env'      // ✅ Jenkins Secret file (서버용 .env)
+    // Runtime
+    ENV_PATH      = "/etc/hobom-dev/dev-for-hobom-backend/.env"
+    HOST_PORT     = "8080"
+    CONTAINER_PORT= "8080"
   }
 
   stages {
+
     stage('Checkout') {
       steps {
         checkout scm
-        sh 'git --no-pager log -1 --pretty=oneline'
-      }
-    }
-
-    stage('Install dependencies') {
-      steps {
-        // 에이전트에 node/npm이 있어야 함
-        sh 'node -v && npm -v && npm ci'
-      }
-    }
-
-    stage('Lint & Test') {
-      steps {
         sh '''
-          npm run lint || true
-          npm run test:ci || npm run test || true
+            set -eux
+            git config --global --add safe.directory "$WORKSPACE" || true
+            git submodule sync --recursive
+            git submodule update --init --recursive
         '''
       }
-      post {
-        always {
-          junit allowEmptyResults: true, testResults: 'reports/junit/**/*.xml'
-        }
-      }
     }
 
-    stage('Build') {
-      steps { sh 'npm run build' }
-      post {
-        // dist만 아카이브 (민감정보 없음)
-        success { archiveArtifacts artifacts: 'dist/**/*', onlyIfSuccessful: true }
-      }
-    }
-
-    stage('Package for deploy (include .env from credentials)') {
+    stage('Build & Push Image (Docker)') {
       steps {
-        sh '''
-          rm -rf deploy && mkdir -p deploy
-          cp -r dist deploy/dist
-          cp package.json package-lock.json deploy/
-          [ -d prisma ] && cp -r prisma deploy/prisma || true
-          [ -d public ] && cp -r public deploy/public || true
-        '''
-        // ✅ Jenkins Secret file -> deploy/.env (로그에 절대 echo 하지 말 것!)
-        withCredentials([file(credentialsId: env.ENV_FILE_CRED, variable: 'ENV_FILE')]) {
+        withCredentials([usernamePassword(credentialsId: env.REGISTRY_CRED, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
           sh '''
-            install -m 600 "$ENV_FILE" deploy/.env
+            set -eu
+            export DOCKER_BUILDKIT=1
+
+            # 로그인 (비밀 마스킹)
+            set +x
+            echo "$REG_PASS" | docker login "$REGISTRY" -u "$REG_USER" --password-stdin
+            set -x
+
+            docker build -t "${IMAGE_TAG}" -t "${IMAGE_LATEST}" .
+            docker push "${IMAGE_TAG}"
+            docker push "${IMAGE_LATEST}"
           '''
         }
-        // 🔒 배포용 tgz (비밀 포함) — 아카이브하지 않음
-        sh 'tar -C deploy -czf deploy.tgz .'
       }
     }
 
-    stage('Deploy to server (systemd)') {
-      when {
-        allOf {
-          anyOf { branch 'develop'; branch 'main' } // 멀티브랜치 기준 배포 브랜치
-          not { changeRequest() }                   // PR 배포 차단
-        }
-      }
+    stage('Deploy container to server') {
+      when { anyOf { branch 'develop'; branch 'main' } }
       steps {
         sshagent (credentials: [env.SSH_CRED_ID]) {
-          sh """
-            # 비밀 포함 배포 패키지 전송 (아카이브 금지)
-            scp -o StrictHostKeyChecking=no deploy.tgz ${DEPLOY_USER}@${DEPLOY_HOST}:/tmp/${APP_NAME}.tgz
+          withCredentials([usernamePassword(credentialsId: env.READ_CRED_ID, usernameVariable: 'PULL_USER', passwordVariable: 'PULL_PASS')]) {
+            sh '''
+set -eux
 
-            ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} << 'EOF'
-set -e
+ssh -o StrictHostKeyChecking=no -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+  APP_NAME="$APP_NAME" \
+  IMAGE="$IMAGE_LATEST" \
+  CONTAINER="$APP_NAME" \
+  ENV_PATH="$ENV_PATH" \
+  HOST_PORT="$HOST_PORT" \
+  CONTAINER_PORT="$CONTAINER_PORT" \
+  PULL_USER="$PULL_USER" \
+  PULL_PASS="$PULL_PASS" \
+  bash -s <<'EOS'
+set -euo pipefail
+echo "[REMOTE] Deploying $APP_NAME with image $IMAGE"
 
-# 0) Node 없으면(대비) 설치 — 원치 않으면 블록 삭제 가능
-if ! command -v node >/dev/null 2>&1; then
-  if [ -f /etc/debian_version ]; then
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-    sudo apt-get update -y && sudo apt-get install -y nodejs
-  elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ] || [ -f /etc/rocky-release ]; then
-    curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-    sudo yum install -y nodejs
-  elif [ -f /etc/amazon-linux-release ]; then
-    curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-    sudo dnf install -y nodejs || sudo yum install -y nodejs
-  else
-    echo "Unsupported distro: please pre-install Node 20+"
-    exit 1
-  fi
-fi
-
-# 1) 배포 디렉토리
-sudo mkdir -p ${DEPLOY_DIR}
-sudo chown -R ${DEPLOY_USER}:${DEPLOY_USER} ${DEPLOY_DIR}
-
-# 2) 패키지 전개 (여기에는 deploy/.env 포함)
-tar -xzf /tmp/${APP_NAME}.tgz -C ${DEPLOY_DIR}
-cd ${DEPLOY_DIR}
-
-# 3) prod deps 설치
-npm ci --omit=dev
-
-# 4) systemd 유닛 (DEPLOY_DIR/.env 사용)
-NODE_BIN="$(command -v node || true)"
-if [ -z "$NODE_BIN" ]; then echo "node not found"; exit 1; fi
-
-# 안전: .env 존재 검증 (없으면 실패)
-if [ ! -f "${DEPLOY_DIR}/.env" ]; then
-  echo "ERROR: ${DEPLOY_DIR}/.env not found"
+# docker 설치 확인
+if ! command -v docker >/dev/null 2>&1; then
+  echo "[REMOTE][ERROR] docker not found. Install docker and add $USER to docker group."
   exit 1
 fi
 
-sudo bash -c 'cat > /etc/systemd/system/${SERVICE_NAME}.service' <<SERVICE
-[Unit]
-Description=${APP_NAME} service
-After=network-online.target
-Wants=network-online.target
+# private pull 로그인 (비밀 미노출)
+echo "$PULL_PASS" | docker login docker.io -u "$PULL_USER" --password-stdin
 
-[Service]
-Type=simple
-User=${DEPLOY_USER}
-Group=${DEPLOY_USER}
-WorkingDirectory=${DEPLOY_DIR}
-Environment=NODE_ENV=production
-EnvironmentFile=${DEPLOY_DIR}/.env
-Environment=PATH=/usr/local/bin:/usr/bin:/bin
-ExecStart=$NODE_BIN ${DEPLOY_DIR}/${ENTRY_FILE}
-Restart=always
-RestartSec=3
+# .env 확인
+if [ ! -f "$ENV_PATH" ]; then
+  echo "[REMOTE][ERROR] $ENV_PATH not found. Create it first."
+  exit 1
+fi
 
-[Install]
-WantedBy=multi-user.target
-SERVICE
+# 최신 이미지 pull + 컨테이너 교체
+docker pull "$IMAGE" || (echo "[REMOTE][ERROR] docker pull failed" && exit 1)
 
-sudo systemctl daemon-reload
-sudo systemctl enable ${SERVICE_NAME}
-sudo systemctl restart ${SERVICE_NAME}
+if docker ps -a --format '{{.Names}}' | grep -w "$CONTAINER" >/dev/null 2>&1; then
+  docker stop "$CONTAINER" || true
+  docker rm "$CONTAINER" || true
+fi
 
-for i in 1 2 3 4 5; do
-  sleep 2
-  if systemctl is-active --quiet ${SERVICE_NAME}; then
-    echo "Service ${SERVICE_NAME} is active."
-    exit 0
-  fi
-done
+docker network create hobom-net || true
+docker run -d --name "$CONTAINER" \
+  --network hobom-net \
+  --restart unless-stopped \
+  --env-file "$ENV_PATH" \
+  --add-host=host.docker.internal:host-gateway \
+  -p "${HOST_PORT}:${CONTAINER_PORT}" \
+  "$IMAGE"
 
-echo "Service ${SERVICE_NAME} failed to become active."
-sudo systemctl status ${SERVICE_NAME} --no-pager -l || true
-exit 1
-EOF
+docker ps --filter "name=$CONTAINER" --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"
+EOS
+            '''
+          }
+        }
+      }
+    }
+
+    stage('Smoke check (optional)') {
+      when { anyOf { branch 'develop'; branch 'main' } }
+      steps {
+        sshagent (credentials: [env.SSH_CRED_ID]) {
+          sh """
+            ssh -o StrictHostKeyChecking=no -p ${env.DEPLOY_PORT} ${env.DEPLOY_USER}@${env.DEPLOY_HOST} '
+              curl -fsS http://localhost:${env.HOST_PORT}/ || true
+            '
           """
         }
       }
@@ -176,8 +140,7 @@ EOF
 
   post {
     success {
-      echo "✅ Build #${env.BUILD_NUMBER} OK (${env.BRANCH_NAME})"
-      echo "🚀 Deployed to ${env.DEPLOY_USER}@${env.DEPLOY_HOST}:${env.DEPLOY_DIR} (systemd: ${env.SERVICE_NAME})"
+      echo "✅ Build #${env.BUILD_NUMBER} → pushed ${env.IMAGE_TAG} & deployed on ${env.DEPLOY_HOST}"
     }
     failure {
       echo "❌ Build failed (${env.BRANCH_NAME})"

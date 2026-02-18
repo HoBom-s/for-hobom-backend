@@ -26,6 +26,7 @@ export class DIToken {
     public static GetUserByNicknameUseCase = this.register(
       "GetUserByNicknameUseCase",
     );
+    public static GetAllUserUseCase = this.register("GetAllUserUseCase");
   };
 
   public static readonly CategoryModule = class extends DITokenRegister {

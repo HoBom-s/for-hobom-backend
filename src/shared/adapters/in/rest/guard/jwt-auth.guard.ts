@@ -25,8 +25,6 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
         request.nickname = decoded.sub;
       } catch (err) {
         if (err.name === "TokenExpiredError") {
-          throw new UnauthorizedException("토큰이 만료됐어요.");
-        } else {
           const refreshToken = String(request.cookies["refreshToken"]);
 
           if (refreshToken) {
@@ -34,13 +32,18 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
 
             if (newAccessToken) {
               request.headers[this.AUTHORIZE_KEY] = `Bearer ${newAccessToken}`;
-              return true;
+              return super.canActivate(context) as Promise<boolean>;
             }
           }
-          throw new Error(
-            `토큰을 갱신하지 못했어요. ${err.name} : ${err.message}`,
+
+          throw new UnauthorizedException(
+            "토큰이 만료됐어요. 다시 로그인해 주세요.",
           );
         }
+
+        throw new UnauthorizedException(
+          `유효하지 않은 토큰이에요. ${err.message}`,
+        );
       }
     }
 

@@ -7,7 +7,7 @@ import { PickTodayMenuDto } from "./pick-today-menu.dto";
 import { PickTodayMenuCommand } from "../../domain/ports/out/pick-today-menu.command";
 import { TodayMenuId } from "../../domain/model/today-menu.vo";
 import { GetPickedTodayMenuDto } from "./get-picked-today-menu.dto";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 
 @ApiTags("TodayMenu")
 @Controller(`${EndPointPrefixConstant}/today-menu`)

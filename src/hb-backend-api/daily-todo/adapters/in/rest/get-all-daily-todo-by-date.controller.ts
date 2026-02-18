@@ -5,13 +5,13 @@ import { DIToken } from "../../../../../shared/di/token.di";
 import { GetUserByNicknameUseCase } from "../../../../user/domain/ports/in/get-user-by-nickname.use-case";
 import { GetDailyTodoByDateUseCase } from "../../../application/ports/in/get-daily-todo-by-date.use-case";
 import { GetDailyTodoDto } from "../dto/get-daily-todo.dto";
-import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { ParseYearMonthDayStringPipe } from "../pipe/year-month-day-string.pipe";
 import { YearMonthDayString } from "../../../domain/vo/year-month-day-string.vo";
 import {
   NicknameAndAccessToken,
   TokenUserInformation,
-} from "../../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
+} from "../../../../../shared/adapters/in/rest/decorator/access-token.decorator";
 import { UserNickname } from "../../../../user/domain/model/user-nickname.vo";
 
 @ApiTags("DailyTodos")

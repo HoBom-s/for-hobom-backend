@@ -12,10 +12,6 @@ export const NicknameAndAccessToken = createParamDecorator(
     const request = ctx.switchToHttp().getRequest<Request>();
     const result = request.user as JwtAuthPayloadModel;
 
-    if (request.cookies?.accessToken == null) {
-      return undefined;
-    }
-
     return {
       nickname: result.sub,
       accessToken: String(request.cookies?.accessToken),

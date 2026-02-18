@@ -1,6 +1,7 @@
 export class CategoryTitle {
   constructor(private readonly value: string) {
     this.value = value;
+    Object.freeze(this);
   }
 
   public static fromString(title: string): CategoryTitle {
@@ -14,6 +15,10 @@ export class CategoryTitle {
     }
 
     return new CategoryTitle(title);
+  }
+
+  public equals(other: CategoryTitle): boolean {
+    return this.value === other.value;
   }
 
   get raw(): string {

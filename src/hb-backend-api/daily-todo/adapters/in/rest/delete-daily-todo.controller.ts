@@ -3,12 +3,12 @@ import { Controller, Delete, Inject, Param, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { GetUserByNicknameUseCase } from "../../../../user/domain/ports/in/get-user-by-nickname.use-case";
-import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { DeleteDailyTodoUseCase } from "src/hb-backend-api/daily-todo/application/ports/in/delete-daily-todo.use-case";
 import {
   NicknameAndAccessToken,
   TokenUserInformation,
-} from "../../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
+} from "../../../../../shared/adapters/in/rest/decorator/access-token.decorator";
 import { ParseDailyTodoIdPipe } from "../pipe/daily-todo-id.pipe";
 import { DailyTodoId } from "../../../domain/vo/daily-todo-id.vo";
 import { UserNickname } from "../../../../user/domain/model/user-nickname.vo";

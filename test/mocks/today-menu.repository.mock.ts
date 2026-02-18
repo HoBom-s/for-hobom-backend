@@ -4,5 +4,6 @@ export function createTodayMenuRepository(): jest.Mocked<TodayMenuRepository> {
   return {
     upsert: jest.fn(),
     findById: jest.fn(),
+    findRecommendedMenuById: jest.fn(),
   };
 }

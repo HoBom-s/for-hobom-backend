@@ -16,8 +16,8 @@ import { UpdateDailyTodoCycleService } from "./application/use-cases/update-dail
 import { UpdateDailyTodoReactionService } from "./application/use-cases/update-daily-todo-reaction.service";
 import { GetDailyTodoByDateService } from "./application/use-cases/get-daily-todo-by-date.service";
 import { CreateDailyTodoController } from "./adapters/in/rest/create-daily-todo.controller";
-import { GetAllDailyTodoByDateController } from "./adapters/in/rest/gat-all-daily-todo-by-date.controller";
-import { GetDailyTodoByIdController } from "./adapters/in/rest/gat-daily-todo-by-id.controller";
+import { GetAllDailyTodoByDateController } from "./adapters/in/rest/get-all-daily-todo-by-date.controller";
+import { GetDailyTodoByIdController } from "./adapters/in/rest/get-daily-todo-by-id.controller";
 import { GetAllDailyTodoController } from "./adapters/in/rest/get-all-daily-todo.controller";
 import { UpdateDailyTodoCompleteStatusController } from "./adapters/in/rest/update-daily-todo-complete-status.controller";
 import { UpdateDailyTodoCycleStatusController } from "./adapters/in/rest/update-daily-todo-cycle-status.controller";

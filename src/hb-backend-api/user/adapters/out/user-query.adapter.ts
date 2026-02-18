@@ -31,6 +31,20 @@ export class UserQueryAdapter implements UserQueryPort {
     );
   }
 
+  public async findAll(): Promise<UserEntitySchema[]> {
+    const founds = await this.userRepository.findAll();
+    return founds.map((foundUser) =>
+      UserEntitySchema.of(
+        UserId.fromString(String(foundUser._id)),
+        foundUser.username,
+        foundUser.email,
+        foundUser.nickname,
+        foundUser.password,
+        foundUser.friends,
+      ),
+    );
+  }
+
   public async findByNickname(
     nickname: UserNickname,
   ): Promise<UserEntitySchema> {

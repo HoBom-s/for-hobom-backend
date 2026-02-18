@@ -1,6 +1,6 @@
 import { Body, Controller, Inject, Put, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { DIToken } from "../../../../shared/di/token.di";
 import { UpsertTodayMenuUseCase } from "../../domain/ports/in/upsert-today-menu.use-case";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";

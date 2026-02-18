@@ -4,7 +4,7 @@ import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-p
 import { DIToken } from "../../../../shared/di/token.di";
 import { GetUserUseCase } from "../../domain/ports/in/get-user.use-case";
 import { GetUserDto } from "./get-user.dto";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { ParseUserIdPipe } from "./user-id.pipe";
 import { UserId } from "../../domain/model/user-id.vo";
 

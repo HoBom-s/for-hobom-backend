@@ -7,6 +7,7 @@ export function createMockUser(
     _id: "681c1ebc9481a8b5148f5155",
     username: "Robin Yeon",
     nickname: "Robin",
+    email: "robin@hobom.com",
     password: "Hashed password",
     friends: [],
     ...overrides,

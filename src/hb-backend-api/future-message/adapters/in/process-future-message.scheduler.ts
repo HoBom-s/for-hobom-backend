@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { DIToken } from "../../../../shared/di/token.di";
 import { ProcessScheduleFutureMessageUseCase } from "../../domain/ports/in/process-schedule-future-message.use-case";
 import { CronExpression } from "../../../../shared/constants/cron-expression.constant";
-import { RegisterJob } from "../../../../shared/adpaters/in/job/job-metadata.decorator";
+import { RegisterJob } from "../../../../shared/adapters/in/job/job-metadata.decorator";
 
 @Injectable()
 @RegisterJob({

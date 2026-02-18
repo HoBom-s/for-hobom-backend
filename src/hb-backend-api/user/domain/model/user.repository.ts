@@ -8,5 +8,7 @@ export interface UserRepository {
 
   findById(id: UserId): Promise<UserDocument>;
 
+  findAll(): Promise<UserDocument[]>;
+
   findByNickname(nickname: UserNickname): Promise<UserDocument>;
 }
