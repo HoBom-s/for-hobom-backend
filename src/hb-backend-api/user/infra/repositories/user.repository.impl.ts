@@ -21,6 +21,7 @@ export class UserRepositoryImpl implements UserRepository {
     await this.userModel.create({
       username: user.getUsername,
       nickname: user.getNickname,
+      email: user.getEmail,
       password: user.getPassword,
       friends: [],
     });

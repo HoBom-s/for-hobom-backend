@@ -94,11 +94,13 @@ export class UserCreateEntitySchema {
   constructor(
     private readonly username: string,
     private readonly nickname: string,
+    private readonly email: string,
     private readonly password: string,
     private readonly friends: Types.ObjectId[],
   ) {
     this.username = username;
     this.nickname = nickname;
+    this.email = email;
     this.password = password;
     this.friends = friends;
   }
@@ -106,12 +108,14 @@ export class UserCreateEntitySchema {
   public static of(
     username: string,
     nickname: string,
+    email: string,
     password: string,
     friends?: Types.ObjectId[],
   ): UserCreateEntitySchema {
     return new UserCreateEntitySchema(
       username,
       nickname,
+      email,
       password,
       friends ?? [],
     );
@@ -123,6 +127,10 @@ export class UserCreateEntitySchema {
 
   get getNickname(): string {
     return this.nickname;
+  }
+
+  get getEmail(): string {
+    return this.email;
   }
 
   get getPassword(): string {

@@ -4,11 +4,11 @@ import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-p
 import { DIToken } from "../../../../shared/di/token.di";
 import { GetUserByNicknameUseCase } from "../../../user/domain/ports/in/get-user-by-nickname.use-case";
 import { CreateCategoryUseCase } from "../../domain/ports/in/create-category.use-case";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import {
   NicknameAndAccessToken,
   TokenUserInformation,
-} from "../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
+} from "../../../../shared/adapters/in/rest/decorator/access-token.decorator";
 import { CreateCategoryDto } from "./create-category.dto";
 import { UserNickname } from "../../../user/domain/model/user-nickname.vo";
 import { CreateCategoryCommand } from "../../domain/ports/out/create-category.command";

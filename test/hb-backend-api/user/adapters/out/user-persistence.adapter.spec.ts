@@ -17,6 +17,7 @@ describe("UserPersistenceAdapter", () => {
       const user = new UserCreateEntitySchema(
         "Robin Yeon",
         "Robin",
+        "robin@hobom.com",
         "Hashed password",
         [],
       );

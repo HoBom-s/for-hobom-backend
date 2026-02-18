@@ -33,6 +33,11 @@ export class YearMonthDayString {
     this._year = year;
     this._month = month;
     this._day = day;
+    Object.freeze(this);
+  }
+
+  public equals(other: YearMonthDayString): boolean {
+    return this._value === other._value;
   }
 
   public static fromString(dateStr: string): YearMonthDayString {

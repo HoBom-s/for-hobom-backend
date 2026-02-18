@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
 import { MongooseModule } from "@nestjs/mongoose";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { LoggerModule } from "nestjs-pino";
 import { DailyTodoModule } from "./hb-backend-api/daily-todo/daily-todo.module";
 import { CategoryModule } from "./hb-backend-api/category/category.module";
 import { AuthModule } from "./hb-backend-api/auth/auth.module";
@@ -11,8 +12,8 @@ import { TodayMenuModule } from "./hb-backend-api/today-menu/today-menu.module";
 import { OutboxModule } from "./hb-backend-api/outbox/outbox.module";
 import { TraceContext } from "./shared/trace/trace.context";
 import { APP_INTERCEPTOR } from "@nestjs/core";
-import { TraceInterceptor } from "./shared/adpaters/in/rest/interceptors/trace.interceptor";
-import { HttpLogInterceptor } from "./shared/adpaters/in/rest/interceptors/log.interceptor";
+import { TraceInterceptor } from "./shared/adapters/in/rest/interceptors/trace.interceptor";
+import { HttpLogInterceptor } from "./shared/adapters/in/rest/interceptors/log.interceptor";
 import { UserModule } from "./hb-backend-api/user/user.module";
 import { FutureMessageModule } from "./hb-backend-api/future-message/future-message.module";
 import { DiscordWebhookService } from "./shared/discord/discord-webhook.service";
@@ -23,8 +24,29 @@ import { HealthModule } from "./hb-backend-api/health/health.module";
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    LoggerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        pinoHttp: {
+          level: configService.get<string>("LOG_LEVEL", "info"),
+          transport:
+            configService.get<string>("NODE_ENV") !== "production"
+              ? {
+                  target: "pino-pretty",
+                  options: { colorize: true, singleLine: true },
+                }
+              : undefined,
+          redact: ["req.headers.authorization", "req.headers.cookie"],
+        },
+      }),
+    }),
     ScheduleModule.forRoot(),
-    MongooseModule.forRoot(String(process.env.HOBOM_SYSTEM_BACKEND_LION_DB)),
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.getOrThrow<string>("HOBOM_SYSTEM_BACKEND_LION_DB"),
+      }),
+    }),
     DailyTodoModule,
     CategoryModule,
     AuthModule,

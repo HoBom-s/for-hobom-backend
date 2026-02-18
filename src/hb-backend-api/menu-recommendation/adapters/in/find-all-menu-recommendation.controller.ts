@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { FindAllMenuRecommendationUseCase } from "../../domain/ports/in/find-all-menu-recommendation.use-case";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { GetMenuRecommendationDto } from "./get-menu-recommendation.dto";
 
 @ApiTags("MenuRecommendation")

@@ -4,12 +4,12 @@ import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-p
 import { DIToken } from "../../../../shared/di/token.di";
 import { GetUserByNicknameUseCase } from "../../../user/domain/ports/in/get-user-by-nickname.use-case";
 import { CreateMenuRecommendationUseCase } from "../../domain/ports/in/create-menu-recommendation.use-case";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { UserNickname } from "../../../user/domain/model/user-nickname.vo";
 import {
   NicknameAndAccessToken,
   TokenUserInformation,
-} from "../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
+} from "../../../../shared/adapters/in/rest/decorator/access-token.decorator";
 import { CreateMenuRecommendationDto } from "./create-menu-recommendation.dto";
 import { CreateMenuRecommendationCommand } from "../../domain/ports/out/create-menu-recommendation.command";
 

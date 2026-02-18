@@ -14,8 +14,9 @@ export class CreateUserService implements CreateUserUseCase {
 
   public async invoke(command: CreateUserCommand): Promise<void> {
     const newUser = UserCreateEntitySchema.of(
-      command.getNickname,
       command.getUsername,
+      command.getNickname,
+      command.getEmail,
       command.getPassword,
     );
     await this.userPersistencePort.save(newUser);

@@ -6,7 +6,7 @@ import { FindTodayMenuByIdUseCase } from "../../domain/ports/in/find-today-menu-
 import { GetTodayMenuDto } from "./get-today-menu.dto";
 import { TodayMenuId } from "../../domain/model/today-menu.vo";
 import { ParseTodayMenuIdPipe } from "./today-menu-id.pipe";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 
 @ApiTags("TodayMenu")
 @Controller(`${EndPointPrefixConstant}/today-menu`)

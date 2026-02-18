@@ -1,4 +1,5 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { compare } from "bcrypt";
 import { LoginAuthUseCase } from "../../domain/ports/in/login-auth.use-case";
 import { UserQueryPort } from "../../../user/domain/ports/out/user-query.port";
@@ -26,6 +27,7 @@ export class LoginAuthService implements LoginAuthUseCase {
     @Inject(DIToken.AuthModule.JwtAuthPort)
     private readonly jwtAuthPort: JwtAuthPort,
     public readonly transactionRunner: TransactionRunner,
+    private readonly configService: ConfigService,
   ) {}
 
   @Transactional()
@@ -89,34 +91,14 @@ export class LoginAuthService implements LoginAuthUseCase {
     return this.jwtAuthPort.signRefreshToken({ sub: nickname });
   }
 
-  private async saveRefreshToken(nickname: string, refreshToken: string) {
-    const expiresAt = new Date();
-    expiresAt.setDate(
-      expiresAt.getDate() +
-        Number(
-          String(process.env.HOBOM_JWT_REFRESH_TOKEN_EXPIRED).replaceAll(
-            "d",
-            "",
-          ),
-        ),
-    );
-
-    await this.authPersistencePort.saveRefreshToken(
-      AuthEntitySchema.of(nickname, refreshToken, expiresAt),
-    );
-  }
-
   private calculateRefreshTokenExpiry(): Date {
     const expiresAt = new Date();
-    expiresAt.setDate(
-      expiresAt.getDate() +
-        Number(
-          String(process.env.HOBOM_JWT_REFRESH_TOKEN_EXPIRED).replaceAll(
-            "d",
-            "",
-          ),
-        ),
+    const refreshTokenExpired = this.configService.getOrThrow<string>(
+      "HOBOM_JWT_REFRESH_TOKEN_EXPIRED",
     );
+    // e.g. "30d" → 30 days
+    const days = Number(refreshTokenExpired.replace("d", ""));
+    expiresAt.setDate(expiresAt.getDate() + days);
     return expiresAt;
   }
 }

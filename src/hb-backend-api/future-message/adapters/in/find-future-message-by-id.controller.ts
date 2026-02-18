@@ -3,7 +3,7 @@ import { Controller, Get, Inject, Param, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { FindFutureMessageByIdUseCase } from "../../domain/ports/in/find-future-message-by-id.use-case";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { ParseFutureMessageIdPipe } from "./future-message-id.pipe";
 import { FutureMessageId } from "../../domain/model/future-message-id.vo";
 import { FindFutureMessageDto } from "./find-future-message.dto";

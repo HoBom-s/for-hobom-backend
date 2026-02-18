@@ -3,7 +3,7 @@ import { Controller, Get, Inject, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { GetUserDto } from "./get-user.dto";
-import { JwtAuthGuard } from "../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { GetAllUserUseCase } from "../../domain/ports/in/get-all-user.use-case";
 
 @ApiTags("Users")

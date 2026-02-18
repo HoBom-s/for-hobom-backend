@@ -1,7 +1,9 @@
 import { Types } from "mongoose";
 
 export class UserId {
-  constructor(private readonly value: Types.ObjectId) {}
+  constructor(private readonly value: Types.ObjectId) {
+    Object.freeze(this);
+  }
 
   public static fromString(id: string): UserId {
     if (!Types.ObjectId.isValid(id)) {
@@ -9,6 +11,10 @@ export class UserId {
     }
 
     return new UserId(new Types.ObjectId(id));
+  }
+
+  public equals(other: UserId): boolean {
+    return this.value.equals(other.value);
   }
 
   public toString(): string {

@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 export class MenuRecommendationId {
   constructor(private readonly value: Types.ObjectId) {
     this.value = value;
+    Object.freeze(this);
   }
 
   public static fromString(id: string): MenuRecommendationId {
@@ -11,6 +12,10 @@ export class MenuRecommendationId {
     }
 
     return new MenuRecommendationId(new Types.ObjectId(id));
+  }
+
+  public equals(other: MenuRecommendationId): boolean {
+    return this.value.equals(other.value);
   }
 
   public toString(): string {

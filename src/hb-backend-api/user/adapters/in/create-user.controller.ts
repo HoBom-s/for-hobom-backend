@@ -20,8 +20,8 @@ export class CreateUserController {
   })
   @Post("")
   public async createUser(@Body() body: CreateUserDto): Promise<void> {
-    const { username, password, nickname } = body;
-    const command = CreateUserCommand.of(username, nickname, password);
+    const { username, password, nickname, email } = body;
+    const command = CreateUserCommand.of(username, nickname, email, password);
 
     await this.createUserUseCase.invoke(command);
   }

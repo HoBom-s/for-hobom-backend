@@ -8,11 +8,11 @@ import {
 } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { DIToken } from "../../../../../shared/di/token.di";
-import { JwtAuthGuard } from "../../../../../shared/adpaters/in/rest/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import {
   NicknameAndAccessToken,
   TokenUserInformation,
-} from "../../../../../shared/adpaters/in/rest/decorator/access-token.decorator";
+} from "../../../../../shared/adapters/in/rest/decorator/access-token.decorator";
 import { GetUserByNicknameUseCase } from "../../../../user/domain/ports/in/get-user-by-nickname.use-case";
 import { UserNickname } from "../../../../user/domain/model/user-nickname.vo";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
