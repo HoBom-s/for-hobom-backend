@@ -15,7 +15,7 @@ export class FutureMessageDomain {
     private readonly updatedAt: Date,
   ) {
     this.id = id;
-    this.senderId = recipientId;
+    this.senderId = senderId;
     this.recipientId = recipientId;
     this.title = title;
     this.content = content;

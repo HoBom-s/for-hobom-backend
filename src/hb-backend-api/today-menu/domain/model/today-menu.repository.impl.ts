@@ -41,7 +41,7 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
         },
       );
 
-      return TodayMenuId.fromSting(String(todayMenuDocument._id));
+      return TodayMenuId.fromString(String(todayMenuDocument._id));
     } else {
       const todayMenuDocument = await this.todayMenuModel.findOneAndUpdate(
         {
@@ -68,7 +68,7 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
         },
       );
 
-      return TodayMenuId.fromSting(String(todayMenuDocument._id));
+      return TodayMenuId.fromString(String(todayMenuDocument._id));
     }
   }
 

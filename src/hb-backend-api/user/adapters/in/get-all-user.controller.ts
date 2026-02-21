@@ -21,7 +21,7 @@ export class GetAllUserController {
   @ApiResponse({ type: GetUserDto })
   @UseGuards(JwtAuthGuard)
   @Get("")
-  public async findById(): Promise<GetUserDto[]> {
+  public async findAll(): Promise<GetUserDto[]> {
     const founds = await this.getAllUserUseCase.invoke();
 
     return founds.map((foundUser) => GetUserDto.from(foundUser));

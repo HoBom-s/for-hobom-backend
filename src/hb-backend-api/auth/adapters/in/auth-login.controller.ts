@@ -1,5 +1,6 @@
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Body, Controller, Inject, Post } from "@nestjs/common";
+import { Body, Controller, Inject, Post, UseGuards } from "@nestjs/common";
+import { ThrottlerGuard, Throttle } from "@nestjs/throttler";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { LoginAuthUseCase } from "../../domain/ports/in/login-auth.use-case";
@@ -20,8 +21,9 @@ export class AuthLoginController {
     description: "사용자 로그인",
   })
   @ApiResponse({ type: GetLoginTokenDto })
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @Post("/login")
-  // @UseInterceptors(CookiesInterceptor)
   public async login(@Body() body: LoginAuthDto): Promise<GetLoginTokenDto> {
     const loginAuthResult = await this.loginAuthUseCase.invoke(
       LoginAuthCommand.of(body.nickname, body.password),

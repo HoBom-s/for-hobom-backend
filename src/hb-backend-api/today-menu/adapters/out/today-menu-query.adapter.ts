@@ -49,7 +49,7 @@ export class TodayMenuQueryAdapter implements TodayMenuQueryPort {
     entity: TodayMenuWithRelationsEntity,
   ): TodayMenuRelationEntity {
     return TodayMenuRelationEntity.of(
-      TodayMenuId.fromSting(entity.id),
+      TodayMenuId.fromString(entity.id),
       entity.recommendedMenu?.id == null
         ? null
         : this.toMenuRecommendation(entity.recommendedMenu),
