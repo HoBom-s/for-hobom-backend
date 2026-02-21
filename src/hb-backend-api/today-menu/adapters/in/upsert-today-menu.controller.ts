@@ -39,7 +39,7 @@ export class UpsertTodayMenuController {
         : YearMonthDayString.fromString(body.recommendationDate),
       body?.todayMenuId == null
         ? null
-        : TodayMenuId.fromSting(body.todayMenuId),
+        : TodayMenuId.fromString(body.todayMenuId),
     );
 
     const todayMenuIdResponse =

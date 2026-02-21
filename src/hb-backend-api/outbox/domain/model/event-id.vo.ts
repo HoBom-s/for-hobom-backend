@@ -1,6 +1,6 @@
 export class EventId {
   constructor(private readonly value: string) {
-    this.value = value;
+    Object.freeze(this);
   }
 
   public static fromString(id: string): EventId {

@@ -3,6 +3,7 @@ export class RefreshToken {
     if (!this.isValid(value)) {
       throw new Error("유효하지 않은 토큰이에요.");
     }
+    Object.freeze(this);
   }
 
   public static fromString(refreshToken: string): RefreshToken {

@@ -1,5 +1,7 @@
 export class UserNickname {
-  constructor(private readonly value: string) {}
+  constructor(private readonly value: string) {
+    Object.freeze(this);
+  }
 
   public static fromString(nickname: string): UserNickname {
     if (nickname == null || nickname.trim().length === 0) {

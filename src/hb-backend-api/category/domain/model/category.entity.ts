@@ -11,8 +11,6 @@ export class CategoryEntity extends BaseEntity {
   @Prop({
     type: String,
     required: true,
-    unique: true,
-    index: true,
   })
   title: string;
 
@@ -20,7 +18,6 @@ export class CategoryEntity extends BaseEntity {
     type: Types.ObjectId,
     ref: "user",
     required: true,
-    index: true,
   })
   owner: Types.ObjectId;
 

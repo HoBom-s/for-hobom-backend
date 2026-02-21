@@ -43,7 +43,6 @@ describe("GlobalExceptionFilter", () => {
 
     it("404 응답으로 status 404를 반환해야 한다", async () => {
       const exception = new NotFoundException("Not Found");
-      const host = buildHost();
       const mockJson = jest.fn();
       const mockStatus = jest.fn().mockReturnValue({ json: mockJson });
 

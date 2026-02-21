@@ -3,6 +3,7 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { LoggerModule } from "nestjs-pino";
+import { ThrottlerModule } from "@nestjs/throttler";
 import { DailyTodoModule } from "./hb-backend-api/daily-todo/daily-todo.module";
 import { CategoryModule } from "./hb-backend-api/category/category.module";
 import { AuthModule } from "./hb-backend-api/auth/auth.module";
@@ -39,6 +40,9 @@ import { HealthModule } from "./hb-backend-api/health/health.module";
           redact: ["req.headers.authorization", "req.headers.cookie"],
         },
       }),
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 60000, limit: 10 }],
     }),
     ScheduleModule.forRoot(),
     MongooseModule.forRootAsync({
