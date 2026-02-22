@@ -119,6 +119,38 @@ export class DIToken {
     public static PickTodayMenuUseCase = this.register("PickTodayMenuUseCase");
   };
 
+  public static readonly LabelModule = class extends DITokenRegister {
+    public static LabelRepository = this.register("LabelRepository");
+
+    public static LabelPersistencePort = this.register("LabelPersistencePort");
+    public static LabelQueryPort = this.register("LabelQueryPort");
+
+    public static CreateLabelUseCase = this.register("CreateLabelUseCase");
+    public static GetAllLabelsUseCase = this.register("GetAllLabelsUseCase");
+    public static GetLabelUseCase = this.register("GetLabelUseCase");
+    public static PatchLabelUseCase = this.register("PatchLabelUseCase");
+    public static DeleteLabelUseCase = this.register("DeleteLabelUseCase");
+  };
+
+  public static readonly NoteModule = class extends DITokenRegister {
+    public static NoteRepository = this.register("NoteRepository");
+
+    public static NotePersistencePort = this.register("NotePersistencePort");
+    public static NoteQueryPort = this.register("NoteQueryPort");
+
+    public static CreateNoteUseCase = this.register("CreateNoteUseCase");
+    public static GetAllNotesUseCase = this.register("GetAllNotesUseCase");
+    public static GetNoteByIdUseCase = this.register("GetNoteByIdUseCase");
+    public static UpdateNoteUseCase = this.register("UpdateNoteUseCase");
+    public static UpdateNoteStatusUseCase = this.register(
+      "UpdateNoteStatusUseCase",
+    );
+    public static ToggleNotePinUseCase = this.register("ToggleNotePinUseCase");
+    public static ReorderNoteUseCase = this.register("ReorderNoteUseCase");
+    public static DeleteNoteUseCase = this.register("DeleteNoteUseCase");
+    public static EmptyTrashUseCase = this.register("EmptyTrashUseCase");
+  };
+
   public static readonly OutboxModule = class extends DITokenRegister {
     public static OutboxRepository = this.register("OutboxRepository");
 
