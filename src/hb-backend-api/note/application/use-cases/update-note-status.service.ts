@@ -26,7 +26,7 @@ export class UpdateNoteStatusService implements UpdateNoteStatusUseCase {
     status: NoteStatus,
   ): Promise<void> {
     const note = await this.noteQueryPort.findById(id, owner);
-    const trashedAt = note.isTrashed() ? note.getTrashedAt : null;
+    const trashedAt = status === NoteStatus.TRASHED ? new Date() : null;
     await this.notePersistencePort.updateStatus(
       note.getId,
       owner,

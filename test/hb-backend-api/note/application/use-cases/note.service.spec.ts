@@ -330,7 +330,7 @@ describe("UpdateNoteStatusService", () => {
     service = module.get(UpdateNoteStatusService);
   });
 
-  it("should set trashedAt to null when current note is not trashed", async () => {
+  it("should set trashedAt when target status is TRASHED", async () => {
     const noteId = makeNoteId();
     const owner = makeOwner();
     queryPort.findById.mockResolvedValue(makeNoteEntity({ id: noteId, owner }));
@@ -341,11 +341,11 @@ describe("UpdateNoteStatusService", () => {
       noteId,
       owner,
       NoteStatus.TRASHED,
-      null,
+      expect.any(Date),
     );
   });
 
-  it("should set trashedAt when current note is trashed", async () => {
+  it("should set trashedAt to null when restoring from trash", async () => {
     const noteId = makeNoteId();
     const owner = makeOwner();
     queryPort.findById.mockResolvedValue(
@@ -358,7 +358,7 @@ describe("UpdateNoteStatusService", () => {
       noteId,
       owner,
       NoteStatus.ACTIVE,
-      expect.any(Date),
+      null,
     );
   });
 
