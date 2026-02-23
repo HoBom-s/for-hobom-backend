@@ -11,7 +11,7 @@ export class CreateFutureMessageCommand {
     private readonly sendStatus: SendStatus,
     private readonly scheduledAt: string,
   ) {
-    this.senderId = recipientId;
+    this.senderId = senderId;
     this.recipientId = recipientId;
     this.title = title;
     this.content = content;

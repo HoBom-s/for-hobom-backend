@@ -5,6 +5,6 @@ export class ParseTodayMenuIdPipe
   implements PipeTransform<string, TodayMenuId>
 {
   transform(value: string): TodayMenuId {
-    return TodayMenuId.fromSting(value);
+    return TodayMenuId.fromString(value);
   }
 }

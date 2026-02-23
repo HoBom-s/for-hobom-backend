@@ -79,7 +79,8 @@ describe("PickTodayMenuService", () => {
 
   it("should pick a menu from candidates", async () => {
     const todayMenuId = new TodayMenuId(new Types.ObjectId());
-    const userId = new UserId(new Types.ObjectId());
+    const firstUserId = new UserId(new Types.ObjectId());
+    const secondUserId = new UserId(new Types.ObjectId());
     const command = PickTodayMenuCommand.of(todayMenuId);
     const firstMenuId = new MenuRecommendationId(new Types.ObjectId());
     const secondMenuId = new MenuRecommendationId(new Types.ObjectId());
@@ -90,7 +91,7 @@ describe("PickTodayMenuService", () => {
         MenuKind.KOREAN,
         MenuTimeOfMeal.BREAKFAST,
         FoodType.MEAL,
-        RegisterPerson.of(userId, "u1", "nick1"),
+        RegisterPerson.of(firstUserId, "u1", "nick1"),
       ),
       MenuRecommendationRelationEntity.of(
         secondMenuId,
@@ -98,7 +99,7 @@ describe("PickTodayMenuService", () => {
         MenuKind.KOREAN,
         MenuTimeOfMeal.DINNER,
         FoodType.BOTH,
-        RegisterPerson.of(userId, "u1", "nick1"),
+        RegisterPerson.of(secondUserId, "u2", "nick2"),
       ),
     ];
     const todayMenu = TodayMenuRelationEntity.of(
@@ -108,24 +109,90 @@ describe("PickTodayMenuService", () => {
       YearMonthDayString.fromString("2025-06-07"),
     );
     const user = UserEntitySchema.of(
-      new UserId(new Types.ObjectId()),
-      "user",
-      "email",
-      "nickname",
+      secondUserId,
+      "u2",
+      "u2@email.com",
+      "nick2",
       "password",
       [new Types.ObjectId()],
     );
     userQueryPort.findById.mockResolvedValue(user);
     todayMenuQueryPort.findById.mockResolvedValue(todayMenu);
-    // 0.9 * 2 = 1.8 → floor = 1
+    // 0.9 * 2 = 1.8 → floor = 1 → "비빔밥"
     jest.spyOn(Math, "random").mockReturnValue(0.9);
 
     const result = await pickTodayMenuService.invoke(command);
 
     expect(result).toBe(secondMenuId);
     expect(todayMenuPersistencePort.upsert).toHaveBeenCalledTimes(1);
-    expect(userQueryPort.findById).toHaveBeenCalledTimes(1);
+    expect(userQueryPort.findById).toHaveBeenCalledWith(secondUserId);
     expect(outboxPersistencePort.save).toHaveBeenCalledTimes(1);
+
+    const savedOutbox = outboxPersistencePort.save.mock.calls[0][0];
+    expect(savedOutbox.getPayload).toEqual(
+      expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        body: expect.stringContaining("비빔밥"),
+      }),
+    );
+  });
+
+  it("should use the same random index for pick and outbox", async () => {
+    const todayMenuId = new TodayMenuId(new Types.ObjectId());
+    const firstUserId = new UserId(new Types.ObjectId());
+    const secondUserId = new UserId(new Types.ObjectId());
+    const command = PickTodayMenuCommand.of(todayMenuId);
+    const firstMenuId = new MenuRecommendationId(new Types.ObjectId());
+    const secondMenuId = new MenuRecommendationId(new Types.ObjectId());
+    const menuCandidates = [
+      MenuRecommendationRelationEntity.of(
+        firstMenuId,
+        "된장찌개",
+        MenuKind.KOREAN,
+        MenuTimeOfMeal.BREAKFAST,
+        FoodType.MEAL,
+        RegisterPerson.of(firstUserId, "u1", "nick1"),
+      ),
+      MenuRecommendationRelationEntity.of(
+        secondMenuId,
+        "비빔밥",
+        MenuKind.KOREAN,
+        MenuTimeOfMeal.DINNER,
+        FoodType.BOTH,
+        RegisterPerson.of(secondUserId, "u2", "nick2"),
+      ),
+    ];
+    const todayMenu = TodayMenuRelationEntity.of(
+      todayMenuId,
+      menuCandidates[0],
+      menuCandidates,
+      YearMonthDayString.fromString("2025-06-07"),
+    );
+    const firstUser = UserEntitySchema.of(
+      firstUserId,
+      "u1",
+      "u1@email.com",
+      "nick1",
+      "password",
+      [],
+    );
+    userQueryPort.findById.mockResolvedValue(firstUser);
+    todayMenuQueryPort.findById.mockResolvedValue(todayMenu);
+    // 0.1 * 2 = 0.2 → floor = 0 → "된장찌개"
+    jest.spyOn(Math, "random").mockReturnValue(0.1);
+
+    const result = await pickTodayMenuService.invoke(command);
+
+    expect(result).toBe(firstMenuId);
+    expect(userQueryPort.findById).toHaveBeenCalledWith(firstUserId);
+
+    const savedOutbox = outboxPersistencePort.save.mock.calls[0][0];
+    expect(savedOutbox.getPayload).toEqual(
+      expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        body: expect.stringContaining("된장찌개"),
+      }),
+    );
   });
 
   it("should throw error if no candidates exist", async () => {

@@ -46,10 +46,7 @@ export class PickTodayMenuService implements PickTodayMenuUseCase {
 
     const candidates = menu.getCandidates;
     const forPickRandomIndex = this.getRandomIndex(candidates.length);
-    const pickedMenuId = this.pickCandidate(
-      candidates,
-      this.getRandomIndex(candidates.length),
-    );
+    const pickedMenuId = this.pickCandidate(candidates, forPickRandomIndex);
     await this.upsertRecommendedMenu(
       UpsertTodayMenuCommand.of(
         candidates.map((item) => item.getId),

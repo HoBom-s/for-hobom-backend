@@ -24,6 +24,7 @@ export class DailyTodoEntity extends BaseEntity {
     type: Types.ObjectId,
     ref: "user",
     required: true,
+    index: true,
   })
   owner: Types.ObjectId;
 

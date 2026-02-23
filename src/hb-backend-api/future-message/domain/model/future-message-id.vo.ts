@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 
 export class FutureMessageId {
   constructor(private readonly value: Types.ObjectId) {
-    this.value = value;
+    Object.freeze(this);
   }
 
   public static fromString(id: string): FutureMessageId {

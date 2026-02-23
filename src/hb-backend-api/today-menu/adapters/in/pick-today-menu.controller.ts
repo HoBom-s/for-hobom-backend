@@ -28,7 +28,7 @@ export class PickTodayMenuController {
     @Body() body: PickTodayMenuDto,
   ): Promise<GetPickedTodayMenuDto> {
     const command = PickTodayMenuCommand.of(
-      TodayMenuId.fromSting(body.todayMenuId),
+      TodayMenuId.fromString(body.todayMenuId),
     );
     const pickedMenuId = await this.pickTodayMenuUseCase.invoke(command);
     return GetPickedTodayMenuDto.of(pickedMenuId);

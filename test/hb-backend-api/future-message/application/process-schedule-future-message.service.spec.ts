@@ -8,7 +8,6 @@ import { DIToken } from "../../../../src/shared/di/token.di";
 import { TransactionRunner } from "../../../../src/infra/mongo/transaction/transaction.runner";
 import { FutureMessageId } from "../../../../src/hb-backend-api/future-message/domain/model/future-message-id.vo";
 import { UserId } from "../../../../src/hb-backend-api/user/domain/model/user-id.vo";
-import { FutureMessageDomain } from "../../../../src/hb-backend-api/future-message/domain/model/future-message.domain";
 import { SendStatus } from "../../../../src/hb-backend-api/future-message/domain/model/send-status.enum";
 import { FutureMessageQueryResult } from "../../../../src/hb-backend-api/future-message/domain/ports/out/future-message-query.result";
 import { UserEntitySchema } from "../../../../src/hb-backend-api/user/domain/model/user.entity";
@@ -63,61 +62,88 @@ describe("ProcessScheduleFutureMessageService", () => {
     userQueryPort = module.get(DIToken.UserModule.UserQueryPort);
   });
 
-  it("should process due scheduled messages", async () => {
+  it("should process due scheduled messages and verify outbox payload", async () => {
     const mockId = new FutureMessageId(new Types.ObjectId());
     const mockSenderId = new UserId(new Types.ObjectId());
     const mockRecipientId = new UserId(new Types.ObjectId());
-    const now = new Date().toISOString();
+    const pastDate = new Date(Date.now() - 1000 * 60 * 60).toISOString();
     const createdAt = new Date();
     const updatedAt = new Date();
-    const mockDomain = new FutureMessageDomain(
+
+    const queryResult = new FutureMessageQueryResult(
       mockId,
       mockSenderId,
       mockRecipientId,
-      "Test title",
-      "Test content",
+      "생일 축하해",
+      "생일 축하한다 친구야!",
       SendStatus.PENDING,
-      now,
+      pastDate,
       createdAt,
       updatedAt,
     );
 
-    jest.spyOn(mockDomain, "isDueToSend").mockReturnValue(true);
-    jest.spyOn(FutureMessageDomain, "of").mockReturnValue(mockDomain);
-
     futureMessageQueryPort.findAllBySendStatusWithoutSenderId.mockResolvedValue(
-      [
-        {
-          id: mockId,
-          senderId: mockSenderId,
-          recipientId: mockRecipientId,
-          title: "Test title",
-          content: "Test content",
-          sendStatus: SendStatus.PENDING,
-          scheduledAt: now,
-          createdAt,
-          updatedAt,
-        } as unknown as FutureMessageQueryResult,
-      ],
+      [queryResult],
     );
 
-    const user = UserEntitySchema.of(
-      new UserId(new Types.ObjectId()),
-      "user",
-      "email",
-      "nickname",
+    const recipientUser = UserEntitySchema.of(
+      mockRecipientId,
+      "recipient-user",
+      "recipient@email.com",
+      "recipient-nick",
       "password",
-      [new Types.ObjectId()],
+      [],
     );
-    userQueryPort.findById.mockResolvedValue(user);
-
-    const saveSpy = outboxPersistencePort.save;
-    const markSpy = futureMessagePersistencePort.markAsSent;
+    userQueryPort.findById.mockResolvedValue(recipientUser);
 
     await service.invoke();
 
-    expect(saveSpy).toHaveBeenCalledTimes(1);
-    expect(markSpy).toHaveBeenCalledWith(mockId);
+    expect(outboxPersistencePort.save).toHaveBeenCalledTimes(1);
+    expect(futureMessagePersistencePort.markAsSent).toHaveBeenCalledWith(
+      mockId,
+    );
+
+    // outbox payload 내용 검증
+    const savedOutbox = outboxPersistencePort.save.mock.calls[0][0];
+    expect(savedOutbox.getPayload).toEqual(
+      expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        title: expect.stringContaining("생일 축하해"),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        body: expect.stringContaining("생일 축하한다 친구야!"),
+        recipient: "recipient@email.com",
+        senderId: mockSenderId.toString(),
+      }),
+    );
+
+    // recipient 유저 조회 시 recipientId로 조회하는지 확인
+    expect(userQueryPort.findById).toHaveBeenCalledWith(mockRecipientId);
+  });
+
+  it("should use distinct senderId and recipientId", () => {
+    const mockId = new FutureMessageId(new Types.ObjectId());
+    const mockSenderId = new UserId(new Types.ObjectId());
+    const mockRecipientId = new UserId(new Types.ObjectId());
+    const pastDate = new Date(Date.now() - 1000 * 60 * 60).toISOString();
+    const createdAt = new Date();
+    const updatedAt = new Date();
+
+    const queryResult = new FutureMessageQueryResult(
+      mockId,
+      mockSenderId,
+      mockRecipientId,
+      "제목",
+      "내용",
+      SendStatus.PENDING,
+      pastDate,
+      createdAt,
+      updatedAt,
+    );
+
+    // senderId와 recipientId가 구분되는지 검증
+    expect(queryResult.getSenderId).toBe(mockSenderId);
+    expect(queryResult.getRecipientId).toBe(mockRecipientId);
+    expect(queryResult.getSenderId).not.toBe(queryResult.getRecipientId);
   });
 
   it("should skip processing if no due messages", async () => {
@@ -125,12 +151,9 @@ describe("ProcessScheduleFutureMessageService", () => {
       [],
     );
 
-    const saveSpy = outboxPersistencePort.save;
-    const markSpy = futureMessagePersistencePort.markAsSent;
-
     await service.invoke();
 
-    expect(saveSpy).not.toHaveBeenCalled();
-    expect(markSpy).not.toHaveBeenCalled();
+    expect(outboxPersistencePort.save).not.toHaveBeenCalled();
+    expect(futureMessagePersistencePort.markAsSent).not.toHaveBeenCalled();
   });
 });
