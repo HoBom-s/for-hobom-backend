@@ -149,6 +149,9 @@ export class DIToken {
     public static ReorderNoteUseCase = this.register("ReorderNoteUseCase");
     public static DeleteNoteUseCase = this.register("DeleteNoteUseCase");
     public static EmptyTrashUseCase = this.register("EmptyTrashUseCase");
+    public static ProcessNoteRemindUseCase = this.register(
+      "ProcessNoteRemindUseCase",
+    );
   };
 
   public static readonly OutboxModule = class extends DITokenRegister {

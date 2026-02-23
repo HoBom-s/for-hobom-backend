@@ -4,6 +4,8 @@ import { NoteEntity } from "./domain/model/note.entity";
 import { NoteSchema } from "./domain/model/note.schema";
 import { DIToken } from "../../shared/di/token.di";
 import { UserModule } from "../user/user.module";
+import { OutboxModule } from "../outbox/outbox.module";
+import { ProcessNoteRemindService } from "./application/use-cases/process-note-remind.service";
 import { NoteRepositoryImpl } from "./infra/repositories/note.repository.impl";
 import { NotePersistenceAdapter } from "./adapters/out/note-persistence.adapter";
 import { NoteQueryAdapter } from "./adapters/out/note-query.adapter";
@@ -17,6 +19,7 @@ import { ToggleNotePinService } from "./application/use-cases/toggle-note-pin.se
 import { ReorderNoteService } from "./application/use-cases/reorder-note.service";
 import { DeleteNoteService } from "./application/use-cases/delete-note.service";
 import { EmptyTrashService } from "./application/use-cases/empty-trash.service";
+import { ProcessNoteRemindScheduler } from "./adapters/in/process-note-remind.scheduler";
 
 @Module({
   imports: [
@@ -27,9 +30,11 @@ import { EmptyTrashService } from "./application/use-cases/empty-trash.service";
       },
     ]),
     UserModule,
+    OutboxModule,
   ],
   controllers: [NoteController],
   providers: [
+    ProcessNoteRemindScheduler,
     {
       provide: DIToken.NoteModule.NoteRepository,
       useClass: NoteRepositoryImpl,
@@ -77,6 +82,10 @@ import { EmptyTrashService } from "./application/use-cases/empty-trash.service";
     {
       provide: DIToken.NoteModule.EmptyTrashUseCase,
       useClass: EmptyTrashService,
+    },
+    {
+      provide: DIToken.NoteModule.ProcessNoteRemindUseCase,
+      useClass: ProcessNoteRemindService,
     },
   ],
 })
