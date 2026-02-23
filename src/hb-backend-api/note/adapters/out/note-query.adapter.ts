@@ -11,7 +11,6 @@ import { UserId } from "../../../user/domain/model/user-id.vo";
 import { LabelId } from "../../../label/domain/model/label-id.vo";
 import { NoteStatus } from "../../domain/enums/note-status.enum";
 import { NoteDocument } from "../../domain/model/note.schema";
-import { Recurrence } from "../../domain/enums/recurrence.enum";
 
 @Injectable()
 export class NoteQueryAdapter implements NoteQueryPort {

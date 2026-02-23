@@ -5,7 +5,6 @@ import { NotePersistencePort } from "../../domain/ports/out/note-persistence.por
 import { NoteQueryPort } from "../../domain/ports/out/note-query.port";
 import { NoteId } from "../../domain/model/note-id.vo";
 import { UserId } from "../../../user/domain/model/user-id.vo";
-import { NoteStatus } from "../../domain/enums/note-status.enum";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
