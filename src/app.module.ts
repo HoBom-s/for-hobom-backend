@@ -18,6 +18,8 @@ import { HttpLogInterceptor } from "./shared/adapters/in/rest/interceptors/log.i
 import { UserModule } from "./hb-backend-api/user/user.module";
 import { FutureMessageModule } from "./hb-backend-api/future-message/future-message.module";
 import { DiscordWebhookService } from "./shared/discord/discord-webhook.service";
+import { LabelModule } from "./hb-backend-api/label/label.module";
+import { NoteModule } from "./hb-backend-api/note/note.module";
 import { HealthModule } from "./hb-backend-api/health/health.module";
 
 @Module({
@@ -60,6 +62,8 @@ import { HealthModule } from "./hb-backend-api/health/health.module";
     UserModule,
     TransactionModule,
     FutureMessageModule,
+    LabelModule,
+    NoteModule,
     HealthModule,
   ],
   providers: [
