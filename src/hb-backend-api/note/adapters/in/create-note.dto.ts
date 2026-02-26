@@ -28,7 +28,8 @@ export class ChecklistItemDto {
 
 export class ReminderDto {
   @ApiProperty()
-  date: Date;
+  @IsString()
+  date: string;
 
   @ApiProperty({ enum: Recurrence })
   @IsEnum(Recurrence)
