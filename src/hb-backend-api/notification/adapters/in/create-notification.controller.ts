@@ -1,6 +1,6 @@
 import { Body, Controller, Inject, Post } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
-import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
+import { InternalEndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { CreateNotificationUseCase } from "../../domain/ports/in/create-notification.use-case";
 import { GetUserByNicknameUseCase } from "../../../user/domain/ports/in/get-user-by-nickname.use-case";
@@ -10,7 +10,7 @@ import { CreateNotificationCommand } from "../../domain/ports/out/create-notific
 import { NotificationCategory } from "../../domain/enums/notification-category.enum";
 
 @ApiTags("Notifications")
-@Controller(`${EndPointPrefixConstant}/internal/notifications`)
+@Controller(`${InternalEndPointPrefixConstant}/notifications`)
 export class CreateNotificationController {
   constructor(
     @Inject(DIToken.UserModule.GetUserByNicknameUseCase)
