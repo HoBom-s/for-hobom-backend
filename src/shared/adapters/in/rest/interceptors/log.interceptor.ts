@@ -32,9 +32,9 @@ export class HttpLogInterceptor implements NestInterceptor {
     private readonly userQueryPort: UserQueryPort,
   ) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const req = context.switchToHttp().getRequest<Request>();
-    if (req.originalUrl.includes("/auth") || req.path === "/") {
+    if (req.originalUrl.includes("/auth") || req.originalUrl.includes("/internal") || req.path === "/") {
       return next.handle();
     }
     const res = context.switchToHttp().getResponse<Response>();
@@ -57,7 +57,7 @@ export class HttpLogInterceptor implements NestInterceptor {
                 query: req.query,
                 body: (typeof req.body === "object" ? req.body : {}) as Record<
                   string,
-                  any
+                  unknown
                 >,
                 headers: req.headers,
               },
@@ -92,7 +92,7 @@ export class HttpLogInterceptor implements NestInterceptor {
                     query: req.query,
                     body: (typeof req.body === "object"
                       ? req.body
-                      : {}) as Record<string, any>,
+                      : {}) as Record<string, unknown>,
                     headers: req.headers,
                     error: String(err.message ?? "Unknown error"),
                   },

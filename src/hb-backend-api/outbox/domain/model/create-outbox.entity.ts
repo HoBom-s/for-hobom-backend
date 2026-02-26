@@ -4,7 +4,7 @@ import { OutboxStatus } from "./outbox-status.enum";
 export class CreateOutboxEntity {
   constructor(
     private readonly eventType: EventType,
-    private readonly payload: Record<string, any>,
+    private readonly payload: Record<string, unknown>,
     private readonly status: OutboxStatus,
     private readonly retryCount: number,
     private readonly version: number,
@@ -17,7 +17,7 @@ export class CreateOutboxEntity {
 
   public static of(
     eventType: EventType,
-    payload: Record<string, any>,
+    payload: Record<string, unknown>,
     status: OutboxStatus,
     retryCount: number,
     version: number,
@@ -35,7 +35,7 @@ export class CreateOutboxEntity {
     return this.eventType;
   }
 
-  public get getPayload(): Record<string, any> {
+  public get getPayload(): Record<string, unknown> {
     return this.payload;
   }
 

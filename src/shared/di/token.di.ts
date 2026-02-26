@@ -154,6 +154,29 @@ export class DIToken {
     );
   };
 
+  public static readonly NotificationModule = class extends DITokenRegister {
+    public static NotificationRepository = this.register(
+      "NotificationRepository",
+    );
+
+    public static NotificationPersistencePort = this.register(
+      "NotificationPersistencePort",
+    );
+    public static NotificationQueryPort = this.register(
+      "NotificationQueryPort",
+    );
+
+    public static CreateNotificationUseCase = this.register(
+      "CreateNotificationUseCase",
+    );
+    public static GetAllNotificationsUseCase = this.register(
+      "GetAllNotificationsUseCase",
+    );
+    public static ReadNotificationUseCase = this.register(
+      "ReadNotificationUseCase",
+    );
+  };
+
   public static readonly OutboxModule = class extends DITokenRegister {
     public static OutboxRepository = this.register("OutboxRepository");
 

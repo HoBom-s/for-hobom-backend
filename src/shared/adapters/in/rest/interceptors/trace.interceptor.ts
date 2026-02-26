@@ -13,7 +13,7 @@ import { TraceContext } from "../../../../trace/trace.context";
 export class TraceInterceptor implements NestInterceptor {
   constructor(private readonly traceContext: TraceContext) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const req = context.switchToHttp().getRequest<Request>();
     const rawTraceId = req.headers["x-hobom-trace-id"];
     const traceId = typeof rawTraceId === "string" ? rawTraceId : randomUUID();
