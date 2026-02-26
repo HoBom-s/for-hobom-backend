@@ -28,7 +28,7 @@ export class OutboxEntity extends BaseEntity {
     type: Mixed,
     required: true,
   })
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
 
   @Prop({
     type: String,

@@ -12,7 +12,7 @@ interface EventInputMap {
 
 type OutboxPayloadFactory<T> = (
   input: T,
-) => Record<string, string | number | Record<string, any>>;
+) => Record<string, string | number | Record<string, unknown>>;
 
 type OutboxPayloadFactoryRegistryType = {
   [K in EventType]: OutboxPayloadFactory<EventInputMap[K]>;

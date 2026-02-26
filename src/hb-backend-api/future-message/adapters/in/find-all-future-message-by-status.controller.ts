@@ -1,4 +1,4 @@
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Controller, Get, Inject, Query, UseGuards } from "@nestjs/common";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
@@ -27,6 +27,7 @@ export class FindAllFutureMessageByStatusController {
     summary: "미래 메시지 상태별 전부 조회",
     description: "미래 메시지 상태별 전부 조회",
   })
+  @ApiResponse({ type: [FindFutureMessageDto] })
   @UseGuards(JwtAuthGuard)
   @Get("/by-status")
   public async findAll(

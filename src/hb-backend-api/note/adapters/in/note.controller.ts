@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
@@ -102,6 +102,7 @@ export class NoteController {
   }
 
   @ApiOperation({ summary: "노트 목록 조회" })
+  @ApiResponse({ type: [NoteQueryResult] })
   @ApiQuery({ name: "status", enum: NoteStatus, required: false })
   @Get("")
   public async findAll(
@@ -118,6 +119,7 @@ export class NoteController {
   }
 
   @ApiOperation({ summary: "노트 단건 조회" })
+  @ApiResponse({ type: NoteQueryResult })
   @Get(":id")
   public async findById(
     @NicknameAndAccessToken() userInfo: TokenUserInformation,
