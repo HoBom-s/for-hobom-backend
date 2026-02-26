@@ -114,7 +114,7 @@ export class ProcessNoteRemindService implements ProcessNoteRemindUseCase {
       id: note.getId.toString(),
       title: note.getTitle ?? "Note Reminder",
       body: note.getContent ?? "",
-      recipient: user.getEmail,
+      recipient: user.getNickname,
       senderId: user.getId.toString(),
       type: MessageEnum.PUSH_MESSAGE,
     });

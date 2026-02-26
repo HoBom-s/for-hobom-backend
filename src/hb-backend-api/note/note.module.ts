@@ -20,7 +20,6 @@ import { ReorderNoteService } from "./application/use-cases/reorder-note.service
 import { DeleteNoteService } from "./application/use-cases/delete-note.service";
 import { EmptyTrashService } from "./application/use-cases/empty-trash.service";
 import { ProcessNoteRemindScheduler } from "./adapters/in/process-note-remind.scheduler";
-import { TriggerNoteRemindController } from "./adapters/in/trigger-note-remind.controller";
 
 @Module({
   imports: [
@@ -33,7 +32,7 @@ import { TriggerNoteRemindController } from "./adapters/in/trigger-note-remind.c
     UserModule,
     OutboxModule,
   ],
-  controllers: [NoteController, TriggerNoteRemindController],
+  controllers: [NoteController],
   providers: [
     ProcessNoteRemindScheduler,
     {
