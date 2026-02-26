@@ -12,7 +12,6 @@ export class CreateNotificationService implements CreateNotificationUseCase {
   constructor(
     @Inject(DIToken.NotificationModule.NotificationPersistencePort)
     private readonly notificationPersistencePort: NotificationPersistencePort,
-    @Inject(DIToken.OutboxModule.OutboxPersistencePort)
     public readonly transactionRunner: TransactionRunner,
   ) {}
 
