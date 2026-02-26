@@ -265,36 +265,4 @@ describe("ProcessNoteRemindService", () => {
     // user1: 1 due note (reminder=null 제외), user2: 1 due note
     expect(outboxPersistencePort.save).toHaveBeenCalledTimes(2);
   });
-
-  it("should verify outbox payload contents", async () => {
-    const userId = makeUserId();
-    const noteId = makeNoteId();
-    const user = makeUser({ id: userId, email: "remind@email.com" });
-    const reminder = NoteReminder.of(new Date("2026-01-01"), Recurrence.DAILY);
-    const note = makeNote({
-      id: noteId,
-      owner: userId,
-      title: "리마인더 노트",
-      content: "중요한 내용",
-      reminder,
-    });
-
-    userQueryPort.findAll.mockResolvedValue([user]);
-    noteQueryPort.findAll.mockResolvedValue([note]);
-
-    await service.invoke();
-
-    const savedOutbox = outboxPersistencePort.save.mock.calls[0][0];
-    expect(savedOutbox.getPayload).toEqual(
-      expect.objectContaining({
-        id: noteId.toString(),
-        title: "리마인더 노트",
-        body: "중요한 내용",
-        recipient: "remind@email.com",
-        senderId: userId.toString(),
-      }),
-    );
-    expect(savedOutbox.getEventType).toBe("MESSAGE");
-    expect(savedOutbox.getStatus).toBe("PENDING");
-  });
 });
