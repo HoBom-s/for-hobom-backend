@@ -206,6 +206,27 @@ export class DIToken {
     );
   };
 
+  public static readonly DashboardModule = class extends DITokenRegister {
+    public static GetDailyTodoDashboardUseCase = this.register(
+      "GetDailyTodoDashboardUseCase",
+    );
+    public static GetNoteDashboardUseCase = this.register(
+      "GetNoteDashboardUseCase",
+    );
+    public static GetFutureMessageDashboardUseCase = this.register(
+      "GetFutureMessageDashboardUseCase",
+    );
+    public static GetNotificationDashboardUseCase = this.register(
+      "GetNotificationDashboardUseCase",
+    );
+    public static GetSystemDashboardUseCase = this.register(
+      "GetSystemDashboardUseCase",
+    );
+    public static GetActivityDashboardUseCase = this.register(
+      "GetActivityDashboardUseCase",
+    );
+  };
+
   public static readonly FutureMessageModule = class extends DITokenRegister {
     public static FutureMessagePersistenceRepository = this.register(
       "FutureMessagePersistenceRepository",

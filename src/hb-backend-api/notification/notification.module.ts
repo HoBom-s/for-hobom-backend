@@ -57,5 +57,6 @@ import { ReadNotificationService } from "./application/use-cases/read-notificati
       useClass: ReadNotificationService,
     },
   ],
+  exports: [MongooseModule],
 })
 export class NotificationModule {}
