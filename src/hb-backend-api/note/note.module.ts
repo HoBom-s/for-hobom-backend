@@ -20,6 +20,8 @@ import { ReorderNoteService } from "./application/use-cases/reorder-note.service
 import { DeleteNoteService } from "./application/use-cases/delete-note.service";
 import { EmptyTrashService } from "./application/use-cases/empty-trash.service";
 import { ProcessNoteRemindScheduler } from "./adapters/in/process-note-remind.scheduler";
+import { ProcessNoteDestroyScheduler } from "./adapters/in/process-note-destroy.scheduler";
+import { ProcessNoteDestroyService } from "./application/use-cases/process-note-destroy.service";
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { ProcessNoteRemindScheduler } from "./adapters/in/process-note-remind.sc
   controllers: [NoteController],
   providers: [
     ProcessNoteRemindScheduler,
+    ProcessNoteDestroyScheduler,
     {
       provide: DIToken.NoteModule.NoteRepository,
       useClass: NoteRepositoryImpl,
@@ -86,6 +89,10 @@ import { ProcessNoteRemindScheduler } from "./adapters/in/process-note-remind.sc
     {
       provide: DIToken.NoteModule.ProcessNoteRemindUseCase,
       useClass: ProcessNoteRemindService,
+    },
+    {
+      provide: DIToken.NoteModule.ProcessNoteDestroyUseCase,
+      useClass: ProcessNoteDestroyService,
     },
   ],
 })

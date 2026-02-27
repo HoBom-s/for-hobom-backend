@@ -19,5 +19,6 @@ export interface NotePersistencePort {
   togglePin(id: NoteId, owner: UserId, isPinned: boolean): Promise<void>;
   updateOrder(id: NoteId, owner: UserId, order: number): Promise<void>;
   deleteOne(id: NoteId, owner: UserId): Promise<void>;
+  deleteTrashedBefore(threshold: Date): Promise<number>;
   emptyTrash(owner: UserId): Promise<void>;
 }

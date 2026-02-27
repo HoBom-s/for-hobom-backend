@@ -152,6 +152,9 @@ export class DIToken {
     public static ProcessNoteRemindUseCase = this.register(
       "ProcessNoteRemindUseCase",
     );
+    public static ProcessNoteDestroyUseCase = this.register(
+      "ProcessNoteDestroyUseCase",
+    );
   };
 
   public static readonly NotificationModule = class extends DITokenRegister {

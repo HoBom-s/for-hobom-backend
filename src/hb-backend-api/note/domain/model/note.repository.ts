@@ -15,5 +15,6 @@ export interface NoteRepository {
   ): Promise<void>;
   deleteOne(id: NoteId, owner: UserId): Promise<void>;
   deleteAllTrashed(owner: UserId): Promise<void>;
+  deleteTrashedBefore(threshold: Date): Promise<number>;
   findMinOrder(owner: UserId): Promise<number>;
 }
