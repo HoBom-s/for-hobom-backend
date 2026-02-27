@@ -26,4 +26,15 @@ export class FutureMessagePersistenceAdapter
   public async markAsSent(id: FutureMessageId): Promise<void> {
     await this.futureMessagePersistenceRepository.markAsSent(id);
   }
+
+  public async update(
+    id: FutureMessageId,
+    data: Record<string, unknown>,
+  ): Promise<void> {
+    await this.futureMessagePersistenceRepository.update(id, data);
+  }
+
+  public async deleteOne(id: FutureMessageId): Promise<void> {
+    await this.futureMessagePersistenceRepository.deleteOne(id);
+  }
 }

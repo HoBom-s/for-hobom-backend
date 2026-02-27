@@ -25,6 +25,8 @@ import { UpdateDailyTodoService } from "./application/use-cases/update-daily-tod
 import { UpdateDailyTodoController } from "./adapters/in/rest/update-daily-todo.controller";
 import { DeleteDailyTodoService } from "./application/use-cases/delete-daily-todo.service";
 import { DeleteDailyTodoController } from "./adapters/in/rest/delete-daily-todo.controller";
+import { ProcessDailyTodoRecurrenceService } from "./application/use-cases/process-daily-todo-recurrence.service";
+import { ProcessDailyTodoRecurrenceScheduler } from "./adapters/in/process-daily-todo-recurrence.scheduler";
 
 @Module({
   imports: [
@@ -85,6 +87,11 @@ import { DeleteDailyTodoController } from "./adapters/in/rest/delete-daily-todo.
       provide: DIToken.DailyTodoModule.DeleteDailyTodoUseCase,
       useClass: DeleteDailyTodoService,
     },
+    {
+      provide: DIToken.DailyTodoModule.ProcessDailyTodoRecurrenceUseCase,
+      useClass: ProcessDailyTodoRecurrenceService,
+    },
+    ProcessDailyTodoRecurrenceScheduler,
   ],
   controllers: [
     CreateDailyTodoController,

@@ -20,6 +20,7 @@ import { UserId } from "../../../user/domain/model/user-id.vo";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 import { DailyTodoCompleteStatus } from "../../domain/enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../../domain/enums/daily-todo-cycle.enum";
+import { CategoryId } from "../../../category/domain/model/category-id.vo";
 
 @Injectable()
 export class DailyTodoRepositoryImpl implements DailyTodoRepository {
@@ -55,6 +56,59 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
       },
     );
     cache.clear();
+  }
+
+  public async saveAll(entities: DailyTodoCreateEntitySchema[]): Promise<void> {
+    if (entities.length === 0) return;
+    const session = MongoSessionContext.getSession();
+    const cache = this.aggregateQuery.cache;
+    await this.dailyTodoModel.insertMany(
+      entities.map((e) => ({
+        title: e.getTitle,
+        date: e.getDate,
+        owner: e.getOwner.raw,
+        reaction: e.getReaction,
+        progress: e.getProgress,
+        cycle: e.getCycle,
+        category: e.getCategory,
+      })),
+      { session },
+    );
+    cache.clear();
+  }
+
+  public async findByDateRangeAndCycles(
+    startDate: Date,
+    endDate: Date,
+    cycles: DailyTodoCycle[],
+  ): Promise<
+    {
+      title: string;
+      owner: UserId;
+      category: CategoryId;
+      cycle: DailyTodoCycle;
+    }[]
+  > {
+    const docs = await this.dailyTodoModel
+      .find(
+        {
+          date: { $gte: startDate, $lte: endDate },
+          cycle: { $in: cycles },
+        },
+        { title: 1, owner: 1, category: 1, cycle: 1 },
+      )
+      .lean()
+      .exec();
+
+    return docs.map((doc) => ({
+      title: doc.title,
+      owner: UserId.fromString(doc.owner.toHexString()),
+      category: CategoryId.fromString(
+        (doc.category as any).value?.toHexString?.() ??
+          doc.category.toHexString(),
+      ),
+      cycle: doc.cycle,
+    }));
   }
 
   public async findAll(

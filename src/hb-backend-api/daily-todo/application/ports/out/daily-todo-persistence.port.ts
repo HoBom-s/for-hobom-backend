@@ -4,9 +4,25 @@ import { UserId } from "../../../../user/domain/model/user-id.vo";
 import { DailyTodoCompleteStatus } from "../../../domain/enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../../../domain/enums/daily-todo-cycle.enum";
 import { Reaction } from "../../../domain/entity/daily-todo.retations";
+import { CategoryId } from "../../../../category/domain/model/category-id.vo";
 
 export interface DailyTodoPersistencePort {
   save(dailyTodoCreateEntitySchema: DailyTodoCreateEntitySchema): Promise<void>;
+
+  saveAll(entities: DailyTodoCreateEntitySchema[]): Promise<void>;
+
+  findByDateRangeAndCycles(
+    startDate: Date,
+    endDate: Date,
+    cycles: DailyTodoCycle[],
+  ): Promise<
+    {
+      title: string;
+      owner: UserId;
+      category: CategoryId;
+      cycle: DailyTodoCycle;
+    }[]
+  >;
 
   updateDailyTodoCompleteStatus(
     id: DailyTodoId,

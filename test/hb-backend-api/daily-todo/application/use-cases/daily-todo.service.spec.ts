@@ -58,11 +58,13 @@ const makeDailyTodoEntity = (
 
 const mockPersistencePort = () => ({
   save: jest.fn(),
+  saveAll: jest.fn(),
   deleteDailyTodoById: jest.fn(),
   updateDailyTodoCompleteStatus: jest.fn(),
   updateDailyTodoCycle: jest.fn(),
   updateDailyTodoReaction: jest.fn(),
   update: jest.fn(),
+  findByDateRangeAndCycles: jest.fn(),
 });
 
 const mockQueryPort = () => ({
