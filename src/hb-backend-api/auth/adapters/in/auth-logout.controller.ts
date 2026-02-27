@@ -26,6 +26,7 @@ export class AuthLogoutController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const refreshTokenValue = request.cookies?.[this.REFRESH_TOKEN];
 
     if (refreshTokenValue) {
