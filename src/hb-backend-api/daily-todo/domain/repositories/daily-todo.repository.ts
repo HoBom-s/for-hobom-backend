@@ -45,5 +45,11 @@ export interface DailyTodoRepository {
     reaction: Reaction,
   ): Promise<void>;
 
+  update(
+    id: DailyTodoId,
+    owner: UserId,
+    data: Record<string, unknown>,
+  ): Promise<void>;
+
   deleteDailyTodoById(id: DailyTodoId, owner: UserId): Promise<void>;
 }
