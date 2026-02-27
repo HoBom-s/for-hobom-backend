@@ -22,6 +22,7 @@ import { LabelModule } from "./hb-backend-api/label/label.module";
 import { NoteModule } from "./hb-backend-api/note/note.module";
 import { NotificationModule } from "./hb-backend-api/notification/notification.module";
 import { HealthModule } from "./hb-backend-api/health/health.module";
+import { DashboardModule } from "./hb-backend-api/dashboard/dashboard.module";
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { HealthModule } from "./hb-backend-api/health/health.module";
     NoteModule,
     NotificationModule,
     HealthModule,
+    DashboardModule,
   ],
   providers: [
     TraceContext,

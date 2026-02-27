@@ -95,5 +95,6 @@ import { ProcessNoteDestroyService } from "./application/use-cases/process-note-
       useClass: ProcessNoteDestroyService,
     },
   ],
+  exports: [MongooseModule],
 })
 export class NoteModule {}
