@@ -8,4 +8,8 @@ export interface FutureMessagePersistenceRepository {
   save(entity: CreateFutureMessageEntity): Promise<void>;
 
   markAsSent(id: FutureMessageId): Promise<void>;
+
+  update(id: FutureMessageId, data: Record<string, unknown>): Promise<void>;
+
+  deleteOne(id: FutureMessageId): Promise<void>;
 }

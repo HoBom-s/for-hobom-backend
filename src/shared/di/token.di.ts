@@ -13,6 +13,7 @@ export class DIToken {
     public static RefreshAuthTokenUseCase = this.register(
       "RefreshAuthTokenUseCase",
     );
+    public static LogoutAuthUseCase = this.register("LogoutAuthUseCase");
   };
 
   public static readonly UserModule = class extends DITokenRegister {
@@ -82,6 +83,9 @@ export class DIToken {
     );
     public static DeleteDailyTodoUseCase = this.register(
       "DeleteDailyTodoUseCase",
+    );
+    public static ProcessDailyTodoRecurrenceUseCase = this.register(
+      "ProcessDailyTodoRecurrenceUseCase",
     );
   };
 
@@ -225,6 +229,12 @@ export class DIToken {
     );
     public static FindFutureMessageByIdUseCase = this.register(
       "FindFutureMessageByIdUseCase",
+    );
+    public static UpdateFutureMessageUseCase = this.register(
+      "UpdateFutureMessageUseCase",
+    );
+    public static DeleteFutureMessageUseCase = this.register(
+      "DeleteFutureMessageUseCase",
     );
     public static ProcessScheduleFutureMessageUseCase = this.register(
       "ProcessScheduleFutureMessageUseCase",

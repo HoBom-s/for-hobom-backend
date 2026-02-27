@@ -7,6 +7,7 @@ import { DailyTodoCompleteStatus } from "src/hb-backend-api/daily-todo/domain/en
 import { DailyTodoCycle } from "src/hb-backend-api/daily-todo/domain/enums/daily-todo-cycle.enum";
 import { DailyTodoId } from "src/hb-backend-api/daily-todo/domain/vo/daily-todo-id.vo";
 import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
+import { CategoryId } from "src/hb-backend-api/category/domain/model/category-id.vo";
 import { Reaction } from "../../../domain/entity/daily-todo.retations";
 
 @Injectable()
@@ -20,6 +21,29 @@ export class DailyTodoPersistenceAdapter implements DailyTodoPersistencePort {
     dailyTodoCreateEntitySchema: DailyTodoCreateEntitySchema,
   ): Promise<void> {
     await this.dailyTodoRepository.save(dailyTodoCreateEntitySchema);
+  }
+
+  public async saveAll(entities: DailyTodoCreateEntitySchema[]): Promise<void> {
+    await this.dailyTodoRepository.saveAll(entities);
+  }
+
+  public async findByDateRangeAndCycles(
+    startDate: Date,
+    endDate: Date,
+    cycles: DailyTodoCycle[],
+  ): Promise<
+    {
+      title: string;
+      owner: UserId;
+      category: CategoryId;
+      cycle: DailyTodoCycle;
+    }[]
+  > {
+    return this.dailyTodoRepository.findByDateRangeAndCycles(
+      startDate,
+      endDate,
+      cycles,
+    );
   }
 
   public async updateDailyTodoCompleteStatus(

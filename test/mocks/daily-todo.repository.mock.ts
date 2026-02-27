@@ -3,6 +3,7 @@ import { DailyTodoRepository } from "../../src/hb-backend-api/daily-todo/domain/
 export function createDailyTodoRepository(): jest.Mocked<DailyTodoRepository> {
   return {
     save: jest.fn(),
+    saveAll: jest.fn(),
     findAll: jest.fn(),
     findById: jest.fn(),
     findByDate: jest.fn(),
@@ -10,6 +11,7 @@ export function createDailyTodoRepository(): jest.Mocked<DailyTodoRepository> {
     updateDailyTodoCycle: jest.fn(),
     updateDailyTodoReaction: jest.fn(),
     update: jest.fn(),
+    findByDateRangeAndCycles: jest.fn(),
     deleteDailyTodoById: jest.fn(),
   };
 }
