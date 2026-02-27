@@ -1,5 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from "class-validator";
+import { DailyTodoCycle } from "../../../domain/enums/daily-todo-cycle.enum";
 
 export class CreateDailyTodoDto {
   @ApiProperty({ type: "string", required: true })
@@ -18,4 +25,11 @@ export class CreateDailyTodoDto {
   @IsString({ message: "카테고리는 문자열이어야 해요." })
   @IsNotEmpty({ message: "데일리 투두의 카테고리는 필수에요." })
   category: string;
+
+  @ApiProperty({ type: "string", required: false, enum: DailyTodoCycle })
+  @IsOptional()
+  @IsEnum(DailyTodoCycle, {
+    message: "데일리 투두의 사이클이 유효하지 않아요.",
+  })
+  cycle?: DailyTodoCycle;
 }

@@ -9,6 +9,7 @@ export function createDailyTodoRepository(): jest.Mocked<DailyTodoRepository> {
     updateDailyTodoCompleteStatus: jest.fn(),
     updateDailyTodoCycle: jest.fn(),
     updateDailyTodoReaction: jest.fn(),
+    update: jest.fn(),
     deleteDailyTodoById: jest.fn(),
   };
 }

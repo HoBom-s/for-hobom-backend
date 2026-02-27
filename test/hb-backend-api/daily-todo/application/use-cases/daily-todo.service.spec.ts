@@ -62,6 +62,7 @@ const mockPersistencePort = () => ({
   updateDailyTodoCompleteStatus: jest.fn(),
   updateDailyTodoCycle: jest.fn(),
   updateDailyTodoReaction: jest.fn(),
+  update: jest.fn(),
 });
 
 const mockQueryPort = () => ({

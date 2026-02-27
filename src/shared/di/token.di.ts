@@ -77,6 +77,9 @@ export class DIToken {
     public static GetDailyTodoByDateUseCase = this.register(
       "GetDailyTodoByDateUseCase",
     );
+    public static UpdateDailyTodoUseCase = this.register(
+      "UpdateDailyTodoUseCase",
+    );
     public static DeleteDailyTodoUseCase = this.register(
       "DeleteDailyTodoUseCase",
     );
