@@ -66,6 +66,7 @@ const mockPersistencePort = (): jest.Mocked<NotePersistencePort> => ({
   togglePin: jest.fn(),
   updateOrder: jest.fn(),
   deleteOne: jest.fn(),
+  deleteTrashedBefore: jest.fn(),
   emptyTrash: jest.fn(),
 });
 

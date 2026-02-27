@@ -90,6 +90,15 @@ export class NoteRepositoryImpl implements NoteRepository {
     );
   }
 
+  public async deleteTrashedBefore(threshold: Date): Promise<number> {
+    const session = MongoSessionContext.getSession();
+    const result = await this.noteModel.deleteMany(
+      { status: NoteStatus.TRASHED, trashedAt: { $lte: threshold } },
+      { session },
+    );
+    return result.deletedCount;
+  }
+
   public async findMinOrder(owner: UserId): Promise<number> {
     const result = await this.noteModel
       .findOne({ owner: owner.raw })

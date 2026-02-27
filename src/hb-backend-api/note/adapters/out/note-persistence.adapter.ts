@@ -55,6 +55,10 @@ export class NotePersistenceAdapter implements NotePersistencePort {
     await this.noteRepository.deleteOne(id, owner);
   }
 
+  public async deleteTrashedBefore(threshold: Date): Promise<number> {
+    return this.noteRepository.deleteTrashedBefore(threshold);
+  }
+
   public async emptyTrash(owner: UserId): Promise<void> {
     await this.noteRepository.deleteAllTrashed(owner);
   }
