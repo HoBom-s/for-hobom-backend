@@ -29,10 +29,7 @@ describe("JwtAuthGuard", () => {
     jwtService = { verify: jest.fn() };
     guard = new JwtAuthGuard(jwtService as unknown as JwtService);
     jest
-      .spyOn(
-        Object.getPrototypeOf(Object.getPrototypeOf(guard)),
-        "canActivate",
-      )
+      .spyOn(Object.getPrototypeOf(Object.getPrototypeOf(guard)), "canActivate")
       .mockImplementation(mockSuperCanActivate);
   });
 

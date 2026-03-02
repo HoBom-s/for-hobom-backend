@@ -14,7 +14,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useLogger(app.get(Logger));
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy:
+        process.env.NODE_ENV !== "production" ? false : undefined,
+    }),
+  );
   app.enableCors({
     origin: process.env.HOBOM_CORS_ORIGIN ?? "https://hobom-system.com",
     credentials: true,

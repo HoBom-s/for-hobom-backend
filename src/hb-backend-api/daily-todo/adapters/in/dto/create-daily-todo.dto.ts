@@ -19,7 +19,9 @@ export class CreateDailyTodoDto {
   @ApiProperty({ type: "string", required: true })
   @IsString({ message: "데일리 투두의 날짜를 선택해 주세요." })
   @IsNotEmpty({ message: "데일리 투두의 날짜는 필수로 입력해야 해요." })
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: "날짜 형식은 YYYY-MM-DD여야 해요." })
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: "날짜 형식은 YYYY-MM-DD여야 해요.",
+  })
   date: string;
 
   @ApiProperty({ type: "string" })
