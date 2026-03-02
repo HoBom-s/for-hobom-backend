@@ -29,6 +29,8 @@ export class UserRepositoryImpl implements UserRepository {
       email: user.getEmail,
       password: user.getPassword,
       friends: [],
+      approvalStatus: ApprovalStatus.PENDING,
+      isAdmin: false,
     });
   }
 
