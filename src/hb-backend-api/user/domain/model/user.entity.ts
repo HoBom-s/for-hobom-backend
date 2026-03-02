@@ -2,6 +2,7 @@ import { Prop, Schema } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { BaseEntity } from "../../../../shared/base/base.entity";
 import { UserId } from "./user-id.vo";
+import { ApprovalStatus } from "../enums/approval-status.enum";
 
 @Schema({ collection: "user" })
 export class UserEntity extends BaseEntity {
@@ -28,6 +29,16 @@ export class UserEntity extends BaseEntity {
 
   @Prop({ type: [Types.ObjectId], ref: "user", default: [] })
   friends: Types.ObjectId[];
+
+  @Prop({
+    type: String,
+    enum: ApprovalStatus,
+    default: ApprovalStatus.PENDING,
+  })
+  approvalStatus: string;
+
+  @Prop({ type: Boolean, default: false })
+  isAdmin: boolean;
 }
 
 export class UserEntitySchema {
@@ -38,6 +49,8 @@ export class UserEntitySchema {
     private readonly nickname: string,
     private readonly password: string,
     private readonly friends: Types.ObjectId[],
+    private readonly approvalStatus: string,
+    private readonly isAdmin: boolean,
   ) {
     this.id = id;
     this.username = username;
@@ -45,6 +58,8 @@ export class UserEntitySchema {
     this.nickname = nickname;
     this.password = password;
     this.friends = friends;
+    this.approvalStatus = approvalStatus;
+    this.isAdmin = isAdmin;
   }
 
   public static of(
@@ -54,6 +69,8 @@ export class UserEntitySchema {
     nickname: string,
     password: string,
     friends?: Types.ObjectId[],
+    approvalStatus?: string,
+    isAdmin?: boolean,
   ): UserEntitySchema {
     return new UserEntitySchema(
       id,
@@ -62,6 +79,8 @@ export class UserEntitySchema {
       nickname,
       password,
       friends ?? [],
+      approvalStatus ?? ApprovalStatus.PENDING,
+      isAdmin ?? false,
     );
   }
 
@@ -87,6 +106,14 @@ export class UserEntitySchema {
 
   get getFriends(): Types.ObjectId[] {
     return this.friends;
+  }
+
+  get getApprovalStatus(): string {
+    return this.approvalStatus;
+  }
+
+  get getIsAdmin(): boolean {
+    return this.isAdmin;
   }
 }
 
