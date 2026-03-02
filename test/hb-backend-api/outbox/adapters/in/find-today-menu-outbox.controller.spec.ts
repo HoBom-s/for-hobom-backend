@@ -1,4 +1,5 @@
 import { Test } from "@nestjs/testing";
+import { ConfigService } from "@nestjs/config";
 import { Types } from "mongoose";
 import { FindMessageOutboxController } from "../../../../../src/hb-backend-api/outbox/adapters/in/find-message-outbox.controller";
 import { FindOutboxByEventTypeAndStatusUseCase } from "../../../../../src/hb-backend-api/outbox/domain/ports/in/find-outbox-by-event-type-and-status.use-case";
@@ -24,6 +25,10 @@ describe("FindMessageOutboxController", () => {
           useValue: {
             invoke: jest.fn(),
           } as FindOutboxByEventTypeAndStatusUseCase,
+        },
+        {
+          provide: ConfigService,
+          useValue: { getOrThrow: jest.fn().mockReturnValue("test-api-key") },
         },
       ],
     }).compile();
