@@ -42,7 +42,10 @@ export class HttpLogInterceptor implements NestInterceptor {
       return next.handle();
     }
     const res = context.switchToHttp().getResponse<Response>();
-    const result = req.user as JwtAuthPayloadModel;
+    const result = req.user as JwtAuthPayloadModel | undefined;
+    if (result?.sub == null) {
+      return next.handle();
+    }
     const nickname = UserNickname.fromString(result.sub);
 
     return from(this.userQueryPort.findByNickname(nickname)).pipe(
