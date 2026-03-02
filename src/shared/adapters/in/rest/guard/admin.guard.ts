@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { DIToken } from "../../../../di/token.di";
 import { UserQueryPort } from "../../../../../hb-backend-api/user/domain/ports/out/user-query.port";
@@ -20,7 +21,12 @@ export class AdminGuard implements CanActivate {
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const request = context.switchToHttp().getRequest();
-    const user = request.user as JwtAuthPayloadModel;
+    const user = request.user as JwtAuthPayloadModel | undefined;
+
+    if (user?.sub == null) {
+      throw new UnauthorizedException("인증이 필요해요.");
+    }
+
     const foundUser = await this.userQueryPort.findByNickname(
       UserNickname.fromString(user.sub),
     );
