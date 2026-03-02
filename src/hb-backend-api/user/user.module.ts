@@ -13,6 +13,10 @@ import { GetUserByNicknameService } from "./application/use-cases/get-user-by-ni
 import { GetUserByIdController } from "./adapters/in/get-user-by-id.controller";
 import { GetAllUserService } from "./application/use-cases/get-all-user.service";
 import { GetAllUserController } from "./adapters/in/get-all-user.controller";
+import { ApproveUserService } from "./application/use-cases/approve-user.service";
+import { RejectUserService } from "./application/use-cases/reject-user.service";
+import { GetPendingUsersService } from "./application/use-cases/get-pending-users.service";
+import { AdminUserController } from "./adapters/in/admin-user.controller";
 
 @Module({
   imports: [
@@ -27,6 +31,7 @@ import { GetAllUserController } from "./adapters/in/get-all-user.controller";
     CreateUserController,
     GetUserByIdController,
     GetAllUserController,
+    AdminUserController,
   ],
   providers: [
     {
@@ -57,6 +62,18 @@ import { GetAllUserController } from "./adapters/in/get-all-user.controller";
       provide: DIToken.UserModule.GetAllUserUseCase,
       useClass: GetAllUserService,
     },
+    {
+      provide: DIToken.UserModule.ApproveUserUseCase,
+      useClass: ApproveUserService,
+    },
+    {
+      provide: DIToken.UserModule.RejectUserUseCase,
+      useClass: RejectUserService,
+    },
+    {
+      provide: DIToken.UserModule.GetPendingUsersUseCase,
+      useClass: GetPendingUsersService,
+    },
   ],
   exports: [
     MongooseModule,
@@ -67,6 +84,9 @@ import { GetAllUserController } from "./adapters/in/get-all-user.controller";
     DIToken.UserModule.GetUserUseCase,
     DIToken.UserModule.GetUserByNicknameUseCase,
     DIToken.UserModule.GetAllUserUseCase,
+    DIToken.UserModule.ApproveUserUseCase,
+    DIToken.UserModule.RejectUserUseCase,
+    DIToken.UserModule.GetPendingUsersUseCase,
   ],
 })
 export class UserModule {}

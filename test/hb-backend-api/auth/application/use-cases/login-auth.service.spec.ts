@@ -13,6 +13,7 @@ import { TransactionRunner } from "../../../../../src/infra/mongo/transaction/tr
 import { UserEntitySchema } from "../../../../../src/hb-backend-api/user/domain/model/user.entity";
 import { AuthEntitySchema } from "../../../../../src/hb-backend-api/auth/domain/model/auth.entity";
 import { UserId } from "../../../../../src/hb-backend-api/user/domain/model/user-id.vo";
+import { ApprovalStatus } from "../../../../../src/hb-backend-api/user/domain/enums/approval-status.enum";
 import { Types } from "mongoose";
 
 jest.mock("bcrypt");
@@ -31,6 +32,8 @@ describe("LoginAuthService", () => {
     "Robin",
     "hashedPassword",
     [],
+    ApprovalStatus.APPROVED,
+    false,
   );
 
   beforeEach(async () => {
@@ -123,6 +126,28 @@ describe("LoginAuthService", () => {
       userQueryPort.findByNickname.mockResolvedValue(mockUser);
 
       const command = LoginAuthCommand.of("Robin", "WrongPassword1!");
+
+      await expect(service.invoke(command)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it("should throw BadRequestException when user is not approved", async () => {
+      const pendingUser = UserEntitySchema.of(
+        new UserId(new Types.ObjectId()),
+        "Pending User",
+        "pending@hobom.com",
+        "PendingUser",
+        "hashedPassword",
+        [],
+        ApprovalStatus.PENDING,
+        false,
+      );
+
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      userQueryPort.findByNickname.mockResolvedValue(pendingUser);
+
+      const command = LoginAuthCommand.of("PendingUser", "Password1!");
 
       await expect(service.invoke(command)).rejects.toThrow(
         BadRequestException,

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { UserRepository } from "../../domain/model/user.repository";
@@ -9,6 +13,7 @@ import {
 } from "../../domain/model/user.entity";
 import { UserId } from "../../domain/model/user-id.vo";
 import { UserNickname } from "../../domain/model/user-nickname.vo";
+import { ApprovalStatus } from "../../domain/enums/approval-status.enum";
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
@@ -55,5 +60,25 @@ export class UserRepositoryImpl implements UserRepository {
     }
 
     return foundUser;
+  }
+
+  public async findPendingUsers(): Promise<UserDocument[]> {
+    return this.userModel
+      .find({ approvalStatus: ApprovalStatus.PENDING })
+      .exec();
+  }
+
+  public async updateApprovalStatus(
+    id: UserId,
+    status: ApprovalStatus,
+  ): Promise<void> {
+    const result = await this.userModel.updateOne(
+      { _id: id.raw },
+      { $set: { approvalStatus: status } },
+    );
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerErrorException("승인 상태 변경에 실패했어요.");
+    }
   }
 }

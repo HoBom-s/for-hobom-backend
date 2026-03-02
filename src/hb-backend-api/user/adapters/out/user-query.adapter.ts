@@ -5,6 +5,7 @@ import { UserRepository } from "../../domain/model/user.repository";
 import { DIToken } from "../../../../shared/di/token.di";
 import { UserId } from "../../domain/model/user-id.vo";
 import { UserNickname } from "../../domain/model/user-nickname.vo";
+import { ApprovalStatus } from "../../domain/enums/approval-status.enum";
 
 @Injectable()
 export class UserQueryAdapter implements UserQueryPort {
@@ -28,6 +29,8 @@ export class UserQueryAdapter implements UserQueryPort {
       foundUser.nickname,
       foundUser.password,
       foundUser.friends,
+      foundUser.approvalStatus,
+      foundUser.isAdmin,
     );
   }
 
@@ -41,6 +44,8 @@ export class UserQueryAdapter implements UserQueryPort {
         foundUser.nickname,
         foundUser.password,
         foundUser.friends,
+        foundUser.approvalStatus,
+        foundUser.isAdmin,
       ),
     );
   }
@@ -62,6 +67,31 @@ export class UserQueryAdapter implements UserQueryPort {
       foundUser.nickname,
       foundUser.password,
       foundUser.friends,
+      foundUser.approvalStatus,
+      foundUser.isAdmin,
     );
+  }
+
+  public async findPendingUsers(): Promise<UserEntitySchema[]> {
+    const founds = await this.userRepository.findPendingUsers();
+    return founds.map((foundUser) =>
+      UserEntitySchema.of(
+        UserId.fromString(String(foundUser._id)),
+        foundUser.username,
+        foundUser.email,
+        foundUser.nickname,
+        foundUser.password,
+        foundUser.friends,
+        foundUser.approvalStatus,
+        foundUser.isAdmin,
+      ),
+    );
+  }
+
+  public async updateApprovalStatus(
+    id: UserId,
+    status: ApprovalStatus,
+  ): Promise<void> {
+    await this.userRepository.updateApprovalStatus(id, status);
   }
 }

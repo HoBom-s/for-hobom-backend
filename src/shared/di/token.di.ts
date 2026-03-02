@@ -28,6 +28,11 @@ export class DIToken {
       "GetUserByNicknameUseCase",
     );
     public static GetAllUserUseCase = this.register("GetAllUserUseCase");
+    public static ApproveUserUseCase = this.register("ApproveUserUseCase");
+    public static RejectUserUseCase = this.register("RejectUserUseCase");
+    public static GetPendingUsersUseCase = this.register(
+      "GetPendingUsersUseCase",
+    );
   };
 
   public static readonly CategoryModule = class extends DITokenRegister {

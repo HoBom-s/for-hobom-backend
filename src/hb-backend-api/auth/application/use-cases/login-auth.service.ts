@@ -15,6 +15,7 @@ import { Transactional } from "../../../../infra/mongo/transaction/transaction.d
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { AuthQueryPort } from "../../domain/ports/out/auth-query.port";
 import { RefreshToken } from "../../domain/model/refresh-token.vo";
+import { ApprovalStatus } from "../../../user/domain/enums/approval-status.enum";
 
 @Injectable()
 export class LoginAuthService implements LoginAuthUseCase {
@@ -43,6 +44,13 @@ export class LoginAuthService implements LoginAuthUseCase {
 
     if (!isVerified) {
       throw new BadRequestException("일치하는 사용자 정보가 없어요.");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+    if (foundUser.getApprovalStatus !== ApprovalStatus.APPROVED) {
+      throw new BadRequestException(
+        "승인 대기 중이에요. 관리자 승인 후 이용할 수 있어요.",
+      );
     }
 
     const nickname = UserNickname.fromString(foundUser.getNickname);
