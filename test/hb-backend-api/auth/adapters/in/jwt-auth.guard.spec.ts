@@ -1,5 +1,4 @@
 import { ExecutionContext } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
 import { JwtAuthGuard } from "../../../../../src/shared/adapters/in/rest/guard/jwt-auth.guard";
 
 /**
@@ -10,7 +9,6 @@ import { JwtAuthGuard } from "../../../../../src/shared/adapters/in/rest/guard/j
  */
 describe("JwtAuthGuard", () => {
   let guard: JwtAuthGuard;
-  let jwtService: jest.Mocked<Pick<JwtService, "verify">>;
 
   const mockSuperCanActivate = jest.fn().mockResolvedValue(true);
 
@@ -26,8 +24,7 @@ describe("JwtAuthGuard", () => {
   };
 
   beforeEach(() => {
-    jwtService = { verify: jest.fn() };
-    guard = new JwtAuthGuard(jwtService as unknown as JwtService);
+    guard = new JwtAuthGuard();
     jest
       .spyOn(Object.getPrototypeOf(Object.getPrototypeOf(guard)), "canActivate")
       .mockImplementation(mockSuperCanActivate);

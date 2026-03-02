@@ -75,11 +75,6 @@ export class AuthRepositoryImpl implements AuthRepository {
   }
 
   public async revokeToken(token: RefreshToken): Promise<void> {
-    const foundAuth = await this.findByRefreshToken(token);
-    if (foundAuth == null) {
-      return;
-    }
-
     await this.authModel.deleteOne({
       refreshToken: token.raw,
     });

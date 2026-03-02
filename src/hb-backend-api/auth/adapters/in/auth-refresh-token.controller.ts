@@ -10,10 +10,10 @@ import { RefreshToken } from "../../domain/model/refresh-token.vo";
 @ApiTags("Auth")
 @Controller(`${EndPointPrefixConstant}/auth`)
 export class AuthRefreshTokenController {
-  private ACCESS_TOKEN = "accessToken";
-  private REFRESH_TOKEN = "refreshToken";
-  private ACCESS_TOKEN_EXPIRATION = 15 * 60 * 1000;
-  private REFRESH_TOKEN_EXPIRATION = 30 * 24 * 60 * 60 * 1000;
+  private readonly ACCESS_TOKEN = "accessToken";
+  private readonly REFRESH_TOKEN = "refreshToken";
+  private readonly ACCESS_TOKEN_EXPIRATION = 15 * 60 * 1000;
+  private readonly REFRESH_TOKEN_EXPIRATION = 30 * 24 * 60 * 60 * 1000;
 
   constructor(
     @Inject(DIToken.AuthModule.RefreshAuthTokenUseCase)

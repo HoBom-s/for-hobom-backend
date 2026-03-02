@@ -33,10 +33,6 @@ export class JwtAuthAdapter implements JwtAuthPort {
     });
   }
 
-  public verifyAccessToken(token: RefreshToken): JwtAuthPayloadModel {
-    return this.jwtService.verify(token.raw);
-  }
-
   public verifyRefreshToken(token: RefreshToken): JwtAuthPayloadModel {
     return this.jwtService.verify(token.raw, { secret: this.refreshSecret });
   }

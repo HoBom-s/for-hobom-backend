@@ -26,10 +26,7 @@ import { LogoutAuthService } from "./application/use-cases/logout-auth.service";
       global: true,
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>("HOBOM_JWT_SECRET"),
-        signOptions: {
-          expiresIn: configService.get<string>("HOBOM_JWT_SIGN_EXPIRED_AT"),
-        },
+        secret: configService.getOrThrow<string>("HOBOM_JWT_SECRET"),
       }),
     }),
     PassportModule.register({
