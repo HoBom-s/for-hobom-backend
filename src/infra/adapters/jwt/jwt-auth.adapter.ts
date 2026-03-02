@@ -12,6 +12,10 @@ export class JwtAuthAdapter implements JwtAuthPort {
     private readonly configService: ConfigService,
   ) {}
 
+  private get refreshSecret(): string {
+    return this.configService.getOrThrow<string>("HOBOM_JWT_REFRESH_SECRET");
+  }
+
   public signAccessToken(payload: JwtAuthPayloadModel): string {
     return this.jwtService.sign(payload, {
       expiresIn: this.configService.getOrThrow<string>(
@@ -22,6 +26,7 @@ export class JwtAuthAdapter implements JwtAuthPort {
 
   public signRefreshToken(payload: JwtAuthPayloadModel): string {
     return this.jwtService.sign(payload, {
+      secret: this.refreshSecret,
       expiresIn: this.configService.getOrThrow<string>(
         "HOBOM_JWT_REFRESH_TOKEN_EXPIRED",
       ),
@@ -33,10 +38,15 @@ export class JwtAuthAdapter implements JwtAuthPort {
   }
 
   public verifyRefreshToken(token: RefreshToken): JwtAuthPayloadModel {
-    return this.jwtService.verify(token.raw);
+    return this.jwtService.verify(token.raw, { secret: this.refreshSecret });
   }
 
-  public decode(token: RefreshToken): JwtAuthPayloadModel | null {
-    return this.jwtService.decode(token.raw);
+  public verifyRefreshTokenIgnoreExpiry(
+    token: RefreshToken,
+  ): JwtAuthPayloadModel {
+    return this.jwtService.verify(token.raw, {
+      secret: this.refreshSecret,
+      ignoreExpiration: true,
+    });
   }
 }

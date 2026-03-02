@@ -14,6 +14,7 @@ import { UserNickname } from "../../../user/domain/model/user-nickname.vo";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { AuthQueryPort } from "../../domain/ports/out/auth-query.port";
+import { RefreshToken } from "../../domain/model/refresh-token.vo";
 
 @Injectable()
 export class LoginAuthService implements LoginAuthUseCase {
@@ -26,7 +27,7 @@ export class LoginAuthService implements LoginAuthUseCase {
     private readonly authQueryPort: AuthQueryPort,
     @Inject(DIToken.AuthModule.JwtAuthPort)
     private readonly jwtAuthPort: JwtAuthPort,
-    public readonly transactionRunner: TransactionRunner,
+    private readonly transactionRunner: TransactionRunner,
     private readonly configService: ConfigService,
   ) {}
 
@@ -45,27 +46,22 @@ export class LoginAuthService implements LoginAuthUseCase {
     }
 
     const nickname = UserNickname.fromString(foundUser.getNickname);
+
+    // 기존 토큰이 있으면 무효화 (세션 회전)
     const existingAuth = await this.authQueryPort.findByNickname(nickname);
-    const now = new Date();
-
-    let refreshToken: string;
-
-    const accessToken = this.generateAccessToken(nickname.raw);
-
-    const isExistingTokenValid =
-      existingAuth != null &&
-      existingAuth.getExpiredAt.getTime() > now.getTime();
-
-    if (isExistingTokenValid) {
-      refreshToken = existingAuth.getRefreshToken;
-    } else {
-      refreshToken = this.generateRefreshToken(nickname.raw);
-      const expiresAt = this.calculateRefreshTokenExpiry();
-
-      await this.authPersistencePort.saveRefreshToken(
-        AuthEntitySchema.of(nickname.raw, refreshToken, expiresAt),
+    if (existingAuth != null) {
+      await this.authPersistencePort.revokeToken(
+        RefreshToken.fromString(existingAuth.getRefreshToken),
       );
     }
+
+    const accessToken = this.generateAccessToken(nickname.raw);
+    const refreshToken = this.generateRefreshToken(nickname.raw);
+    const expiresAt = this.calculateRefreshTokenExpiry();
+
+    await this.authPersistencePort.saveRefreshToken(
+      AuthEntitySchema.of(nickname.raw, refreshToken, expiresAt),
+    );
 
     return LoginAuthResult.of(accessToken, refreshToken);
   }

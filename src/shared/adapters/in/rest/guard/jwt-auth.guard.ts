@@ -1,85 +1,14 @@
-import {
-  Injectable,
-  ExecutionContext,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Injectable, ExecutionContext } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { JwtService } from "@nestjs/jwt";
-import { Request } from "express";
-import { JwtAuthPayloadModel } from "src/hb-backend-api/auth/domain/model/jwt-auth-payload.model";
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard("jwt") {
-  private readonly AUTHORIZE_KEY = "authorization";
-
   constructor(private readonly jwtService: JwtService) {
     super();
   }
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractAccessToken(request);
-
-    if (token) {
-      try {
-        const decoded = this.jwtService.verify<JwtAuthPayloadModel>(token);
-        (request as any).nickname = decoded.sub;
-      } catch (err) {
-        if (err.name === "TokenExpiredError") {
-          const refreshToken = String(request.cookies?.["refreshToken"]);
-
-          if (refreshToken) {
-            const newAccessToken = await this.refreshAccessToken(refreshToken);
-
-            if (newAccessToken) {
-              request.headers[this.AUTHORIZE_KEY] = `Bearer ${newAccessToken}`;
-              return super.canActivate(context) as Promise<boolean>;
-            }
-          }
-
-          throw new UnauthorizedException(
-            "토큰이 만료됐어요. 다시 로그인해 주세요.",
-          );
-        }
-
-        throw new UnauthorizedException(
-          `유효하지 않은 토큰이에요. ${err.message}`,
-        );
-      }
-    }
-
     return super.canActivate(context) as Promise<boolean>;
-  }
-
-  private extractAccessToken(request: Request): string | null {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const cookieToken = request.cookies?.["accessToken"];
-    if (cookieToken) {
-      return String(cookieToken);
-    }
-
-    const authHeader = request.headers["authorization"];
-    if (authHeader) {
-      return authHeader.split(" ")[1] ?? null;
-    }
-
-    return null;
-  }
-
-  private async refreshAccessToken(
-    refreshToken: string,
-  ): Promise<string | null> {
-    try {
-      const decoded =
-        await this.jwtService.verifyAsync<JwtAuthPayloadModel>(refreshToken);
-
-      return await this.jwtService.signAsync({
-        sub: decoded.sub,
-      });
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_) {
-      return null;
-    }
   }
 }

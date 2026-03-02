@@ -10,5 +10,7 @@ export interface JwtAuthPort {
 
   verifyRefreshToken(token: RefreshToken): JwtAuthPayloadModel;
 
-  decode(token: RefreshToken): JwtAuthPayloadModel | null;
+  verifyRefreshTokenIgnoreExpiry(
+    token: RefreshToken,
+  ): JwtAuthPayloadModel;
 }

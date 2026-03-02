@@ -11,6 +11,7 @@ import { GetUserByNicknameUseCase } from "../../../user/domain/ports/in/get-user
 import { UserNickname } from "../../../user/domain/model/user-nickname.vo";
 import { ReadNotificationUseCase } from "../../domain/ports/in/read-notification.use-case";
 import { NotificationId } from "../../domain/model/notification-id.vo";
+import { ParseNotificationIdPipe } from "./notification-id.pipe";
 
 @ApiTags("Notifications")
 @Controller(`${EndPointPrefixConstant}/notifications`)
@@ -27,14 +28,11 @@ export class ReadNotificationController {
   @Patch(":id/read")
   public async markAsRead(
     @NicknameAndAccessToken() userInfo: TokenUserInformation,
-    @Param("id") id: string,
+    @Param("id", ParseNotificationIdPipe) id: NotificationId,
   ): Promise<void> {
     const user = await this.getUserByNicknameUseCase.invoke(
       UserNickname.fromString(userInfo.nickname),
     );
-    await this.readNotificationUseCase.invoke(
-      NotificationId.fromString(id),
-      user.getId,
-    );
+    await this.readNotificationUseCase.invoke(id, user.getId);
   }
 }

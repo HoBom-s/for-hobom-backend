@@ -3,6 +3,8 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  Matches,
+  MaxLength,
   IsNumber,
   IsOptional,
   IsString,
@@ -15,6 +17,7 @@ import { Recurrence } from "../../domain/enums/recurrence.enum";
 export class ChecklistItemDto {
   @ApiProperty()
   @IsString()
+  @MaxLength(500)
   text: string;
 
   @ApiProperty()
@@ -40,11 +43,13 @@ export class CreateNoteDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(200)
   title?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(10000)
   content?: string;
 
   @ApiProperty({ enum: NoteType, default: NoteType.TEXT })
@@ -61,6 +66,7 @@ export class CreateNoteDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @Matches(/^#[0-9A-Fa-f]{6}$/, { message: "색상은 #RRGGBB 형식이어야 해요." })
   color?: string;
 
   @ApiPropertyOptional({ type: [String] })

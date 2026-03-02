@@ -81,7 +81,7 @@ export class AuthRepositoryImpl implements AuthRepository {
     }
 
     await this.authModel.deleteOne({
-      refreshToken: token,
+      refreshToken: token.raw,
     });
   }
 }

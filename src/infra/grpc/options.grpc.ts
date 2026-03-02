@@ -41,7 +41,7 @@ import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 export const grpcOptions: MicroserviceOptions = {
   transport: Transport.GRPC,
   options: {
-    url: "0.0.0.0:50051",
+    url: `${process.env.HOBOM_GRPC_HOST ?? "127.0.0.1"}:50051`,
     package: ["outbox.message", "outbox.log"],
     protoPath: [
       join(

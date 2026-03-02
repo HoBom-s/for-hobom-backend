@@ -9,8 +9,8 @@ import { RefreshToken } from "../../domain/model/refresh-token.vo";
 @ApiTags("Auth")
 @Controller(`${EndPointPrefixConstant}/auth`)
 export class AuthLogoutController {
-  private ACCESS_TOKEN = "accessToken";
-  private REFRESH_TOKEN = "refreshToken";
+  private readonly ACCESS_TOKEN = "accessToken";
+  private readonly REFRESH_TOKEN = "refreshToken";
 
   constructor(
     @Inject(DIToken.AuthModule.LogoutAuthUseCase)
@@ -38,7 +38,12 @@ export class AuthLogoutController {
       }
     }
 
-    response.clearCookie(this.ACCESS_TOKEN);
-    response.clearCookie(this.REFRESH_TOKEN);
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict" as const,
+    };
+    response.clearCookie(this.ACCESS_TOKEN, cookieOptions);
+    response.clearCookie(this.REFRESH_TOKEN, cookieOptions);
   }
 }

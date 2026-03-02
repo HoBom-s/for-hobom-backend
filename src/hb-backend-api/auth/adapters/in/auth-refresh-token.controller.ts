@@ -1,5 +1,6 @@
-import { Controller, Inject, Post, Req, Res } from "@nestjs/common";
+import { Controller, Inject, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ThrottlerGuard, Throttle } from "@nestjs/throttler";
 import { Request, Response } from "express";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { RefreshAuthTokenUseCase } from "../../domain/ports/in/refresh-auth-token.use-case";
@@ -23,6 +24,8 @@ export class AuthRefreshTokenController {
     summary: "리프래시 토큰 갱신",
     description: "리프래시 토큰 갱신",
   })
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   @Post("/refresh")
   public async refresh(
     @Req() request: Request,
