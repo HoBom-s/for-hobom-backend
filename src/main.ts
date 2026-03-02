@@ -22,7 +22,10 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api-docs", app, documentFactory);
 
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.HOBOM_CORS_ORIGIN ?? "https://hobom-system.com",
+    credentials: true,
+  });
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
