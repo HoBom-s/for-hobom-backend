@@ -16,8 +16,7 @@ async function bootstrap() {
 
   app.use(
     helmet({
-      contentSecurityPolicy:
-        process.env.NODE_ENV !== "production" ? false : undefined,
+      contentSecurityPolicy: false,
     }),
   );
   app.enableCors({
@@ -26,33 +25,31 @@ async function bootstrap() {
   });
   app.use(cookieParser());
 
-  if (process.env.NODE_ENV !== "production") {
-    const config = new DocumentBuilder()
-      .setTitle("HoBom Backend API Document 🐻🦊")
-      .setDescription("HoBom System Backend")
-      .setVersion("1.1.0")
-      .setLicense("HoBom", "https://github.com/hobom-s")
-      .addCookieAuth("accessToken", {
-        type: "apiKey",
-        in: "cookie",
-        name: "accessToken",
-        description: "httpOnly 쿠키 (로그인 시 자동 설정)",
-      })
-      .addBearerAuth(
-        {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          description: "JWT 액세스 토큰",
-        },
-        "bearer",
-      )
-      .addSecurityRequirements("accessToken")
-      .addSecurityRequirements("bearer")
-      .build();
-    const documentFactory = () => SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup("api-docs", app, documentFactory);
-  }
+  const config = new DocumentBuilder()
+    .setTitle("HoBom Backend API Document 🐻🦊")
+    .setDescription("HoBom System Backend")
+    .setVersion("1.1.0")
+    .setLicense("HoBom", "https://github.com/hobom-s")
+    .addCookieAuth("accessToken", {
+      type: "apiKey",
+      in: "cookie",
+      name: "accessToken",
+      description: "httpOnly 쿠키 (로그인 시 자동 설정)",
+    })
+    .addBearerAuth(
+      {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description: "JWT 액세스 토큰",
+      },
+      "bearer",
+    )
+    .addSecurityRequirements("accessToken")
+    .addSecurityRequirements("bearer")
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api-docs", app, documentFactory);
 
   app.useGlobalPipes(
     new ValidationPipe({
