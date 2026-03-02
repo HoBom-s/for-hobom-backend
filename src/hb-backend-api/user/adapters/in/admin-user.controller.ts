@@ -6,7 +6,7 @@ import {
   Patch,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { AdminGuard } from "../../../../shared/adapters/in/rest/guard/admin.guard";
@@ -15,6 +15,7 @@ import { ApproveUserUseCase } from "../../domain/ports/in/approve-user.use-case"
 import { RejectUserUseCase } from "../../domain/ports/in/reject-user.use-case";
 import { GetPendingUsersUseCase } from "../../domain/ports/in/get-pending-users.use-case";
 import { UserId } from "../../domain/model/user-id.vo";
+import { GetPendingUserDto } from "./get-pending-user.dto";
 
 @ApiTags("Admin")
 @Controller(`${EndPointPrefixConstant}/admin/users`)
@@ -33,15 +34,11 @@ export class AdminUserController {
     summary: "승인 대기 사용자 목록 조회",
     description: "관리자 전용: 승인 대기 중인 사용자 목록",
   })
+  @ApiOkResponse({ type: [GetPendingUserDto] })
   @Get("/pending")
-  public async getPendingUsers() {
+  public async getPendingUsers(): Promise<GetPendingUserDto[]> {
     const users = await this.getPendingUsersUseCase.invoke();
-    return users.map((user) => ({
-      id: user.getId.raw.toHexString(),
-      username: user.getUsername,
-      nickname: user.getNickname,
-      email: user.getEmail,
-    }));
+    return users.map(GetPendingUserDto.from);
   }
 
   @ApiOperation({
