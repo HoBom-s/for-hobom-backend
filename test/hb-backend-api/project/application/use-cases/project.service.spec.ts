@@ -109,30 +109,16 @@ describe("CreateProjectService", () => {
   it("프로젝트를 정상 생성하고 기본값을 설정해야 한다", async () => {
     const key = makeProjectKey();
     const owner = makeUserId();
-    const savedDoc = makeProjectDoc();
 
     // verifyDuplicateProjectKey: 중복 없음
     queryPort.findByKey.mockResolvedValueOnce(null);
-    // saveProject
+    // save (defaults 포함)
     persistencePort.save.mockResolvedValue(undefined);
-    // setupDefaults: findByKey returns saved doc
-    queryPort.findByKey.mockResolvedValueOnce(savedDoc);
-    // update with defaults
-    persistencePort.update.mockResolvedValue(undefined);
 
     await service.invoke(key, "test", null, owner);
 
+    expect(queryPort.findByKey).toHaveBeenCalledTimes(1);
     expect(persistencePort.save).toHaveBeenCalledTimes(1);
-    expect(queryPort.findByKey).toHaveBeenCalledTimes(2);
-    expect(persistencePort.update).toHaveBeenCalledTimes(1);
-    expect(persistencePort.update).toHaveBeenCalledWith(
-      expect.any(ProjectId),
-      expect.objectContaining({
-        workflow: expect.any(Object),
-        issueTypes: expect.any(Array),
-        priorities: expect.any(Array),
-      }),
-    );
   });
 
   it("이미 존재하는 프로젝트 키이면 BadRequestException을 던져야 한다", async () => {

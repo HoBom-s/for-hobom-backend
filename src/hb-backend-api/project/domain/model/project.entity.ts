@@ -116,6 +116,9 @@ export class CreateProjectEntity {
     private readonly name: string,
     private readonly description: string | null,
     private readonly owner: UserId,
+    private readonly workflow: Record<string, unknown> | null,
+    private readonly issueTypes: readonly Record<string, unknown>[],
+    private readonly priorities: readonly Record<string, unknown>[],
   ) {}
 
   public static of(
@@ -123,8 +126,19 @@ export class CreateProjectEntity {
     name: string,
     description: string | null,
     owner: UserId,
+    workflow: Record<string, unknown> | null = null,
+    issueTypes: readonly Record<string, unknown>[] = [],
+    priorities: readonly Record<string, unknown>[] = [],
   ): CreateProjectEntity {
-    return new CreateProjectEntity(key, name, description, owner);
+    return new CreateProjectEntity(
+      key,
+      name,
+      description,
+      owner,
+      workflow,
+      issueTypes,
+      priorities,
+    );
   }
 
   public get getKey(): ProjectKey {
@@ -141,5 +155,17 @@ export class CreateProjectEntity {
 
   public get getOwner(): UserId {
     return this.owner;
+  }
+
+  public get getWorkflow(): Record<string, unknown> | null {
+    return this.workflow;
+  }
+
+  public get getIssueTypes(): readonly Record<string, unknown>[] {
+    return this.issueTypes;
+  }
+
+  public get getPriorities(): readonly Record<string, unknown>[] {
+    return this.priorities;
   }
 }
