@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { from, lastValueFrom, Observable, switchMap } from "rxjs";
 import { AssignIssueUseCase } from "../../ports/in/assign-issue.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { IssuePersistencePort } from "../../ports/out/issue-persistence.port";
@@ -10,7 +9,6 @@ import { UserId } from "../../../user/domain/model/user-id.vo";
 import { ProjectId } from "../../../project/domain/model/project-id.vo";
 import { IssueHistoryAction } from "../../domain/enums/issue-history-action.enum";
 import { CreateIssueHistoryEntity } from "../../domain/model/issue-history.entity";
-import { IssueDocument } from "../../domain/model/issue.schema";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 
@@ -32,47 +30,26 @@ export class AssignIssueService implements AssignIssueUseCase {
     assignee: UserId | null,
     actor: UserId,
   ): Promise<void> {
-    await lastValueFrom(
-      this.findIssue(id).pipe(
-        switchMap((issue) =>
-          this.assignAndRecordHistory(id, issue, assignee, actor),
-        ),
+    const issue = await this.issueQueryPort.findById(id);
+
+    await this.issuePersistencePort.update(id, {
+      assignee: assignee?.raw ?? null,
+    });
+
+    await this.issueHistoryPersistencePort.save(
+      CreateIssueHistoryEntity.of(
+        id,
+        ProjectId.fromString(String(issue.project)),
+        actor,
+        IssueHistoryAction.ASSIGNED,
+        [
+          {
+            field: "assignee",
+            from: issue.assignee != null ? String(issue.assignee) : null,
+            to: assignee != null ? assignee.toString() : null,
+          },
+        ],
       ),
-    );
-  }
-
-  private findIssue(id: IssueId): Observable<IssueDocument> {
-    return from(this.issueQueryPort.findById(id));
-  }
-
-  private assignAndRecordHistory(
-    id: IssueId,
-    issue: IssueDocument,
-    assignee: UserId | null,
-    actor: UserId,
-  ): Observable<void> {
-    return from(
-      (async () => {
-        await this.issuePersistencePort.update(id, {
-          assignee: assignee?.raw ?? null,
-        });
-
-        await this.issueHistoryPersistencePort.save(
-          CreateIssueHistoryEntity.of(
-            id,
-            ProjectId.fromString(String(issue.project)),
-            actor,
-            IssueHistoryAction.ASSIGNED,
-            [
-              {
-                field: "assignee",
-                from: issue.assignee != null ? String(issue.assignee) : null,
-                to: assignee != null ? assignee.toString() : null,
-              },
-            ],
-          ),
-        );
-      })(),
     );
   }
 }

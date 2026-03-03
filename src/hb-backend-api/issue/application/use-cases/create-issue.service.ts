@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { from, lastValueFrom, Observable, switchMap } from "rxjs";
 import { Types } from "mongoose";
 import { CreateIssueUseCase } from "../../ports/in/create-issue.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
@@ -40,92 +39,30 @@ export class CreateIssueService implements CreateIssueUseCase {
     parent: Types.ObjectId | null,
     labels: string[],
   ): Promise<void> {
-    await lastValueFrom(
-      this.getProjectAndIncrement(projectId).pipe(
-        switchMap(
-          ({ key, issueNumber, defaultStatus, defaultStatusCategory }) =>
-            this.saveIssue(
-              projectId,
-              issueNumber,
-              `${key}-${issueNumber}`,
-              type,
-              title,
-              description,
-              defaultStatus,
-              defaultStatusCategory,
-              priority,
-              reporter,
-              assignee,
-              sprint,
-              parent,
-              labels,
-            ),
-        ),
-      ),
-    );
-  }
+    const project = await this.projectQueryPort.findById(projectId);
+    const issueNumber =
+      await this.projectPersistencePort.incrementIssueSequence(projectId);
 
-  private getProjectAndIncrement(projectId: ProjectId): Observable<{
-    key: string;
-    issueNumber: number;
-    defaultStatus: string;
-    defaultStatusCategory: StatusCategory;
-  }> {
-    return from(
-      (async () => {
-        const project = await this.projectQueryPort.findById(projectId);
-        const issueNumber =
-          await this.projectPersistencePort.incrementIssueSequence(projectId);
+    const firstStatus = project.workflow?.statuses?.[0];
+    const defaultStatus = firstStatus?.id ?? "TODO";
+    const defaultStatusCategory = firstStatus?.category ?? StatusCategory.TODO;
 
-        const firstStatus = project.workflow?.statuses?.[0];
-        const defaultStatus = firstStatus?.id ?? "TODO";
-        const defaultStatusCategory =
-          firstStatus?.category ?? StatusCategory.TODO;
-
-        return {
-          key: project.key,
-          issueNumber,
-          defaultStatus,
-          defaultStatusCategory,
-        };
-      })(),
-    );
-  }
-
-  private saveIssue(
-    projectId: ProjectId,
-    issueNumber: number,
-    issueKey: string,
-    type: IssueType,
-    title: string,
-    description: string | null,
-    status: string,
-    statusCategory: StatusCategory,
-    priority: IssuePriority,
-    reporter: UserId,
-    assignee: UserId | null,
-    sprint: Types.ObjectId | null,
-    parent: Types.ObjectId | null,
-    labels: string[],
-  ): Observable<void> {
-    return from(
-      this.issuePersistencePort.save(
-        CreateIssueEntity.of(
-          projectId,
-          issueNumber,
-          issueKey,
-          type,
-          title,
-          description,
-          status,
-          statusCategory,
-          priority,
-          reporter,
-          assignee,
-          sprint,
-          parent,
-          labels,
-        ),
+    await this.issuePersistencePort.save(
+      CreateIssueEntity.of(
+        projectId,
+        issueNumber,
+        `${project.key}-${issueNumber}`,
+        type,
+        title,
+        description,
+        defaultStatus,
+        defaultStatusCategory,
+        priority,
+        reporter,
+        assignee,
+        sprint,
+        parent,
+        labels,
       ),
     );
   }

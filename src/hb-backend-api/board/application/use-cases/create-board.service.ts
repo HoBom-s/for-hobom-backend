@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { from, lastValueFrom, Observable } from "rxjs";
 import { CreateBoardUseCase } from "../../ports/in/create-board.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { BoardPersistencePort } from "../../ports/out/board-persistence.port";
@@ -25,19 +24,8 @@ export class CreateBoardService implements CreateBoardUseCase {
     type: BoardType,
     createdBy: UserId,
   ): Promise<void> {
-    await lastValueFrom(this.saveBoard(projectId, name, type, createdBy));
-  }
-
-  private saveBoard(
-    projectId: ProjectId,
-    name: string,
-    type: BoardType,
-    createdBy: UserId,
-  ): Observable<void> {
-    return from(
-      this.boardPersistencePort.save(
-        CreateBoardEntity.of(projectId, name, type, createdBy),
-      ),
+    await this.boardPersistencePort.save(
+      CreateBoardEntity.of(projectId, name, type, createdBy),
     );
   }
 }

@@ -1,5 +1,4 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-import { from, lastValueFrom, Observable, switchMap } from "rxjs";
 import { CreateSprintUseCase } from "../../ports/in/create-sprint.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { SprintPersistencePort } from "../../ports/out/sprint-persistence.port";
@@ -26,43 +25,18 @@ export class CreateSprintService implements CreateSprintUseCase {
     endDate: Date,
     createdBy: UserId,
   ): Promise<void> {
-    await lastValueFrom(
-      this.validateDates(startDate, endDate).pipe(
-        switchMap(() =>
-          this.saveSprint(projectId, name, goal, startDate, endDate, createdBy),
-        ),
-      ),
-    );
-  }
+    if (startDate >= endDate) {
+      throw new BadRequestException("시작일은 종료일보다 이전이어야 해요.");
+    }
 
-  private validateDates(startDate: Date, endDate: Date): Observable<void> {
-    return from(
-      Promise.resolve().then(() => {
-        if (startDate >= endDate) {
-          throw new BadRequestException("시작일은 종료일보다 이전이어야 해요.");
-        }
-      }),
-    );
-  }
-
-  private saveSprint(
-    projectId: ProjectId,
-    name: string,
-    goal: string | null,
-    startDate: Date,
-    endDate: Date,
-    createdBy: UserId,
-  ): Observable<void> {
-    return from(
-      this.sprintPersistencePort.save(
-        CreateSprintEntity.of(
-          projectId,
-          name,
-          goal,
-          startDate,
-          endDate,
-          createdBy,
-        ),
+    await this.sprintPersistencePort.save(
+      CreateSprintEntity.of(
+        projectId,
+        name,
+        goal,
+        startDate,
+        endDate,
+        createdBy,
       ),
     );
   }
