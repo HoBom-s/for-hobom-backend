@@ -1,13 +1,4 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-import {
-  EMPTY,
-  from,
-  lastValueFrom,
-  map,
-  Observable,
-  switchMap,
-  tap,
-} from "rxjs";
 import { CreateProjectUseCase } from "../../ports/in/create-project.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { ProjectPersistencePort } from "../../ports/out/project-persistence.port";
@@ -18,7 +9,6 @@ import { UserId } from "../../../user/domain/model/user-id.vo";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { CreateProjectEntity } from "../../domain/model/project.entity";
-import { ProjectDocument } from "../../domain/model/project.schema";
 import {
   DEFAULT_ISSUE_TYPES,
   DEFAULT_PRIORITIES,
@@ -42,55 +32,27 @@ export class CreateProjectService implements CreateProjectUseCase {
     description: string | null,
     owner: UserId,
   ): Promise<void> {
-    await lastValueFrom(
-      this.verifyDuplicateProjectKey(key).pipe(
-        switchMap(() => this.saveProject(key, name, description, owner)),
-        switchMap(() => this.setupDefaults(key)),
-      ),
-    );
-  }
+    const existing = await this.projectQueryPort.findByKey(key);
+    if (existing != null) {
+      throw new BadRequestException(
+        `이미 존재하는 프로젝트 키에요. ${key.raw}`,
+      );
+    }
 
-  private verifyDuplicateProjectKey(key: ProjectKey): Observable<void> {
-    return from(this.projectQueryPort.findByKey(key)).pipe(
-      tap((found) => {
-        if (found != null) {
-          throw new BadRequestException(
-            `이미 존재하는 프로젝트 키에요. ${key.raw}`,
-          );
-        }
-      }),
-      map(() => undefined as void),
+    await this.projectPersistencePort.save(
+      CreateProjectEntity.of(key, name, description, owner),
     );
-  }
 
-  private saveProject(
-    key: ProjectKey,
-    name: string,
-    description: string | null,
-    owner: UserId,
-  ): Observable<void> {
-    return from(
-      this.projectPersistencePort.save(
-        CreateProjectEntity.of(key, name, description, owner),
-      ),
-    );
-  }
+    const project = await this.projectQueryPort.findByKey(key);
+    if (project == null) {
+      throw new BadRequestException("프로젝트 저장 후 조회에 실패했어요.");
+    }
 
-  private setupDefaults(key: ProjectKey): Observable<void> {
-    return from(this.projectQueryPort.findByKey(key)).pipe(
-      switchMap((project: ProjectDocument | null) => {
-        if (project == null) {
-          return EMPTY;
-        }
-        const projectId = ProjectId.fromString(String(project._id));
-        return from(
-          this.projectPersistencePort.update(projectId, {
-            workflow: DEFAULT_WORKFLOW,
-            issueTypes: DEFAULT_ISSUE_TYPES,
-            priorities: DEFAULT_PRIORITIES,
-          }),
-        );
-      }),
-    );
+    const projectId = ProjectId.fromString(String(project._id));
+    await this.projectPersistencePort.update(projectId, {
+      workflow: DEFAULT_WORKFLOW,
+      issueTypes: DEFAULT_ISSUE_TYPES,
+      priorities: DEFAULT_PRIORITIES,
+    });
   }
 }

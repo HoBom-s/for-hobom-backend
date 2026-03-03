@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { from, lastValueFrom, Observable, switchMap } from "rxjs";
 import { CreateIssueCommentUseCase } from "../../ports/in/create-issue-comment.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { IssueCommentPersistencePort } from "../../ports/out/issue-comment-persistence.port";
@@ -30,40 +29,17 @@ export class CreateIssueCommentService implements CreateIssueCommentUseCase {
     author: UserId,
     body: string,
   ): Promise<void> {
-    await lastValueFrom(
-      this.saveComment(issueId, projectId, author, body).pipe(
-        switchMap(() => this.recordHistory(issueId, projectId, author)),
-      ),
+    await this.issueCommentPersistencePort.save(
+      CreateIssueCommentEntity.of(issueId, projectId, author, body),
     );
-  }
 
-  private saveComment(
-    issueId: IssueId,
-    projectId: ProjectId,
-    author: UserId,
-    body: string,
-  ): Observable<void> {
-    return from(
-      this.issueCommentPersistencePort.save(
-        CreateIssueCommentEntity.of(issueId, projectId, author, body),
-      ),
-    );
-  }
-
-  private recordHistory(
-    issueId: IssueId,
-    projectId: ProjectId,
-    author: UserId,
-  ): Observable<void> {
-    return from(
-      this.issueHistoryPersistencePort.save(
-        CreateIssueHistoryEntity.of(
-          issueId,
-          projectId,
-          author,
-          IssueHistoryAction.COMMENTED,
-          [],
-        ),
+    await this.issueHistoryPersistencePort.save(
+      CreateIssueHistoryEntity.of(
+        issueId,
+        projectId,
+        author,
+        IssueHistoryAction.COMMENTED,
+        [],
       ),
     );
   }

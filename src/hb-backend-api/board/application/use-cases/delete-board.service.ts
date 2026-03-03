@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { from, lastValueFrom, Observable, switchMap } from "rxjs";
 import { DeleteBoardUseCase } from "../../ports/in/delete-board.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { BoardPersistencePort } from "../../ports/out/board-persistence.port";
@@ -20,18 +19,7 @@ export class DeleteBoardService implements DeleteBoardUseCase {
 
   @Transactional()
   public async invoke(id: BoardId): Promise<void> {
-    await lastValueFrom(
-      this.verifyExists(id).pipe(switchMap(() => this.deleteBoard(id))),
-    );
-  }
-
-  private verifyExists(id: BoardId): Observable<void> {
-    return from(this.boardQueryPort.findById(id)).pipe(
-      switchMap(() => from(Promise.resolve())),
-    );
-  }
-
-  private deleteBoard(id: BoardId): Observable<void> {
-    return from(this.boardPersistencePort.deleteOne(id));
+    await this.boardQueryPort.findById(id);
+    await this.boardPersistencePort.deleteOne(id);
   }
 }

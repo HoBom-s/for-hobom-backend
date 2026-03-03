@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { from, lastValueFrom, Observable, switchMap } from "rxjs";
 import { UpdateProjectLabelUseCase } from "../../ports/in/update-project-label.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { ProjectLabelPersistencePort } from "../../ports/out/project-label-persistence.port";
@@ -24,24 +23,7 @@ export class UpdateProjectLabelService implements UpdateProjectLabelUseCase {
     name: string,
     color: string,
   ): Promise<void> {
-    await lastValueFrom(
-      this.verifyExists(id).pipe(
-        switchMap(() => this.updateLabel(id, name, color)),
-      ),
-    );
-  }
-
-  private verifyExists(id: ProjectLabelId): Observable<void> {
-    return from(this.projectLabelQueryPort.findById(id)).pipe(
-      switchMap(() => from(Promise.resolve())),
-    );
-  }
-
-  private updateLabel(
-    id: ProjectLabelId,
-    name: string,
-    color: string,
-  ): Observable<void> {
-    return from(this.projectLabelPersistencePort.update(id, { name, color }));
+    await this.projectLabelQueryPort.findById(id);
+    await this.projectLabelPersistencePort.update(id, { name, color });
   }
 }

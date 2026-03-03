@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { from, lastValueFrom, Observable, switchMap } from "rxjs";
 import { DeleteProjectLabelUseCase } from "../../ports/in/delete-project-label.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { ProjectLabelPersistencePort } from "../../ports/out/project-label-persistence.port";
@@ -20,18 +19,7 @@ export class DeleteProjectLabelService implements DeleteProjectLabelUseCase {
 
   @Transactional()
   public async invoke(id: ProjectLabelId): Promise<void> {
-    await lastValueFrom(
-      this.verifyExists(id).pipe(switchMap(() => this.deleteLabel(id))),
-    );
-  }
-
-  private verifyExists(id: ProjectLabelId): Observable<void> {
-    return from(this.projectLabelQueryPort.findById(id)).pipe(
-      switchMap(() => from(Promise.resolve())),
-    );
-  }
-
-  private deleteLabel(id: ProjectLabelId): Observable<void> {
-    return from(this.projectLabelPersistencePort.deleteOne(id));
+    await this.projectLabelQueryPort.findById(id);
+    await this.projectLabelPersistencePort.deleteOne(id);
   }
 }
