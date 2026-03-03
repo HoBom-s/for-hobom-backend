@@ -11,4 +11,5 @@ export interface IssueHistoryRepository {
     startDate: Date,
     endDate: Date,
   ): Promise<IssueHistoryDocument[]>;
+  deleteByProject(projectId: ProjectId): Promise<void>;
 }

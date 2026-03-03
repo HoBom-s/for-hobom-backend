@@ -9,4 +9,5 @@ export interface ProjectLabelRepository {
   findById(id: ProjectLabelId): Promise<ProjectLabelDocument>;
   update(id: ProjectLabelId, data: Record<string, unknown>): Promise<void>;
   deleteOne(id: ProjectLabelId): Promise<void>;
+  deleteByProject(projectId: ProjectId): Promise<void>;
 }

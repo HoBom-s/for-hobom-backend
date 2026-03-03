@@ -64,4 +64,12 @@ export class ProjectLabelRepositoryImpl implements ProjectLabelRepository {
     const session = MongoSessionContext.getSession();
     await this.projectLabelModel.deleteOne({ _id: id.raw }, { session });
   }
+
+  public async deleteByProject(projectId: ProjectId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.projectLabelModel.deleteMany(
+      { project: projectId.raw },
+      { session },
+    );
+  }
 }
