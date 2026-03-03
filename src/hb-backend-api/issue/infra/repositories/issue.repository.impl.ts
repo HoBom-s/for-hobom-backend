@@ -117,4 +117,9 @@ export class IssueRepositoryImpl implements IssueRepository {
       { session },
     );
   }
+
+  public async deleteByProject(projectId: ProjectId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.issueModel.deleteMany({ project: projectId.raw }, { session });
+  }
 }

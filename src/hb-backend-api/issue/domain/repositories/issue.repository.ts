@@ -18,4 +18,5 @@ export interface IssueRepository {
   findByParent(parentId: IssueId): Promise<IssueDocument[]>;
   update(id: IssueId, data: Record<string, unknown>): Promise<void>;
   deleteOne(id: IssueId): Promise<void>;
+  deleteByProject(projectId: ProjectId): Promise<void>;
 }

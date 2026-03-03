@@ -9,6 +9,7 @@ import {
 } from "../../domain/model/issue-comment.entity";
 import { IssueCommentId } from "../../domain/model/issue-comment-id.vo";
 import { IssueId } from "../../domain/model/issue-id.vo";
+import { ProjectId } from "../../../project/domain/model/project-id.vo";
 import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 
 @Injectable()
@@ -69,6 +70,14 @@ export class IssueCommentRepositoryImpl implements IssueCommentRepository {
     await this.issueCommentModel.findOneAndUpdate(
       { _id: id.raw },
       { $set: { deletedAt: new Date() } },
+      { session },
+    );
+  }
+
+  public async deleteByProject(projectId: ProjectId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.issueCommentModel.deleteMany(
+      { project: projectId.raw },
       { session },
     );
   }

@@ -80,4 +80,9 @@ export class SprintRepositoryImpl implements SprintRepository {
     const session = MongoSessionContext.getSession();
     await this.sprintModel.deleteOne({ _id: id.raw }, { session });
   }
+
+  public async deleteByProject(projectId: ProjectId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.sprintModel.deleteMany({ project: projectId.raw }, { session });
+  }
 }

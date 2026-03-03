@@ -9,4 +9,5 @@ export interface BoardRepository {
   findByProject(projectId: ProjectId): Promise<BoardDocument[]>;
   update(id: BoardId, data: Record<string, unknown>): Promise<void>;
   deleteOne(id: BoardId): Promise<void>;
+  deleteByProject(projectId: ProjectId): Promise<void>;
 }

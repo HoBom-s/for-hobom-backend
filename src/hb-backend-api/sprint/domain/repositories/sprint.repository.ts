@@ -10,4 +10,5 @@ export interface SprintRepository {
   findActiveSprint(projectId: ProjectId): Promise<SprintDocument | null>;
   update(id: SprintId, data: Record<string, unknown>): Promise<void>;
   deleteOne(id: SprintId): Promise<void>;
+  deleteByProject(projectId: ProjectId): Promise<void>;
 }

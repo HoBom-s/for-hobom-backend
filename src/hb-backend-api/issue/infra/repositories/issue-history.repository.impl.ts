@@ -54,4 +54,12 @@ export class IssueHistoryRepositoryImpl implements IssueHistoryRepository {
       .sort({ createdAt: -1 })
       .exec();
   }
+
+  public async deleteByProject(projectId: ProjectId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.issueHistoryModel.deleteMany(
+      { project: projectId.raw },
+      { session },
+    );
+  }
 }

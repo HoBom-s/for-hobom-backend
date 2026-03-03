@@ -266,4 +266,152 @@ export class DIToken {
       "ProcessScheduleFutureMessageUseCase",
     );
   };
+
+  public static readonly ProjectModule = class extends DITokenRegister {
+    public static ProjectRepository = this.register("ProjectRepository");
+
+    public static ProjectPersistencePort = this.register(
+      "ProjectPersistencePort",
+    );
+    public static ProjectQueryPort = this.register("ProjectQueryPort");
+
+    public static CreateProjectUseCase = this.register("CreateProjectUseCase");
+    public static GetProjectUseCase = this.register("GetProjectUseCase");
+    public static GetMyProjectsUseCase = this.register("GetMyProjectsUseCase");
+    public static UpdateProjectUseCase = this.register("UpdateProjectUseCase");
+    public static DeleteProjectUseCase = this.register("DeleteProjectUseCase");
+    public static AddProjectMemberUseCase = this.register(
+      "AddProjectMemberUseCase",
+    );
+    public static RemoveProjectMemberUseCase = this.register(
+      "RemoveProjectMemberUseCase",
+    );
+    public static UpdateProjectMemberRoleUseCase = this.register(
+      "UpdateProjectMemberRoleUseCase",
+    );
+    public static UpdateProjectWorkflowUseCase = this.register(
+      "UpdateProjectWorkflowUseCase",
+    );
+    public static UpdateProjectIssueTypesUseCase = this.register(
+      "UpdateProjectIssueTypesUseCase",
+    );
+    public static UpdateProjectPrioritiesUseCase = this.register(
+      "UpdateProjectPrioritiesUseCase",
+    );
+  };
+
+  public static readonly IssueModule = class extends DITokenRegister {
+    public static IssueRepository = this.register("IssueRepository");
+    public static IssueCommentRepository = this.register(
+      "IssueCommentRepository",
+    );
+    public static IssueHistoryRepository = this.register(
+      "IssueHistoryRepository",
+    );
+
+    public static IssuePersistencePort = this.register("IssuePersistencePort");
+    public static IssueCommentPersistencePort = this.register(
+      "IssueCommentPersistencePort",
+    );
+    public static IssueHistoryPersistencePort = this.register(
+      "IssueHistoryPersistencePort",
+    );
+
+    public static IssueQueryPort = this.register("IssueQueryPort");
+    public static IssueCommentQueryPort = this.register(
+      "IssueCommentQueryPort",
+    );
+    public static IssueHistoryQueryPort = this.register(
+      "IssueHistoryQueryPort",
+    );
+
+    public static CreateIssueUseCase = this.register("CreateIssueUseCase");
+    public static GetIssueUseCase = this.register("GetIssueUseCase");
+    public static GetIssuesByProjectUseCase = this.register(
+      "GetIssuesByProjectUseCase",
+    );
+    public static UpdateIssueUseCase = this.register("UpdateIssueUseCase");
+    public static DeleteIssueUseCase = this.register("DeleteIssueUseCase");
+    public static TransitionIssueStatusUseCase = this.register(
+      "TransitionIssueStatusUseCase",
+    );
+    public static AssignIssueUseCase = this.register("AssignIssueUseCase");
+    public static CreateIssueCommentUseCase = this.register(
+      "CreateIssueCommentUseCase",
+    );
+    public static UpdateIssueCommentUseCase = this.register(
+      "UpdateIssueCommentUseCase",
+    );
+    public static DeleteIssueCommentUseCase = this.register(
+      "DeleteIssueCommentUseCase",
+    );
+    public static GetIssueCommentsUseCase = this.register(
+      "GetIssueCommentsUseCase",
+    );
+    public static GetIssueHistoryUseCase = this.register(
+      "GetIssueHistoryUseCase",
+    );
+  };
+
+  public static readonly SprintModule = class extends DITokenRegister {
+    public static SprintRepository = this.register("SprintRepository");
+
+    public static SprintPersistencePort = this.register(
+      "SprintPersistencePort",
+    );
+    public static SprintQueryPort = this.register("SprintQueryPort");
+
+    public static CreateSprintUseCase = this.register("CreateSprintUseCase");
+    public static GetSprintUseCase = this.register("GetSprintUseCase");
+    public static GetSprintsByProjectUseCase = this.register(
+      "GetSprintsByProjectUseCase",
+    );
+    public static UpdateSprintUseCase = this.register("UpdateSprintUseCase");
+    public static DeleteSprintUseCase = this.register("DeleteSprintUseCase");
+    public static StartSprintUseCase = this.register("StartSprintUseCase");
+    public static CompleteSprintUseCase = this.register(
+      "CompleteSprintUseCase",
+    );
+  };
+
+  public static readonly BoardModule = class extends DITokenRegister {
+    public static BoardRepository = this.register("BoardRepository");
+
+    public static BoardPersistencePort = this.register("BoardPersistencePort");
+    public static BoardQueryPort = this.register("BoardQueryPort");
+
+    public static CreateBoardUseCase = this.register("CreateBoardUseCase");
+    public static GetBoardUseCase = this.register("GetBoardUseCase");
+    public static GetBoardsByProjectUseCase = this.register(
+      "GetBoardsByProjectUseCase",
+    );
+    public static UpdateBoardUseCase = this.register("UpdateBoardUseCase");
+    public static DeleteBoardUseCase = this.register("DeleteBoardUseCase");
+  };
+
+  public static readonly ProjectLabelModule = class extends DITokenRegister {
+    public static ProjectLabelRepository = this.register(
+      "ProjectLabelRepository",
+    );
+
+    public static ProjectLabelPersistencePort = this.register(
+      "ProjectLabelPersistencePort",
+    );
+    public static ProjectLabelQueryPort = this.register(
+      "ProjectLabelQueryPort",
+    );
+
+    public static CreateProjectLabelUseCase = this.register(
+      "CreateProjectLabelUseCase",
+    );
+    public static GetProjectLabelsUseCase = this.register(
+      "GetProjectLabelsUseCase",
+    );
+    public static UpdateProjectLabelUseCase = this.register(
+      "UpdateProjectLabelUseCase",
+    );
+    public static DeleteProjectLabelUseCase = this.register(
+      "DeleteProjectLabelUseCase",
+    );
+  };
 }

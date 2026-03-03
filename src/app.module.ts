@@ -23,6 +23,11 @@ import { NoteModule } from "./hb-backend-api/note/note.module";
 import { NotificationModule } from "./hb-backend-api/notification/notification.module";
 import { HealthModule } from "./hb-backend-api/health/health.module";
 import { DashboardModule } from "./hb-backend-api/dashboard/dashboard.module";
+import { ProjectModule } from "./hb-backend-api/project/project.module";
+import { IssueModule } from "./hb-backend-api/issue/issue.module";
+import { SprintModule } from "./hb-backend-api/sprint/sprint.module";
+import { BoardModule } from "./hb-backend-api/board/board.module";
+import { ProjectLabelModule } from "./hb-backend-api/project-label/project-label.module";
 
 @Module({
   imports: [
@@ -69,6 +74,11 @@ import { DashboardModule } from "./hb-backend-api/dashboard/dashboard.module";
     NotificationModule,
     HealthModule,
     DashboardModule,
+    ProjectModule,
+    IssueModule,
+    SprintModule,
+    BoardModule,
+    ProjectLabelModule,
   ],
   providers: [
     TraceContext,
