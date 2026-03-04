@@ -27,8 +27,6 @@ export class GetNotificationsCursorService
         size + 1,
       );
     const results = notifications.map(NotificationQueryResult.from);
-    return CursorPaginatedResponse.of(results, size, (r) =>
-      r.getId.toString(),
-    );
+    return CursorPaginatedResponse.of(results, size, (r) => r.getId.toString());
   }
 }
