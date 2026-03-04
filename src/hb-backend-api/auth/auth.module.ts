@@ -17,6 +17,7 @@ import { AuthRepositoryImpl } from "./infra/repositories/auth.repository.impl";
 import { DIToken } from "../../shared/di/token.di";
 import { AuthLoginController } from "./adapters/in/auth-login.controller";
 import { AuthLogoutController } from "./adapters/in/auth-logout.controller";
+import { AuthMeController } from "./adapters/in/auth-me.controller";
 import { LogoutAuthService } from "./application/use-cases/logout-auth.service";
 
 @Module({
@@ -75,6 +76,7 @@ import { LogoutAuthService } from "./application/use-cases/logout-auth.service";
     AuthLoginController,
     AuthRefreshTokenController,
     AuthLogoutController,
+    AuthMeController,
   ],
   exports: [
     JwtModule,
