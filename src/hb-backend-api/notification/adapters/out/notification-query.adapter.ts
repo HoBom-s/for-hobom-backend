@@ -23,6 +23,20 @@ export class NotificationQueryAdapter implements NotificationQueryPort {
     return docs.map((doc) => this.toEntity(doc));
   }
 
+  public async findByOwnerWithCursor(
+    owner: UserId,
+    cursor: string | undefined,
+    limit: number,
+  ): Promise<NotificationEntitySchema[]> {
+    const docs = await this.notificationRepository.findByOwnerWithCursor(
+      owner,
+      cursor,
+      limit,
+    );
+    if (docs.length === 0) return [];
+    return docs.map((doc) => this.toEntity(doc));
+  }
+
   private toEntity(doc: NotificationDocument): NotificationEntitySchema {
     return NotificationEntitySchema.of(
       NotificationId.fromString(String(doc._id)),

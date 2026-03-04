@@ -13,7 +13,9 @@ import { GetNotificationsController } from "./adapters/in/get-notifications.cont
 import { ReadNotificationController } from "./adapters/in/read-notification.controller";
 import { CreateNotificationService } from "./application/use-cases/create-notification.service";
 import { GetAllNotificationsService } from "./application/use-cases/get-all-notifications.service";
+import { GetNotificationsCursorService } from "./application/use-cases/get-notifications-cursor.service";
 import { ReadNotificationService } from "./application/use-cases/read-notification.service";
+import { GetNotificationsCursorController } from "./adapters/in/get-notifications-cursor.controller";
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { ReadNotificationService } from "./application/use-cases/read-notificati
   controllers: [
     CreateNotificationController,
     GetNotificationsController,
+    GetNotificationsCursorController,
     ReadNotificationController,
   ],
   providers: [
@@ -51,6 +54,10 @@ import { ReadNotificationService } from "./application/use-cases/read-notificati
     {
       provide: DIToken.NotificationModule.GetAllNotificationsUseCase,
       useClass: GetAllNotificationsService,
+    },
+    {
+      provide: DIToken.NotificationModule.GetNotificationsCursorUseCase,
+      useClass: GetNotificationsCursorService,
     },
     {
       provide: DIToken.NotificationModule.ReadNotificationUseCase,

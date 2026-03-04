@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { NotificationRepository } from "../../domain/model/notification.repository";
 import { NotificationDocument } from "../../domain/model/notification.schema";
 import {
@@ -39,6 +39,22 @@ export class NotificationRepositoryImpl implements NotificationRepository {
     return this.notificationModel
       .find({ owner: owner.raw })
       .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  public async findByOwnerWithCursor(
+    owner: UserId,
+    cursor: string | undefined,
+    limit: number,
+  ): Promise<NotificationDocument[]> {
+    const filter: Record<string, unknown> = { owner: owner.raw };
+    if (cursor != null) {
+      filter._id = { $lt: new Types.ObjectId(cursor) };
+    }
+    return this.notificationModel
+      .find(filter)
+      .sort({ _id: -1 })
+      .limit(limit)
       .exec();
   }
 

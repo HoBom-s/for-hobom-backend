@@ -187,6 +187,9 @@ export class DIToken {
     public static GetAllNotificationsUseCase = this.register(
       "GetAllNotificationsUseCase",
     );
+    public static GetNotificationsCursorUseCase = this.register(
+      "GetNotificationsCursorUseCase",
+    );
     public static ReadNotificationUseCase = this.register(
       "ReadNotificationUseCase",
     );
