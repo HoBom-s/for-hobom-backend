@@ -7,7 +7,14 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import {
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+  getSchemaPath,
+} from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
@@ -32,6 +39,22 @@ export class GetNotificationsCursorController {
   ) {}
 
   @ApiOperation({ summary: "알림 목록 커서 페이지네이션 조회" })
+  @ApiExtraModels(CursorPaginatedResponse, NotificationResponseDto)
+  @ApiOkResponse({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(CursorPaginatedResponse) },
+        {
+          properties: {
+            data: {
+              type: "array",
+              items: { $ref: getSchemaPath(NotificationResponseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @ApiQuery({ name: "cursor", required: false, type: String })
   @ApiQuery({ name: "size", required: false, type: Number })
   @UseGuards(JwtAuthGuard)
