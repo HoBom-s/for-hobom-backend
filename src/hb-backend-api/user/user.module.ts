@@ -17,6 +17,7 @@ import { ApproveUserService } from "./application/use-cases/approve-user.service
 import { RejectUserService } from "./application/use-cases/reject-user.service";
 import { GetPendingUsersService } from "./application/use-cases/get-pending-users.service";
 import { AdminUserController } from "./adapters/in/admin-user.controller";
+import { InternalUserController } from "./adapters/in/internal-user.controller";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdminUserController } from "./adapters/in/admin-user.controller";
     GetUserByIdController,
     GetAllUserController,
     AdminUserController,
+    InternalUserController,
   ],
   providers: [
     {
