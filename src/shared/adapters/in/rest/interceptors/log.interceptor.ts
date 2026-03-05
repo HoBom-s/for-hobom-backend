@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import {
   CallHandler,
   ExecutionContext,
+  HttpException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -87,12 +88,14 @@ export class HttpLogInterceptor implements NestInterceptor {
           catchError((err) =>
             from(
               (async () => {
+                const errorStatusCode =
+                  err instanceof HttpException ? err.getStatus() : 500;
                 const payload = OutboxPayloadFactoryRegistry.HOBOM_LOG({
                   traceId: this.traceContext.getTraceId(),
                   level: TraceInfoConstant.ERROR,
                   method: convertToHttpMethod(req.method),
                   path: req.originalUrl,
-                  statusCode: res?.statusCode ?? 500,
+                  statusCode: errorStatusCode,
                   host: req.hostname ?? "-",
                   userId: userInfo.getId.toString(),
                   payload: {
