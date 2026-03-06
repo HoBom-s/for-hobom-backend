@@ -94,4 +94,21 @@ export class OutboxRepositoryImpl implements OutboxRepository {
 
     return outbox;
   }
+
+  public async deleteExpiredBatch(
+    olderThan: Date,
+    batchSize: number,
+  ): Promise<number> {
+    const docs = await this.outboxModel
+      .find({ createdAt: { $lt: olderThan } })
+      .limit(batchSize)
+      .select("_id")
+      .lean()
+      .exec();
+    if (docs.length === 0) return 0;
+
+    const ids = docs.map((doc) => doc._id);
+    const result = await this.outboxModel.deleteMany({ _id: { $in: ids } });
+    return result.deletedCount;
+  }
 }

@@ -7,4 +7,6 @@ export interface OutboxPersistencePort {
   markAsSent(eventId: EventId): Promise<void>;
 
   markAsFailed(eventId: EventId, errorMessage: string): Promise<void>;
+
+  deleteExpiredBatch(olderThan: Date, batchSize: number): Promise<number>;
 }

@@ -212,6 +212,9 @@ export class DIToken {
     public static PatchOutboxMarkAsSentUseCase = this.register(
       "PatchOutboxMarkAsSentUseCase",
     );
+    public static ProcessExpiredOutboxCleanupUseCase = this.register(
+      "ProcessExpiredOutboxCleanupUseCase",
+    );
   };
 
   public static readonly DashboardModule = class extends DITokenRegister {

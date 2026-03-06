@@ -12,6 +12,8 @@ import { PatchOutboxMarkAsSentService } from "./application/use-cases/patch-outb
 import { PatchMessageOutboxMarkAsSentController } from "./adapters/in/patch-message-outbox-mark-as-sent.controller";
 import { FindLogOutboxByEventTypeAndStatusService } from "./application/use-cases/find-log-outbox-by-event-type-and-status.service";
 import { FindLogOutboxController } from "./adapters/in/find-log-outbox.controller";
+import { ProcessExpiredOutboxCleanupService } from "./application/use-cases/process-expired-outbox-cleanup.service";
+import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expired-outbox-cleanup.scheduler";
 
 @Module({
   imports: [
@@ -52,6 +54,11 @@ import { FindLogOutboxController } from "./adapters/in/find-log-outbox.controlle
       provide: DIToken.OutboxModule.PatchOutboxMarkAsSentUseCase,
       useClass: PatchOutboxMarkAsSentService,
     },
+    {
+      provide: DIToken.OutboxModule.ProcessExpiredOutboxCleanupUseCase,
+      useClass: ProcessExpiredOutboxCleanupService,
+    },
+    ProcessExpiredOutboxCleanupScheduler,
   ],
   exports: [
     MongooseModule,

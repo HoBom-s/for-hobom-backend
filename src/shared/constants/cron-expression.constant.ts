@@ -1,4 +1,5 @@
 export const CronExpression = {
+  DAILY_3AM: "0 3 * * *",
   DAILY_6AM: "0 6 * * *",
   DAILY_9AM: "0 9 * * *",
   DAILY_8AM_30M: "30 8 * * *",
