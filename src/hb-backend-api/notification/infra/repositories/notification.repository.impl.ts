@@ -58,6 +58,24 @@ export class NotificationRepositoryImpl implements NotificationRepository {
       .exec();
   }
 
+  public async deleteExpiredBatch(
+    olderThan: Date,
+    batchSize: number,
+  ): Promise<number> {
+    const docs = await this.notificationModel
+      .find({ createdAt: { $lt: olderThan } })
+      .limit(batchSize)
+      .select("_id")
+      .lean()
+      .exec();
+    if (docs.length === 0) return 0;
+    const ids = docs.map((doc) => doc._id);
+    const result = await this.notificationModel.deleteMany({
+      _id: { $in: ids },
+    });
+    return result.deletedCount;
+  }
+
   public async markAsRead(id: NotificationId, owner: UserId): Promise<void> {
     const result = await this.notificationModel.findOneAndUpdate(
       { _id: id.raw, owner: owner.raw },

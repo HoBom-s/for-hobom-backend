@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from "@nestjs/testing";
 import { BadRequestException } from "@nestjs/common";
 import { Types } from "mongoose";
@@ -52,7 +51,7 @@ const makeProjectDoc = (overrides: Record<string, unknown> = {}) => {
     issueTypes: [],
     priorities: [],
     ...overrides,
-  } as any;
+  } as never;
 };
 
 const mockProjectQueryPort = (): Record<keyof ProjectQueryPort, jest.Mock> => ({
@@ -651,7 +650,7 @@ describe("UpdateProjectWorkflowService", () => {
     queryPort.findById.mockResolvedValue(makeProjectDoc());
     // 이슈가 "in-progress" 상태를 사용 중인데, 새 워크플로우에 "in-progress"가 없음
     issueQueryPort.findByProject.mockResolvedValue([
-      { status: "in-progress" } as any,
+      { status: "in-progress" } as never,
     ]);
 
     await expect(service.invoke(projectId, workflow)).rejects.toThrow(

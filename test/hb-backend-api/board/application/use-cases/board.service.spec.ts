@@ -104,7 +104,7 @@ describe("GetBoardService", () => {
 
   it("ID로 보드를 정상적으로 조회해야 한다", async () => {
     const doc = makeBoardDoc();
-    queryPort.findById.mockResolvedValue(doc as any);
+    queryPort.findById.mockResolvedValue(doc as never);
 
     const id = new BoardId(new Types.ObjectId());
     const result = await service.invoke(id);
@@ -137,7 +137,7 @@ describe("GetBoardsByProjectService", () => {
   });
 
   it("프로젝트별 보드 배열을 반환해야 한다", async () => {
-    queryPort.findByProject.mockResolvedValue([makeBoardDoc() as any]);
+    queryPort.findByProject.mockResolvedValue([makeBoardDoc() as never]);
 
     const projectId = new ProjectId(new Types.ObjectId());
     const result = await service.invoke(projectId);
@@ -180,7 +180,7 @@ describe("UpdateBoardService", () => {
   });
 
   it("보드를 정상적으로 수정해야 한다", async () => {
-    queryPort.findById.mockResolvedValue(makeBoardDoc() as any);
+    queryPort.findById.mockResolvedValue(makeBoardDoc() as never);
     persistencePort.update.mockResolvedValue(undefined);
 
     const id = new BoardId(new Types.ObjectId());
@@ -226,7 +226,7 @@ describe("DeleteBoardService", () => {
   });
 
   it("보드를 정상적으로 삭제해야 한다", async () => {
-    queryPort.findById.mockResolvedValue(makeBoardDoc() as any);
+    queryPort.findById.mockResolvedValue(makeBoardDoc() as never);
     persistencePort.deleteOne.mockResolvedValue(undefined);
 
     const id = new BoardId(new Types.ObjectId());

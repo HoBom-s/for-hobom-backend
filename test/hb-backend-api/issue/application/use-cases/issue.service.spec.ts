@@ -26,6 +26,8 @@ import { IssueId } from "src/hb-backend-api/issue/domain/model/issue-id.vo";
 import { IssueCommentId } from "src/hb-backend-api/issue/domain/model/issue-comment-id.vo";
 import { ProjectId } from "src/hb-backend-api/project/domain/model/project-id.vo";
 import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
+import { IssueType } from "src/hb-backend-api/issue/domain/enums/issue-type.enum";
+import { IssuePriority } from "src/hb-backend-api/issue/domain/enums/issue-priority.enum";
 
 const projectId = new Types.ObjectId();
 const reporterId = new Types.ObjectId();
@@ -180,7 +182,7 @@ describe("CreateIssueService", () => {
   });
 
   it("이슈를 정상적으로 생성해야 한다 (issueKey 생성 포함)", async () => {
-    projectQuery.findById.mockResolvedValue(makeProjectDoc() as any);
+    projectQuery.findById.mockResolvedValue(makeProjectDoc() as never);
     projectPersistence.incrementIssueSequence.mockResolvedValue(1);
     issuePersistence.save.mockResolvedValue(undefined);
 
@@ -189,10 +191,10 @@ describe("CreateIssueService", () => {
 
     await service.invoke(
       pid,
-      "TASK" as any,
+      IssueType.TASK,
       "Test Issue",
       null,
-      "MEDIUM" as any,
+      IssuePriority.MEDIUM,
       reporter,
       null,
       null,
@@ -233,7 +235,7 @@ describe("GetIssueService", () => {
 
   it("ID로 이슈를 정상적으로 조회해야 한다", async () => {
     const doc = makeIssueDoc();
-    queryPort.findById.mockResolvedValue(doc as any);
+    queryPort.findById.mockResolvedValue(doc as never);
 
     const id = new IssueId(new Types.ObjectId());
     const result = await service.invoke(id);
@@ -266,7 +268,7 @@ describe("GetIssuesByProjectService", () => {
   });
 
   it("프로젝트별 이슈 배열을 반환해야 한다", async () => {
-    queryPort.findByProject.mockResolvedValue([makeIssueDoc() as any]);
+    queryPort.findByProject.mockResolvedValue([makeIssueDoc() as never]);
 
     const pid = new ProjectId(new Types.ObjectId());
     const result = await service.invoke(pid);
@@ -320,7 +322,7 @@ describe("DeleteIssueService", () => {
   });
 
   it("하위 이슈가 존재하면 BadRequestException을 던져야 한다", async () => {
-    issueQuery.findByParent.mockResolvedValue([makeIssueDoc() as any]);
+    issueQuery.findByParent.mockResolvedValue([makeIssueDoc() as never]);
 
     const id = new IssueId(new Types.ObjectId());
 
@@ -378,9 +380,9 @@ describe("TransitionIssueStatusService", () => {
 
   it("유효한 전환을 정상적으로 수행해야 한다", async () => {
     issueQuery.findById.mockResolvedValue(
-      makeIssueDoc({ status: "todo", project: projectId }) as any,
+      makeIssueDoc({ status: "todo", project: projectId }) as never,
     );
-    projectQuery.findById.mockResolvedValue(makeProjectDoc() as any);
+    projectQuery.findById.mockResolvedValue(makeProjectDoc() as never);
     issuePersistence.update.mockResolvedValue(undefined);
     issueHistoryPersistence.save.mockResolvedValue(undefined);
 
@@ -398,10 +400,10 @@ describe("TransitionIssueStatusService", () => {
 
   it("워크플로우가 없으면 BadRequestException을 던져야 한다", async () => {
     issueQuery.findById.mockResolvedValue(
-      makeIssueDoc({ project: projectId }) as any,
+      makeIssueDoc({ project: projectId }) as never,
     );
     projectQuery.findById.mockResolvedValue(
-      makeProjectDoc({ workflow: null }) as any,
+      makeProjectDoc({ workflow: null }) as never,
     );
 
     const id = new IssueId(new Types.ObjectId());
@@ -416,9 +418,9 @@ describe("TransitionIssueStatusService", () => {
 
   it("유효하지 않은 전환이면 BadRequestException을 던져야 한다", async () => {
     issueQuery.findById.mockResolvedValue(
-      makeIssueDoc({ status: "todo", project: projectId }) as any,
+      makeIssueDoc({ status: "todo", project: projectId }) as never,
     );
-    projectQuery.findById.mockResolvedValue(makeProjectDoc() as any);
+    projectQuery.findById.mockResolvedValue(makeProjectDoc() as never);
 
     const id = new IssueId(new Types.ObjectId());
     const actor = new UserId(new Types.ObjectId());
@@ -473,7 +475,7 @@ describe("AssignIssueService", () => {
 
   it("담당자를 정상적으로 변경해야 한다", async () => {
     issueQuery.findById.mockResolvedValue(
-      makeIssueDoc({ project: projectId }) as any,
+      makeIssueDoc({ project: projectId }) as never,
     );
     issuePersistence.update.mockResolvedValue(undefined);
     issueHistoryPersistence.save.mockResolvedValue(undefined);

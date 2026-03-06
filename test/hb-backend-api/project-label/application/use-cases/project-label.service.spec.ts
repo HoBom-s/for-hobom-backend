@@ -80,7 +80,7 @@ describe("CreateProjectLabelService", () => {
 
   it("중복 이름의 라벨이면 BadRequestException을 던져야 한다", async () => {
     queryPort.findByProject.mockResolvedValue([
-      makeLabelDoc({ name: "Bug" }) as any,
+      makeLabelDoc({ name: "Bug" }) as never,
     ]);
 
     const pid = new ProjectId(new Types.ObjectId());
@@ -116,7 +116,7 @@ describe("GetProjectLabelsService", () => {
   });
 
   it("프로젝트별 라벨 배열을 반환해야 한다", async () => {
-    queryPort.findByProject.mockResolvedValue([makeLabelDoc() as any]);
+    queryPort.findByProject.mockResolvedValue([makeLabelDoc() as never]);
 
     const pid = new ProjectId(new Types.ObjectId());
     const result = await service.invoke(pid);
@@ -170,7 +170,7 @@ describe("UpdateProjectLabelService", () => {
   });
 
   it("프로젝트 라벨을 정상적으로 수정해야 한다", async () => {
-    queryPort.findById.mockResolvedValue(makeLabelDoc() as any);
+    queryPort.findById.mockResolvedValue(makeLabelDoc() as never);
     persistencePort.update.mockResolvedValue(undefined);
 
     const id = new ProjectLabelId(new Types.ObjectId());
@@ -219,7 +219,7 @@ describe("DeleteProjectLabelService", () => {
   });
 
   it("프로젝트 라벨을 정상적으로 삭제해야 한다", async () => {
-    queryPort.findById.mockResolvedValue(makeLabelDoc() as any);
+    queryPort.findById.mockResolvedValue(makeLabelDoc() as never);
     persistencePort.deleteOne.mockResolvedValue(undefined);
 
     const id = new ProjectLabelId(new Types.ObjectId());

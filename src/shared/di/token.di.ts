@@ -193,6 +193,9 @@ export class DIToken {
     public static ReadNotificationUseCase = this.register(
       "ReadNotificationUseCase",
     );
+    public static ProcessExpiredNotificationCleanupUseCase = this.register(
+      "ProcessExpiredNotificationCleanupUseCase",
+    );
   };
 
   public static readonly OutboxModule = class extends DITokenRegister {

@@ -22,4 +22,11 @@ export class NotificationPersistenceAdapter
   public async markAsRead(id: NotificationId, owner: UserId): Promise<void> {
     await this.notificationRepository.markAsRead(id, owner);
   }
+
+  public async deleteExpiredBatch(
+    olderThan: Date,
+    batchSize: number,
+  ): Promise<number> {
+    return this.notificationRepository.deleteExpiredBatch(olderThan, batchSize);
+  }
 }

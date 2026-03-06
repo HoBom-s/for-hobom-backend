@@ -5,4 +5,5 @@ import { UserId } from "../../../../user/domain/model/user-id.vo";
 export interface NotificationPersistencePort {
   save(schema: NotificationCreateEntitySchema): Promise<string>;
   markAsRead(id: NotificationId, owner: UserId): Promise<void>;
+  deleteExpiredBatch(olderThan: Date, batchSize: number): Promise<number>;
 }

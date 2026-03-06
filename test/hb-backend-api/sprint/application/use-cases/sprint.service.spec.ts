@@ -133,7 +133,7 @@ describe("GetSprintService", () => {
 
   it("ID로 스프린트를 정상적으로 조회해야 한다", async () => {
     const doc = makeSprintDoc();
-    queryPort.findById.mockResolvedValue(doc as any);
+    queryPort.findById.mockResolvedValue(doc as never);
 
     const id = new SprintId(new Types.ObjectId());
     const result = await service.invoke(id);
@@ -166,7 +166,7 @@ describe("GetSprintsByProjectService", () => {
   });
 
   it("프로젝트별 스프린트 배열을 반환해야 한다", async () => {
-    queryPort.findByProject.mockResolvedValue([makeSprintDoc() as any]);
+    queryPort.findByProject.mockResolvedValue([makeSprintDoc() as never]);
 
     const projectId = new ProjectId(new Types.ObjectId());
     const result = await service.invoke(projectId);
@@ -219,7 +219,7 @@ describe("UpdateSprintService", () => {
 
   it("PLANNING 상태의 스프린트를 정상적으로 수정해야 한다", async () => {
     queryPort.findById.mockResolvedValue(
-      makeSprintDoc({ status: "PLANNING" }) as any,
+      makeSprintDoc({ status: "PLANNING" }) as never,
     );
     persistencePort.update.mockResolvedValue(undefined);
 
@@ -231,7 +231,7 @@ describe("UpdateSprintService", () => {
 
   it("PLANNING이 아닌 상태의 스프린트를 수정하면 BadRequestException을 던져야 한다", async () => {
     queryPort.findById.mockResolvedValue(
-      makeSprintDoc({ status: "ACTIVE" }) as any,
+      makeSprintDoc({ status: "ACTIVE" }) as never,
     );
 
     const id = new SprintId(new Types.ObjectId());
@@ -277,7 +277,7 @@ describe("DeleteSprintService", () => {
   });
 
   it("스프린트를 정상적으로 삭제해야 한다", async () => {
-    queryPort.findById.mockResolvedValue(makeSprintDoc() as any);
+    queryPort.findById.mockResolvedValue(makeSprintDoc() as never);
     persistencePort.deleteOne.mockResolvedValue(undefined);
 
     const id = new SprintId(new Types.ObjectId());
@@ -323,7 +323,7 @@ describe("StartSprintService", () => {
   it("PLANNING 상태의 스프린트를 정상적으로 시작해야 한다", async () => {
     const projectId = new Types.ObjectId();
     queryPort.findById.mockResolvedValue(
-      makeSprintDoc({ status: "PLANNING", project: projectId }) as any,
+      makeSprintDoc({ status: "PLANNING", project: projectId }) as never,
     );
     queryPort.findActiveSprint.mockResolvedValue(null);
     persistencePort.update.mockResolvedValue(undefined);
@@ -338,7 +338,7 @@ describe("StartSprintService", () => {
 
   it("PLANNING이 아닌 상태의 스프린트를 시작하면 BadRequestException을 던져야 한다", async () => {
     queryPort.findById.mockResolvedValue(
-      makeSprintDoc({ status: "ACTIVE" }) as any,
+      makeSprintDoc({ status: "ACTIVE" }) as never,
     );
 
     const id = new SprintId(new Types.ObjectId());
@@ -351,10 +351,10 @@ describe("StartSprintService", () => {
   it("이미 진행 중인 스프린트가 존재하면 BadRequestException을 던져야 한다", async () => {
     const projectId = new Types.ObjectId();
     queryPort.findById.mockResolvedValue(
-      makeSprintDoc({ status: "PLANNING", project: projectId }) as any,
+      makeSprintDoc({ status: "PLANNING", project: projectId }) as never,
     );
     queryPort.findActiveSprint.mockResolvedValue(
-      makeSprintDoc({ status: "ACTIVE", project: projectId }) as any,
+      makeSprintDoc({ status: "ACTIVE", project: projectId }) as never,
     );
 
     const id = new SprintId(new Types.ObjectId());
@@ -399,7 +399,7 @@ describe("CompleteSprintService", () => {
 
   it("ACTIVE 상태의 스프린트를 정상적으로 완료해야 한다", async () => {
     queryPort.findById.mockResolvedValue(
-      makeSprintDoc({ status: "ACTIVE" }) as any,
+      makeSprintDoc({ status: "ACTIVE" }) as never,
     );
     persistencePort.update.mockResolvedValue(undefined);
 
@@ -415,7 +415,7 @@ describe("CompleteSprintService", () => {
 
   it("ACTIVE가 아닌 상태의 스프린트를 완료하면 BadRequestException을 던져야 한다", async () => {
     queryPort.findById.mockResolvedValue(
-      makeSprintDoc({ status: "PLANNING" }) as any,
+      makeSprintDoc({ status: "PLANNING" }) as never,
     );
 
     const id = new SprintId(new Types.ObjectId());

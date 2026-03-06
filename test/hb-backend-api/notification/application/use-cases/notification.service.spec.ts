@@ -37,10 +37,12 @@ const makeNotificationEntity = (
 const mockPersistencePort = (): jest.Mocked<NotificationPersistencePort> => ({
   save: jest.fn(),
   markAsRead: jest.fn(),
+  deleteExpiredBatch: jest.fn(),
 });
 
 const mockQueryPort = (): jest.Mocked<NotificationQueryPort> => ({
   findAllByOwner: jest.fn(),
+  findByOwnerWithCursor: jest.fn(),
 });
 
 // ──────────────────────────────────────────────

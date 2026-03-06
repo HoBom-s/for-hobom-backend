@@ -201,7 +201,7 @@ describe("PickTodayMenuService", () => {
 
     const emptyTodayMenu = TodayMenuRelationEntity.of(
       todayMenuId,
-      null as any,
+      null as never,
       [],
       YearMonthDayString.fromString("2025-06-07"),
     );
