@@ -27,7 +27,6 @@ import { ProjectId } from "src/hb-backend-api/project/domain/model/project-id.vo
 import { ProjectKey } from "src/hb-backend-api/project/domain/model/project-key.vo";
 import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
 import { MemberRole } from "src/hb-backend-api/project/domain/enums/member-role.enum";
-import { StatusCategory } from "src/hb-backend-api/project/domain/enums/status-category.enum";
 
 // ── helpers ──────────────────────────────────────
 const makeProjectId = () =>
@@ -623,8 +622,8 @@ describe("UpdateProjectWorkflowService", () => {
     const projectId = makeProjectId();
     const workflow = {
       statuses: [
-        { id: "todo", name: "할 일", category: StatusCategory.TODO, order: 0 },
-        { id: "done", name: "완료", category: StatusCategory.DONE, order: 1 },
+        { id: "todo", name: "할 일", isDone: false, order: 0 },
+        { id: "done", name: "완료", isDone: true, order: 1 },
       ],
       transitions: [{ from: "todo", to: "done", name: "완료" }],
     };
@@ -642,9 +641,7 @@ describe("UpdateProjectWorkflowService", () => {
   it("이슈에서 사용 중인 상태를 삭제하려 하면 BadRequestException을 던져야 한다", async () => {
     const projectId = makeProjectId();
     const workflow = {
-      statuses: [
-        { id: "todo", name: "할 일", category: StatusCategory.TODO, order: 0 },
-      ],
+      statuses: [{ id: "todo", name: "할 일", isDone: false, order: 0 }],
       transitions: [],
     };
     queryPort.findById.mockResolvedValue(makeProjectDoc());

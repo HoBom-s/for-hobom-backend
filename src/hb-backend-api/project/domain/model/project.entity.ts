@@ -2,7 +2,6 @@ import { Prop, Schema } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { BaseEntity } from "../../../../shared/base/base.entity";
 import { MemberRole } from "../enums/member-role.enum";
-import { StatusCategory } from "../enums/status-category.enum";
 import { UserId } from "../../../user/domain/model/user-id.vo";
 import { ProjectKey } from "./project-key.vo";
 
@@ -45,7 +44,7 @@ export class ProjectEntity extends BaseEntity {
         {
           id: { type: String },
           name: { type: String },
-          category: { type: String, enum: StatusCategory },
+          isDone: { type: Boolean, default: false },
           order: { type: Number },
         },
       ],
@@ -63,7 +62,7 @@ export class ProjectEntity extends BaseEntity {
     statuses: {
       id: string;
       name: string;
-      category: StatusCategory;
+      isDone: boolean;
       order: number;
     }[];
     transitions: {

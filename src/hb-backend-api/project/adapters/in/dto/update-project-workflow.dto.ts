@@ -1,13 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsArray,
-  IsEnum,
+  IsBoolean,
   IsNumber,
   IsString,
   ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { StatusCategory } from "../../../domain/enums/status-category.enum";
 
 class WorkflowStatusDto {
   @ApiProperty({ type: String })
@@ -18,9 +17,9 @@ class WorkflowStatusDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ enum: StatusCategory })
-  @IsEnum(StatusCategory)
-  category: StatusCategory;
+  @ApiProperty({ type: Boolean })
+  @IsBoolean()
+  isDone: boolean;
 
   @ApiProperty({ type: Number })
   @IsNumber()

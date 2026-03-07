@@ -6,7 +6,6 @@ import { ProjectPersistencePort } from "../../ports/out/project-persistence.port
 import { ProjectQueryPort } from "../../ports/out/project-query.port";
 import { IssueQueryPort } from "../../../issue/ports/out/issue-query.port";
 import { ProjectId } from "../../domain/model/project-id.vo";
-import { StatusCategory } from "../../domain/enums/status-category.enum";
 import { IssueDocument } from "../../../issue/domain/model/issue.schema";
 
 @Injectable()
@@ -28,7 +27,7 @@ export class UpdateProjectWorkflowService
       statuses: {
         id: string;
         name: string;
-        category: StatusCategory;
+        isDone: boolean;
         order: number;
       }[];
       transitions: { from: string; to: string; name: string }[];
@@ -54,7 +53,7 @@ export class UpdateProjectWorkflowService
       statuses: {
         id: string;
         name: string;
-        category: StatusCategory;
+        isDone: boolean;
         order: number;
       }[];
       transitions: { from: string; to: string; name: string }[];
@@ -84,7 +83,7 @@ export class UpdateProjectWorkflowService
       statuses: {
         id: string;
         name: string;
-        category: StatusCategory;
+        isDone: boolean;
         order: number;
       }[];
       transitions: { from: string; to: string; name: string }[];

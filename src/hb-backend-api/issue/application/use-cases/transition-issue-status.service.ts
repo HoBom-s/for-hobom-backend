@@ -9,7 +9,6 @@ import { IssueId } from "../../domain/model/issue-id.vo";
 import { UserId } from "../../../user/domain/model/user-id.vo";
 import { ProjectId } from "../../../project/domain/model/project-id.vo";
 import { IssueHistoryAction } from "../../domain/enums/issue-history-action.enum";
-import { StatusCategory } from "../../../project/domain/enums/status-category.enum";
 import { CreateIssueHistoryEntity } from "../../domain/model/issue-history.entity";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
@@ -65,10 +64,9 @@ export class TransitionIssueStatusService
 
     const updateData: Record<string, unknown> = {
       status: newStatusId,
-      statusCategory: targetStatus.category,
     };
 
-    if (targetStatus.category === StatusCategory.DONE) {
+    if (targetStatus.isDone) {
       updateData.resolvedAt = new Date();
     }
 

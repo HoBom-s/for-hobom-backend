@@ -32,7 +32,6 @@ export class IssueRepositoryImpl implements IssueRepository {
           title: entity.getTitle,
           description: entity.getDescription,
           status: entity.getStatus,
-          statusCategory: entity.getStatusCategory,
           priority: entity.getPriority,
           reporter: entity.getReporter.raw,
           assignee: entity.getAssignee?.raw ?? null,

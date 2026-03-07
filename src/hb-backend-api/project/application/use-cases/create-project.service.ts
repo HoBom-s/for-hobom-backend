@@ -11,7 +11,6 @@ import { CreateProjectEntity } from "../../domain/model/project.entity";
 import {
   DEFAULT_ISSUE_TYPES,
   DEFAULT_PRIORITIES,
-  DEFAULT_WORKFLOW,
 } from "../../domain/constants/project-defaults.constant";
 
 @Injectable()
@@ -44,7 +43,7 @@ export class CreateProjectService implements CreateProjectUseCase {
         name,
         description,
         owner,
-        DEFAULT_WORKFLOW as unknown as Record<string, unknown>,
+        null,
         DEFAULT_ISSUE_TYPES as unknown as readonly Record<string, unknown>[],
         DEFAULT_PRIORITIES as unknown as readonly Record<string, unknown>[],
       ),

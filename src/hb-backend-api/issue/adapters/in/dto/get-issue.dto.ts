@@ -27,9 +27,6 @@ export class GetIssueDto {
   status: string;
 
   @ApiProperty({ type: String })
-  statusCategory: string;
-
-  @ApiProperty({ type: String })
   priority: string;
 
   @ApiPropertyOptional({ type: String })
@@ -73,7 +70,6 @@ export class GetIssueDto {
       title: doc.title,
       description: doc.description,
       status: doc.status,
-      statusCategory: doc.statusCategory,
       priority: doc.priority,
       resolution: doc.resolution,
       reporter: String(doc.reporter),

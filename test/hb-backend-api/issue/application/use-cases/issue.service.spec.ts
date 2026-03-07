@@ -41,7 +41,6 @@ const makeIssueDoc = (overrides: Record<string, unknown> = {}) => ({
   title: "Test",
   description: null,
   status: "todo",
-  statusCategory: "TODO",
   priority: "MEDIUM",
   resolution: null,
   reporter: reporterId,
@@ -68,14 +67,9 @@ const makeProjectDoc = (overrides: Record<string, unknown> = {}) => ({
   issueSequence: 0,
   workflow: {
     statuses: [
-      { id: "todo", name: "To Do", category: "TODO", order: 0 },
-      {
-        id: "inprogress",
-        name: "In Progress",
-        category: "IN_PROGRESS",
-        order: 1,
-      },
-      { id: "done", name: "Done", category: "DONE", order: 2 },
+      { id: "todo", name: "To Do", isDone: false, order: 0 },
+      { id: "inprogress", name: "In Progress", isDone: false, order: 1 },
+      { id: "done", name: "Done", isDone: true, order: 2 },
     ],
     transitions: [
       { from: "todo", to: "inprogress", name: "Start" },
@@ -393,7 +387,6 @@ describe("TransitionIssueStatusService", () => {
 
     expect(issuePersistence.update).toHaveBeenCalledWith(id, {
       status: "inprogress",
-      statusCategory: "IN_PROGRESS",
     });
     expect(issueHistoryPersistence.save).toHaveBeenCalledTimes(1);
   });

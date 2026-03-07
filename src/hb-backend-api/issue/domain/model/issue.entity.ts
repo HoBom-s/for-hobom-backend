@@ -4,7 +4,6 @@ import { BaseEntity } from "../../../../shared/base/base.entity";
 import { IssueType } from "../enums/issue-type.enum";
 import { IssuePriority } from "../enums/issue-priority.enum";
 import { IssueResolution } from "../enums/issue-resolution.enum";
-import { StatusCategory } from "../../../project/domain/enums/status-category.enum";
 import { ProjectId } from "../../../project/domain/model/project-id.vo";
 import { UserId } from "../../../user/domain/model/user-id.vo";
 
@@ -30,9 +29,6 @@ export class IssueEntity extends BaseEntity {
 
   @Prop({ type: String, required: true })
   status: string;
-
-  @Prop({ type: String, enum: StatusCategory, required: true })
-  statusCategory: StatusCategory;
 
   @Prop({ type: String, enum: IssuePriority, default: IssuePriority.MEDIUM })
   priority: IssuePriority;
@@ -93,7 +89,6 @@ export class CreateIssueEntity {
     private readonly title: string,
     private readonly description: string | null,
     private readonly status: string,
-    private readonly statusCategory: StatusCategory,
     private readonly priority: IssuePriority,
     private readonly reporter: UserId,
     private readonly assignee: UserId | null,
@@ -110,7 +105,6 @@ export class CreateIssueEntity {
     title: string,
     description: string | null,
     status: string,
-    statusCategory: StatusCategory,
     priority: IssuePriority,
     reporter: UserId,
     assignee: UserId | null,
@@ -126,7 +120,6 @@ export class CreateIssueEntity {
       title,
       description,
       status,
-      statusCategory,
       priority,
       reporter,
       assignee,
@@ -162,10 +155,6 @@ export class CreateIssueEntity {
 
   public get getStatus(): string {
     return this.status;
-  }
-
-  public get getStatusCategory(): StatusCategory {
-    return this.statusCategory;
   }
 
   public get getPriority(): IssuePriority {

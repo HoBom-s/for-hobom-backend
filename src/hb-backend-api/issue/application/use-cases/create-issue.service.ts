@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { Types } from "mongoose";
 import { CreateIssueUseCase } from "../../ports/in/create-issue.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
@@ -9,7 +9,6 @@ import { ProjectId } from "../../../project/domain/model/project-id.vo";
 import { UserId } from "../../../user/domain/model/user-id.vo";
 import { IssueType } from "../../domain/enums/issue-type.enum";
 import { IssuePriority } from "../../domain/enums/issue-priority.enum";
-import { StatusCategory } from "../../../project/domain/enums/status-category.enum";
 import { CreateIssueEntity } from "../../domain/model/issue.entity";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
@@ -40,12 +39,20 @@ export class CreateIssueService implements CreateIssueUseCase {
     labels: string[],
   ): Promise<void> {
     const project = await this.projectQueryPort.findById(projectId);
+
+    if (project.workflow == null) {
+      throw new BadRequestException(
+        "프로젝트에 워크플로우가 설정되지 않았어요.",
+      );
+    }
+
+    const firstStatus = project.workflow.statuses[0];
+    if (firstStatus == null) {
+      throw new BadRequestException("워크플로우에 상태가 정의되지 않았어요.");
+    }
+
     const issueNumber =
       await this.projectPersistencePort.incrementIssueSequence(projectId);
-
-    const firstStatus = project.workflow?.statuses?.[0];
-    const defaultStatus = firstStatus?.id ?? "TODO";
-    const defaultStatusCategory = firstStatus?.category ?? StatusCategory.TODO;
 
     await this.issuePersistencePort.save(
       CreateIssueEntity.of(
@@ -55,8 +62,7 @@ export class CreateIssueService implements CreateIssueUseCase {
         type,
         title,
         description,
-        defaultStatus,
-        defaultStatusCategory,
+        firstStatus.id,
         priority,
         reporter,
         assignee,

@@ -1,5 +1,4 @@
 import { ProjectId } from "../../domain/model/project-id.vo";
-import { StatusCategory } from "../../domain/enums/status-category.enum";
 
 export interface UpdateProjectWorkflowUseCase {
   invoke(
@@ -8,7 +7,7 @@ export interface UpdateProjectWorkflowUseCase {
       statuses: {
         id: string;
         name: string;
-        category: StatusCategory;
+        isDone: boolean;
         order: number;
       }[];
       transitions: {
