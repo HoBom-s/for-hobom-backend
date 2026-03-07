@@ -37,4 +37,9 @@ export class UpdateIssueDto {
   @IsOptional()
   @IsString()
   dueDate?: string;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  @IsOptional()
+  @IsString()
+  parent?: string | null;
 }
