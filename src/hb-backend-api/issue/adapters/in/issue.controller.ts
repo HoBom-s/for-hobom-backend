@@ -131,8 +131,7 @@ export class IssueController {
     if (dto.labels != null) data.labels = dto.labels;
     if (dto.dueDate != null) data.dueDate = new Date(dto.dueDate);
     if (dto.parent !== undefined)
-      data.parent =
-        dto.parent != null ? new Types.ObjectId(dto.parent) : null;
+      data.parent = dto.parent != null ? new Types.ObjectId(dto.parent) : null;
 
     await this.updateIssueUseCase.invoke(issueId, user.getId, data);
   }

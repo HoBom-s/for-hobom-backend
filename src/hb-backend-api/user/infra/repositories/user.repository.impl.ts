@@ -14,6 +14,7 @@ import {
 import { UserId } from "../../domain/model/user-id.vo";
 import { UserNickname } from "../../domain/model/user-nickname.vo";
 import { ApprovalStatus } from "../../domain/enums/approval-status.enum";
+import { MongoSessionContext } from "../../../../infra/mongo/transaction/transaction.context";
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
@@ -82,5 +83,14 @@ export class UserRepositoryImpl implements UserRepository {
     if (result.modifiedCount === 0) {
       throw new InternalServerErrorException("승인 상태 변경에 실패했어요.");
     }
+  }
+
+  public async addFriend(ownerId: UserId, id: UserId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.userModel.findOneAndUpdate(
+      { _id: ownerId.raw },
+      { $push: { friends: id.raw } },
+      { session },
+    );
   }
 }

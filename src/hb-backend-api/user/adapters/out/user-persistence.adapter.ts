@@ -3,6 +3,7 @@ import { UserPersistencePort } from "../../domain/ports/out/user-persistence.por
 import { UserCreateEntitySchema } from "../../domain/model/user.entity";
 import { UserRepository } from "../../domain/model/user.repository";
 import { DIToken } from "../../../../shared/di/token.di";
+import { UserId } from "../../domain/model/user-id.vo";
 
 @Injectable()
 export class UserPersistenceAdapter implements UserPersistencePort {
@@ -13,5 +14,9 @@ export class UserPersistenceAdapter implements UserPersistencePort {
 
   public async save(user: UserCreateEntitySchema): Promise<void> {
     await this.userRepository.save(user);
+  }
+
+  public async addFriend(ownerId: UserId, id: UserId): Promise<void> {
+    await this.userRepository.addFriend(ownerId, id);
   }
 }

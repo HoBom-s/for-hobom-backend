@@ -33,6 +33,7 @@ export class DIToken {
     public static GetPendingUsersUseCase = this.register(
       "GetPendingUsersUseCase",
     );
+    public static AddFriendsUseCase = this.register("AddFriendsUseCase");
   };
 
   public static readonly CategoryModule = class extends DITokenRegister {

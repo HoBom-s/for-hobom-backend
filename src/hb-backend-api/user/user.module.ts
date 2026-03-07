@@ -18,6 +18,8 @@ import { RejectUserService } from "./application/use-cases/reject-user.service";
 import { GetPendingUsersService } from "./application/use-cases/get-pending-users.service";
 import { AdminUserController } from "./adapters/in/admin-user.controller";
 import { InternalUserController } from "./adapters/in/internal-user.controller";
+import { AddFriendsService } from "./application/use-cases/add-friends.service";
+import { AddFriendController } from "./adapters/in/add-friend.controller";
 
 @Module({
   imports: [
@@ -32,6 +34,7 @@ import { InternalUserController } from "./adapters/in/internal-user.controller";
     CreateUserController,
     GetUserByIdController,
     GetAllUserController,
+    AddFriendController,
     AdminUserController,
     InternalUserController,
   ],
@@ -75,6 +78,10 @@ import { InternalUserController } from "./adapters/in/internal-user.controller";
     {
       provide: DIToken.UserModule.GetPendingUsersUseCase,
       useClass: GetPendingUsersService,
+    },
+    {
+      provide: DIToken.UserModule.AddFriendsUseCase,
+      useClass: AddFriendsService,
     },
   ],
   exports: [

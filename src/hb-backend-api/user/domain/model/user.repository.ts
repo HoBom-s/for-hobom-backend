@@ -16,4 +16,6 @@ export interface UserRepository {
   findPendingUsers(): Promise<UserDocument[]>;
 
   updateApprovalStatus(id: UserId, status: ApprovalStatus): Promise<void>;
+
+  addFriend(ownerId: UserId, id: UserId): Promise<void>;
 }

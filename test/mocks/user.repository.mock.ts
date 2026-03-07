@@ -8,5 +8,6 @@ export function createMockUserRepository(): jest.Mocked<UserRepository> {
     findByNickname: jest.fn(),
     findPendingUsers: jest.fn(),
     updateApprovalStatus: jest.fn(),
+    addFriend: jest.fn(),
   };
 }
