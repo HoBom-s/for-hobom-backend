@@ -1,5 +1,19 @@
-import { Controller, Get, Inject, Query, UseGuards } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
+import { Types } from "mongoose";
 import { EndPointPrefixConstant } from "../../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../../shared/di/token.di";
 import { JwtAuthGuard } from "../../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
@@ -19,12 +33,17 @@ import { GetFutureMessageDashboardUseCase } from "../../../domain/ports/in/get-f
 import { GetNotificationDashboardUseCase } from "../../../domain/ports/in/get-notification-dashboard.use-case";
 import { GetSystemDashboardUseCase } from "../../../domain/ports/in/get-system-dashboard.use-case";
 import { GetActivityDashboardUseCase } from "../../../domain/ports/in/get-activity-dashboard.use-case";
+import { GetProjectIssueDashboardUseCase } from "../../../domain/ports/in/get-project-issue-dashboard.use-case";
+import { GetSprintDashboardUseCase } from "../../../domain/ports/in/get-sprint-dashboard.use-case";
+import { ProjectId } from "../../../../project/domain/model/project-id.vo";
 import { DailyTodoDashboardDto } from "./dto/daily-todo-dashboard.dto";
 import { NoteDashboardDto } from "./dto/note-dashboard.dto";
 import { FutureMessageDashboardDto } from "./dto/future-message-dashboard.dto";
 import { NotificationDashboardDto } from "./dto/notification-dashboard.dto";
 import { SystemDashboardDto } from "./dto/system-dashboard.dto";
 import { ActivityDashboardDto } from "./dto/activity-dashboard.dto";
+import { ProjectIssueDashboardDto } from "./dto/project-issue-dashboard.dto";
+import { SprintDashboardDto } from "./dto/sprint-dashboard.dto";
 
 @ApiTags("Dashboard")
 @Controller(`${EndPointPrefixConstant}/dashboard`)
@@ -45,6 +64,10 @@ export class DashboardController {
     private readonly getSystemDashboardUseCase: GetSystemDashboardUseCase,
     @Inject(DIToken.DashboardModule.GetActivityDashboardUseCase)
     private readonly getActivityDashboardUseCase: GetActivityDashboardUseCase,
+    @Inject(DIToken.DashboardModule.GetProjectIssueDashboardUseCase)
+    private readonly getProjectIssueDashboardUseCase: GetProjectIssueDashboardUseCase,
+    @Inject(DIToken.DashboardModule.GetSprintDashboardUseCase)
+    private readonly getSprintDashboardUseCase: GetSprintDashboardUseCase,
   ) {}
 
   @ApiOperation({ summary: "데일리 투두 대시보드" })
@@ -149,6 +172,35 @@ export class DashboardController {
       this.parseDate(date),
     );
     return ActivityDashboardDto.from(result);
+  }
+
+  @ApiOperation({ summary: "프로젝트 이슈 대시보드" })
+  @ApiParam({ name: "projectId", type: String })
+  @ApiResponse({ type: ProjectIssueDashboardDto })
+  @Get("projects/:projectId/issues")
+  public async getProjectIssueDashboard(
+    @Param("projectId") projectId: string,
+  ): Promise<ProjectIssueDashboardDto> {
+    const result = await this.getProjectIssueDashboardUseCase.invoke(
+      ProjectId.fromString(projectId),
+    );
+    return ProjectIssueDashboardDto.from(result);
+  }
+
+  @ApiOperation({ summary: "스프린트 대시보드" })
+  @ApiParam({ name: "projectId", type: String })
+  @ApiParam({ name: "sprintId", type: String })
+  @ApiResponse({ type: SprintDashboardDto })
+  @Get("projects/:projectId/sprints/:sprintId")
+  public async getSprintDashboard(
+    @Param("projectId") projectId: string,
+    @Param("sprintId") sprintId: string,
+  ): Promise<SprintDashboardDto> {
+    const result = await this.getSprintDashboardUseCase.invoke(
+      ProjectId.fromString(projectId),
+      new Types.ObjectId(sprintId),
+    );
+    return SprintDashboardDto.from(result);
   }
 
   private parsePeriod(period?: string): DashboardPeriod {

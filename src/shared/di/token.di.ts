@@ -240,6 +240,12 @@ export class DIToken {
     public static GetActivityDashboardUseCase = this.register(
       "GetActivityDashboardUseCase",
     );
+    public static GetProjectIssueDashboardUseCase = this.register(
+      "GetProjectIssueDashboardUseCase",
+    );
+    public static GetSprintDashboardUseCase = this.register(
+      "GetSprintDashboardUseCase",
+    );
   };
 
   public static readonly FutureMessageModule = class extends DITokenRegister {
