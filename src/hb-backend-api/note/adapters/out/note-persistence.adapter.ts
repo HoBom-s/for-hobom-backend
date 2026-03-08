@@ -20,10 +20,10 @@ export class NotePersistenceAdapter implements NotePersistencePort {
 
   public async update(
     id: NoteId,
-    owner: UserId,
+    userId: UserId,
     data: Record<string, unknown>,
   ): Promise<void> {
-    await this.noteRepository.update(id, owner, data);
+    await this.noteRepository.update(id, userId, data);
   }
 
   public async updateStatus(
@@ -37,18 +37,18 @@ export class NotePersistenceAdapter implements NotePersistencePort {
 
   public async togglePin(
     id: NoteId,
-    owner: UserId,
+    userId: UserId,
     isPinned: boolean,
   ): Promise<void> {
-    await this.noteRepository.update(id, owner, { isPinned });
+    await this.noteRepository.update(id, userId, { isPinned });
   }
 
   public async updateOrder(
     id: NoteId,
-    owner: UserId,
+    userId: UserId,
     order: number,
   ): Promise<void> {
-    await this.noteRepository.update(id, owner, { order });
+    await this.noteRepository.update(id, userId, { order });
   }
 
   public async deleteOne(id: NoteId, owner: UserId): Promise<void> {
@@ -61,5 +61,13 @@ export class NotePersistenceAdapter implements NotePersistencePort {
 
   public async emptyTrash(owner: UserId): Promise<void> {
     await this.noteRepository.deleteAllTrashed(owner);
+  }
+
+  public async addMember(id: NoteId, memberUserId: UserId): Promise<void> {
+    await this.noteRepository.addMember(id, memberUserId);
+  }
+
+  public async removeMember(id: NoteId, memberUserId: UserId): Promise<void> {
+    await this.noteRepository.removeMember(id, memberUserId);
   }
 }

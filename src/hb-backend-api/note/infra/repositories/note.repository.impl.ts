@@ -39,9 +39,12 @@ export class NoteRepositoryImpl implements NoteRepository {
     );
   }
 
-  public async findById(id: NoteId, owner: UserId): Promise<NoteDocument> {
+  public async findById(id: NoteId, userId: UserId): Promise<NoteDocument> {
     const found = await this.noteModel
-      .findOne({ _id: id.raw, owner: owner.raw })
+      .findOne({
+        _id: id.raw,
+        $or: [{ owner: userId.raw }, { members: userId.raw }],
+      })
       .exec();
     if (found == null) {
       throw new NotFoundException(
@@ -52,23 +55,29 @@ export class NoteRepositoryImpl implements NoteRepository {
   }
 
   public async findAll(
-    owner: UserId,
+    userId: UserId,
     status: NoteStatus,
   ): Promise<NoteDocument[]> {
     return this.noteModel
-      .find({ owner: owner.raw, status })
+      .find({
+        $or: [{ owner: userId.raw }, { members: userId.raw }],
+        status,
+      })
       .sort({ isPinned: -1, order: 1 })
       .exec();
   }
 
   public async update(
     id: NoteId,
-    owner: UserId,
+    userId: UserId,
     data: Record<string, unknown>,
   ): Promise<void> {
     const session = MongoSessionContext.getSession();
     await this.noteModel.findOneAndUpdate(
-      { _id: id.raw, owner: owner.raw },
+      {
+        _id: id.raw,
+        $or: [{ owner: userId.raw }, { members: userId.raw }],
+      },
       { $set: data },
       { session },
     );
@@ -99,13 +108,33 @@ export class NoteRepositoryImpl implements NoteRepository {
     return result.deletedCount;
   }
 
-  public async findMinOrder(owner: UserId): Promise<number> {
+  public async findMinOrder(userId: UserId): Promise<number> {
     const result = await this.noteModel
-      .findOne({ owner: owner.raw })
+      .findOne({
+        $or: [{ owner: userId.raw }, { members: userId.raw }],
+      })
       .sort({ order: 1 })
       .select("order")
       .lean()
       .exec();
     return result?.order ?? 0;
+  }
+
+  public async addMember(id: NoteId, memberUserId: UserId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.noteModel.findOneAndUpdate(
+      { _id: id.raw },
+      { $push: { members: memberUserId.raw } },
+      { session },
+    );
+  }
+
+  public async removeMember(id: NoteId, memberUserId: UserId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.noteModel.findOneAndUpdate(
+      { _id: id.raw },
+      { $pull: { members: memberUserId.raw } },
+      { session },
+    );
   }
 }

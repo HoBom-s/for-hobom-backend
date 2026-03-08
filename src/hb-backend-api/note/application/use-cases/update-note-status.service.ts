@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { ForbiddenException, Inject, Injectable } from "@nestjs/common";
 import { UpdateNoteStatusUseCase } from "../../domain/ports/in/update-note-status.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { NotePersistencePort } from "../../domain/ports/out/note-persistence.port";
@@ -26,6 +26,9 @@ export class UpdateNoteStatusService implements UpdateNoteStatusUseCase {
     status: NoteStatus,
   ): Promise<void> {
     const note = await this.noteQueryPort.findById(id, owner);
+    if (!note.isOwner(owner)) {
+      throw new ForbiddenException("노트 소유자만 상태를 변경할 수 있어요.");
+    }
     const trashedAt = status === NoteStatus.TRASHED ? new Date() : null;
     await this.notePersistencePort.updateStatus(
       note.getId,

@@ -13,8 +13,8 @@ export class GetNoteByIdService implements GetNoteByIdUseCase {
     private readonly noteQueryPort: NoteQueryPort,
   ) {}
 
-  public async invoke(id: NoteId, owner: UserId): Promise<NoteQueryResult> {
-    const note = await this.noteQueryPort.findById(id, owner);
+  public async invoke(id: NoteId, userId: UserId): Promise<NoteQueryResult> {
+    const note = await this.noteQueryPort.findById(id, userId);
     return NoteQueryResult.from(note);
   }
 }

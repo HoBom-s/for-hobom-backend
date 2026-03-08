@@ -4,7 +4,7 @@ import {
   Inject,
   Injectable,
 } from "@nestjs/common";
-import { DeleteNoteUseCase } from "../../domain/ports/in/delete-note.use-case";
+import { AddNoteMemberUseCase } from "../../domain/ports/in/add-note-member.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { NotePersistencePort } from "../../domain/ports/out/note-persistence.port";
 import { NoteQueryPort } from "../../domain/ports/out/note-query.port";
@@ -14,7 +14,7 @@ import { Transactional } from "../../../../infra/mongo/transaction/transaction.d
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
 @Injectable()
-export class DeleteNoteService implements DeleteNoteUseCase {
+export class AddNoteMemberService implements AddNoteMemberUseCase {
   constructor(
     @Inject(DIToken.NoteModule.NotePersistencePort)
     private readonly notePersistencePort: NotePersistencePort,
@@ -24,16 +24,25 @@ export class DeleteNoteService implements DeleteNoteUseCase {
   ) {}
 
   @Transactional()
-  public async invoke(id: NoteId, owner: UserId): Promise<void> {
-    const note = await this.noteQueryPort.findById(id, owner);
-    if (!note.isOwner(owner)) {
-      throw new ForbiddenException("노트 소유자만 영구 삭제할 수 있어요.");
+  public async invoke(
+    noteId: NoteId,
+    userId: UserId,
+    memberUserId: UserId,
+  ): Promise<void> {
+    const note = await this.noteQueryPort.findById(noteId, userId);
+
+    if (!note.isOwner(userId)) {
+      throw new ForbiddenException("노트 소유자만 멤버를 추가할 수 있어요.");
     }
-    if (!note.isTrashed()) {
-      throw new BadRequestException(
-        "휴지통에 있는 노트만 영구 삭제할 수 있어요.",
-      );
+
+    if (note.getOwner.equals(memberUserId)) {
+      throw new BadRequestException("소유자를 멤버로 추가할 수 없어요.");
     }
-    await this.notePersistencePort.deleteOne(note.getId, owner);
+
+    if (note.isMember(memberUserId)) {
+      throw new BadRequestException("이미 멤버로 추가된 사용자에요.");
+    }
+
+    await this.notePersistencePort.addMember(note.getId, memberUserId);
   }
 }

@@ -3,5 +3,5 @@ import { NoteStatus } from "../../enums/note-status.enum";
 import { NoteQueryResult } from "../out/note-query.result";
 
 export interface GetAllNotesUseCase {
-  invoke(owner: UserId, status: NoteStatus): Promise<NoteQueryResult[]>;
+  invoke(userId: UserId, status: NoteStatus): Promise<NoteQueryResult[]>;
 }

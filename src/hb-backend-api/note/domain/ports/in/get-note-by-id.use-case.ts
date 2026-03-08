@@ -3,5 +3,5 @@ import { UserId } from "../../../../user/domain/model/user-id.vo";
 import { NoteQueryResult } from "../out/note-query.result";
 
 export interface GetNoteByIdUseCase {
-  invoke(id: NoteId, owner: UserId): Promise<NoteQueryResult>;
+  invoke(id: NoteId, userId: UserId): Promise<NoteQueryResult>;
 }

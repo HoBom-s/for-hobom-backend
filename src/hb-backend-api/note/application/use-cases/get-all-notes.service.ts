@@ -14,10 +14,10 @@ export class GetAllNotesService implements GetAllNotesUseCase {
   ) {}
 
   public async invoke(
-    owner: UserId,
+    userId: UserId,
     status: NoteStatus,
   ): Promise<NoteQueryResult[]> {
-    const notes = await this.noteQueryPort.findAll(owner, status);
+    const notes = await this.noteQueryPort.findAll(userId, status);
     if (notes.length === 0) return [];
     return notes.map(NoteQueryResult.from);
   }

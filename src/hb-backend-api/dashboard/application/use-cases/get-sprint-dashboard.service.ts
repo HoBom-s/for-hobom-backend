@@ -45,9 +45,8 @@ export class GetSprintDashboardService implements GetSprintDashboardUseCase {
     }
 
     const doneStatusIds =
-      project.workflow?.statuses
-        ?.filter((s) => s.isDone)
-        .map((s) => s.id) ?? [];
+      project.workflow?.statuses?.filter((s) => s.isDone).map((s) => s.id) ??
+      [];
 
     const [summary] = await this.issueModel
       .aggregate<SprintIssueSummary>([
@@ -98,9 +97,7 @@ export class GetSprintDashboardService implements GetSprintDashboardUseCase {
         totalIssues: stats.totalIssues,
         completedIssues: stats.completedIssues,
         completionRate:
-          stats.totalIssues > 0
-            ? stats.completedIssues / stats.totalIssues
-            : 0,
+          stats.totalIssues > 0 ? stats.completedIssues / stats.totalIssues : 0,
         totalStoryPoints: stats.totalStoryPoints,
         completedStoryPoints: stats.completedStoryPoints,
       },

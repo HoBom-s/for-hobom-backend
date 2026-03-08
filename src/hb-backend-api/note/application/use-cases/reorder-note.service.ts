@@ -19,8 +19,12 @@ export class ReorderNoteService implements ReorderNoteUseCase {
   ) {}
 
   @Transactional()
-  public async invoke(id: NoteId, owner: UserId, order: number): Promise<void> {
-    const note = await this.noteQueryPort.findById(id, owner);
-    await this.notePersistencePort.updateOrder(note.getId, owner, order);
+  public async invoke(
+    id: NoteId,
+    userId: UserId,
+    order: number,
+  ): Promise<void> {
+    const note = await this.noteQueryPort.findById(id, userId);
+    await this.notePersistencePort.updateOrder(note.getId, userId, order);
   }
 }

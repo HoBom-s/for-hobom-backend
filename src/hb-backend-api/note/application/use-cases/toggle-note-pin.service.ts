@@ -19,11 +19,11 @@ export class ToggleNotePinService implements ToggleNotePinUseCase {
   ) {}
 
   @Transactional()
-  public async invoke(id: NoteId, owner: UserId): Promise<void> {
-    const note = await this.noteQueryPort.findById(id, owner);
+  public async invoke(id: NoteId, userId: UserId): Promise<void> {
+    const note = await this.noteQueryPort.findById(id, userId);
     await this.notePersistencePort.togglePin(
       note.getId,
-      owner,
+      userId,
       !note.getIsPinned,
     );
   }

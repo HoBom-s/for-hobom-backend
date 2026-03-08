@@ -29,6 +29,8 @@ import { ToggleNotePinUseCase } from "../../domain/ports/in/toggle-note-pin.use-
 import { ReorderNoteUseCase } from "../../domain/ports/in/reorder-note.use-case";
 import { DeleteNoteUseCase } from "../../domain/ports/in/delete-note.use-case";
 import { EmptyTrashUseCase } from "../../domain/ports/in/empty-trash.use-case";
+import { AddNoteMemberUseCase } from "../../domain/ports/in/add-note-member.use-case";
+import { RemoveNoteMemberUseCase } from "../../domain/ports/in/remove-note-member.use-case";
 import { CreateNoteDto } from "./create-note.dto";
 import { UpdateNoteDto } from "./update-note.dto";
 import { UpdateNoteStatusDto } from "./update-note-status.dto";
@@ -43,6 +45,8 @@ import { ChecklistItem } from "../../domain/model/checklist-item";
 import { NoteReminder } from "../../domain/model/note-reminder";
 import { LabelId } from "../../../label/domain/model/label-id.vo";
 import { NoteQueryResult } from "../../domain/ports/out/note-query.result";
+import { AddNoteMemberDto } from "./add-note-member.dto";
+import { UserId } from "../../../user/domain/model/user-id.vo";
 
 @ApiTags("Notes")
 @Controller(`${EndPointPrefixConstant}/notes`)
@@ -69,6 +73,10 @@ export class NoteController {
     private readonly deleteNoteUseCase: DeleteNoteUseCase,
     @Inject(DIToken.NoteModule.EmptyTrashUseCase)
     private readonly emptyTrashUseCase: EmptyTrashUseCase,
+    @Inject(DIToken.NoteModule.AddNoteMemberUseCase)
+    private readonly addNoteMemberUseCase: AddNoteMemberUseCase,
+    @Inject(DIToken.NoteModule.RemoveNoteMemberUseCase)
+    private readonly removeNoteMemberUseCase: RemoveNoteMemberUseCase,
   ) {}
 
   @ApiOperation({ summary: "노트 생성" })
@@ -200,6 +208,40 @@ export class NoteController {
       UserNickname.fromString(userInfo.nickname),
     );
     await this.reorderNoteUseCase.invoke(id, user.getId, body.order);
+  }
+
+  @ApiOperation({ summary: "노트 멤버 추가" })
+  @Post(":id/members")
+  public async addMember(
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+    @Param("id", ParseNoteIdPipe) id: NoteId,
+    @Body() body: AddNoteMemberDto,
+  ): Promise<void> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+    await this.addNoteMemberUseCase.invoke(
+      id,
+      user.getId,
+      UserId.fromString(body.userId),
+    );
+  }
+
+  @ApiOperation({ summary: "노트 멤버 제거" })
+  @Delete(":id/members/:userId")
+  public async removeMember(
+    @NicknameAndAccessToken() userInfo: TokenUserInformation,
+    @Param("id", ParseNoteIdPipe) id: NoteId,
+    @Param("userId") memberUserId: string,
+  ): Promise<void> {
+    const user = await this.getUserByNicknameUseCase.invoke(
+      UserNickname.fromString(userInfo.nickname),
+    );
+    await this.removeNoteMemberUseCase.invoke(
+      id,
+      user.getId,
+      UserId.fromString(memberUserId),
+    );
   }
 
   @ApiOperation({ summary: "휴지통 비우기 (휴지통 노트 전체 영구 삭제)" })

@@ -19,28 +19,29 @@ export class NoteQueryAdapter implements NoteQueryPort {
     private readonly noteRepository: NoteRepository,
   ) {}
 
-  public async findById(id: NoteId, owner: UserId): Promise<NoteEntitySchema> {
-    const doc = await this.noteRepository.findById(id, owner);
+  public async findById(id: NoteId, userId: UserId): Promise<NoteEntitySchema> {
+    const doc = await this.noteRepository.findById(id, userId);
     return this.toEntity(doc);
   }
 
   public async findAll(
-    owner: UserId,
+    userId: UserId,
     status: NoteStatus,
   ): Promise<NoteEntitySchema[]> {
-    const docs = await this.noteRepository.findAll(owner, status);
+    const docs = await this.noteRepository.findAll(userId, status);
     if (docs.length === 0) return [];
     return docs.map((doc) => this.toEntity(doc));
   }
 
-  public async findMinOrder(owner: UserId): Promise<number> {
-    return this.noteRepository.findMinOrder(owner);
+  public async findMinOrder(userId: UserId): Promise<number> {
+    return this.noteRepository.findMinOrder(userId);
   }
 
   private toEntity(doc: NoteDocument): NoteEntitySchema {
     return NoteEntitySchema.of(
       NoteId.fromString(String(doc._id)),
       UserId.fromString(String(doc.owner)),
+      (doc.members ?? []).map((m) => UserId.fromString(String(m))),
       doc.title,
       doc.content,
       doc.type,

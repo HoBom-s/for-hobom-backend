@@ -16,6 +16,9 @@ export class NoteEntity extends BaseEntity {
   @Prop({ type: Types.ObjectId, ref: "user", required: true, index: true })
   owner: Types.ObjectId;
 
+  @Prop({ type: [Types.ObjectId], ref: "user", default: [] })
+  members: Types.ObjectId[];
+
   @Prop({ type: String, default: null })
   title: string | null;
 
@@ -73,6 +76,7 @@ export class NoteEntitySchema {
   constructor(
     private readonly id: NoteId,
     private readonly owner: UserId,
+    private readonly members: UserId[],
     private readonly title: string | null,
     private readonly content: string | null,
     private readonly type: NoteType,
@@ -89,6 +93,7 @@ export class NoteEntitySchema {
   public static of(
     id: NoteId,
     owner: UserId,
+    members: UserId[],
     title: string | null,
     content: string | null,
     type: NoteType,
@@ -104,6 +109,7 @@ export class NoteEntitySchema {
     return new NoteEntitySchema(
       id,
       owner,
+      members,
       title,
       content,
       type,
@@ -122,11 +128,22 @@ export class NoteEntitySchema {
     return this.status === NoteStatus.TRASHED;
   }
 
+  public isOwner(userId: UserId): boolean {
+    return this.owner.equals(userId);
+  }
+
+  public isMember(userId: UserId): boolean {
+    return this.members.some((m) => m.equals(userId));
+  }
+
   get getId(): NoteId {
     return this.id;
   }
   get getOwner(): UserId {
     return this.owner;
+  }
+  get getMembers(): UserId[] {
+    return this.members;
   }
   get getTitle(): string | null {
     return this.title;

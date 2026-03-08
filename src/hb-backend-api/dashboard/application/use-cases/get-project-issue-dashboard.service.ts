@@ -39,9 +39,8 @@ export class GetProjectIssueDashboardService
     }
 
     const doneStatusIds =
-      project.workflow?.statuses
-        ?.filter((s) => s.isDone)
-        .map((s) => s.id) ?? [];
+      project.workflow?.statuses?.filter((s) => s.isDone).map((s) => s.id) ??
+      [];
 
     const [result] = await this.issueModel
       .aggregate<IssueFacetResult>([
@@ -49,9 +48,7 @@ export class GetProjectIssueDashboardService
         {
           $facet: {
             byStatus: [{ $group: { _id: "$status", count: { $sum: 1 } } }],
-            byPriority: [
-              { $group: { _id: "$priority", count: { $sum: 1 } } },
-            ],
+            byPriority: [{ $group: { _id: "$priority", count: { $sum: 1 } } }],
             byType: [{ $group: { _id: "$type", count: { $sum: 1 } } }],
             overview: [
               {
@@ -97,8 +94,7 @@ export class GetProjectIssueDashboardService
         total: overview.total,
         open: overview.total - overview.done,
         done: overview.done,
-        completionRate:
-          overview.total > 0 ? overview.done / overview.total : 0,
+        completionRate: overview.total > 0 ? overview.done / overview.total : 0,
         overdueCount: overview.overdueCount,
       },
       byStatus: result.byStatus.map((s) => ({

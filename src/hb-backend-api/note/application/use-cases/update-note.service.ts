@@ -20,7 +20,7 @@ export class UpdateNoteService implements UpdateNoteUseCase {
 
   @Transactional()
   public async invoke(id: NoteId, command: UpdateNoteCommand): Promise<void> {
-    const note = await this.noteQueryPort.findById(id, command.getOwner);
+    const note = await this.noteQueryPort.findById(id, command.getUserId);
     const data: Record<string, unknown> = {};
 
     if (command.getTitle !== undefined) data.title = command.getTitle;
@@ -37,7 +37,11 @@ export class UpdateNoteService implements UpdateNoteUseCase {
     }
 
     if (Object.keys(data).length > 0) {
-      await this.notePersistencePort.update(note.getId, command.getOwner, data);
+      await this.notePersistencePort.update(
+        note.getId,
+        command.getUserId,
+        data,
+      );
     }
   }
 }

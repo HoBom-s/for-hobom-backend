@@ -162,6 +162,10 @@ export class DIToken {
     public static ReorderNoteUseCase = this.register("ReorderNoteUseCase");
     public static DeleteNoteUseCase = this.register("DeleteNoteUseCase");
     public static EmptyTrashUseCase = this.register("EmptyTrashUseCase");
+    public static AddNoteMemberUseCase = this.register("AddNoteMemberUseCase");
+    public static RemoveNoteMemberUseCase = this.register(
+      "RemoveNoteMemberUseCase",
+    );
     public static ProcessNoteRemindUseCase = this.register(
       "ProcessNoteRemindUseCase",
     );

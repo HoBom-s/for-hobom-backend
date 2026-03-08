@@ -12,6 +12,7 @@ export class NoteQueryResult {
   constructor(
     private readonly id: NoteId,
     private readonly owner: UserId,
+    private readonly members: UserId[],
     private readonly title: string | null,
     private readonly content: string | null,
     private readonly type: NoteType,
@@ -29,6 +30,7 @@ export class NoteQueryResult {
     return new NoteQueryResult(
       entity.getId,
       entity.getOwner,
+      entity.getMembers,
       entity.getTitle,
       entity.getContent,
       entity.getType,
@@ -48,6 +50,9 @@ export class NoteQueryResult {
   }
   get getOwner(): UserId {
     return this.owner;
+  }
+  get getMembers(): UserId[] {
+    return this.members;
   }
   get getTitle(): string | null {
     return this.title;

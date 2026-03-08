@@ -7,7 +7,7 @@ export interface NotePersistencePort {
   save(schema: NoteCreateEntitySchema): Promise<void>;
   update(
     id: NoteId,
-    owner: UserId,
+    userId: UserId,
     data: Record<string, unknown>,
   ): Promise<void>;
   updateStatus(
@@ -16,9 +16,11 @@ export interface NotePersistencePort {
     status: NoteStatus,
     trashedAt: Date | null,
   ): Promise<void>;
-  togglePin(id: NoteId, owner: UserId, isPinned: boolean): Promise<void>;
-  updateOrder(id: NoteId, owner: UserId, order: number): Promise<void>;
+  togglePin(id: NoteId, userId: UserId, isPinned: boolean): Promise<void>;
+  updateOrder(id: NoteId, userId: UserId, order: number): Promise<void>;
   deleteOne(id: NoteId, owner: UserId): Promise<void>;
   deleteTrashedBefore(threshold: Date): Promise<number>;
   emptyTrash(owner: UserId): Promise<void>;
+  addMember(id: NoteId, memberUserId: UserId): Promise<void>;
+  removeMember(id: NoteId, memberUserId: UserId): Promise<void>;
 }

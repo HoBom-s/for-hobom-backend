@@ -22,6 +22,8 @@ import { EmptyTrashService } from "./application/use-cases/empty-trash.service";
 import { ProcessNoteRemindScheduler } from "./adapters/in/process-note-remind.scheduler";
 import { ProcessNoteDestroyScheduler } from "./adapters/in/process-note-destroy.scheduler";
 import { ProcessNoteDestroyService } from "./application/use-cases/process-note-destroy.service";
+import { AddNoteMemberService } from "./application/use-cases/add-note-member.service";
+import { RemoveNoteMemberService } from "./application/use-cases/remove-note-member.service";
 
 @Module({
   imports: [
@@ -85,6 +87,14 @@ import { ProcessNoteDestroyService } from "./application/use-cases/process-note-
     {
       provide: DIToken.NoteModule.EmptyTrashUseCase,
       useClass: EmptyTrashService,
+    },
+    {
+      provide: DIToken.NoteModule.AddNoteMemberUseCase,
+      useClass: AddNoteMemberService,
+    },
+    {
+      provide: DIToken.NoteModule.RemoveNoteMemberUseCase,
+      useClass: RemoveNoteMemberService,
     },
     {
       provide: DIToken.NoteModule.ProcessNoteRemindUseCase,
