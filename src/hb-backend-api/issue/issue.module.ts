@@ -136,6 +136,7 @@ import { UserModule } from "../user/user.module";
     },
   ],
   exports: [
+    MongooseModule,
     DIToken.IssueModule.IssueRepository,
     DIToken.IssueModule.IssueCommentRepository,
     DIToken.IssueModule.IssueHistoryRepository,

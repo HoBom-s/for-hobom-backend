@@ -98,6 +98,7 @@ import { ProjectController } from "./adapters/in/project.controller";
     },
   ],
   exports: [
+    MongooseModule,
     DIToken.ProjectModule.ProjectRepository,
     DIToken.ProjectModule.ProjectPersistencePort,
     DIToken.ProjectModule.ProjectQueryPort,
