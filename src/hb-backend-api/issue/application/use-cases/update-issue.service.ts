@@ -31,32 +31,46 @@ export class UpdateIssueService implements UpdateIssueUseCase {
     data: Record<string, unknown>,
   ): Promise<void> {
     const issue = await this.issueQueryPort.findById(id);
-    const doc = issue as unknown as Record<string, unknown>;
-
-    const changes: { field: string; from: string | null; to: string | null }[] =
-      [];
-
-    for (const key of Object.keys(data)) {
-      const oldStr = this.stringify(doc[key]);
-      const newStr = this.stringify(data[key]);
-      if ((oldStr ?? "") !== (newStr ?? "")) {
-        changes.push({ field: key, from: oldStr, to: newStr });
-      }
-    }
+    const changes = this.detectChanges(
+      issue as unknown as Record<string, unknown>,
+      data,
+    );
 
     await this.issuePersistencePort.update(id, data);
 
     if (changes.length > 0) {
-      await this.issueHistoryPersistencePort.save(
-        CreateIssueHistoryEntity.of(
-          id,
-          ProjectId.fromString(String(issue.project)),
-          actor,
-          IssueHistoryAction.UPDATED,
-          changes,
-        ),
-      );
+      await this.saveHistory(id, issue.project, actor, changes);
     }
+  }
+
+  private detectChanges(
+    doc: Record<string, unknown>,
+    data: Record<string, unknown>,
+  ): { field: string; from: string | null; to: string | null }[] {
+    return Object.keys(data)
+      .map((key) => ({
+        field: key,
+        from: this.stringify(doc[key]),
+        to: this.stringify(data[key]),
+      }))
+      .filter((c) => (c.from ?? "") !== (c.to ?? ""));
+  }
+
+  private async saveHistory(
+    id: IssueId,
+    project: unknown,
+    actor: UserId,
+    changes: { field: string; from: string | null; to: string | null }[],
+  ): Promise<void> {
+    await this.issueHistoryPersistencePort.save(
+      CreateIssueHistoryEntity.of(
+        id,
+        ProjectId.fromString(String(project)),
+        actor,
+        IssueHistoryAction.UPDATED,
+        changes,
+      ),
+    );
   }
 
   private stringify(v: unknown): string | null {
