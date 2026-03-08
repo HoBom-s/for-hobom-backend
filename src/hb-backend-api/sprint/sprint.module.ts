@@ -67,6 +67,7 @@ import { UserModule } from "../user/user.module";
     },
   ],
   exports: [
+    MongooseModule,
     DIToken.SprintModule.SprintRepository,
     DIToken.SprintModule.SprintPersistencePort,
     DIToken.SprintModule.SprintQueryPort,
