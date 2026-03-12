@@ -17,7 +17,7 @@ import { TraceInterceptor } from "./shared/adapters/in/rest/interceptors/trace.i
 import { HttpLogInterceptor } from "./shared/adapters/in/rest/interceptors/log.interceptor";
 import { UserModule } from "./hb-backend-api/user/user.module";
 import { FutureMessageModule } from "./hb-backend-api/future-message/future-message.module";
-import { DiscordWebhookService } from "./shared/discord/discord-webhook.service";
+import { DiscordModule } from "./shared/discord/discord.module";
 import { LabelModule } from "./hb-backend-api/label/label.module";
 import { NoteModule } from "./hb-backend-api/note/note.module";
 import { NotificationModule } from "./hb-backend-api/notification/notification.module";
@@ -81,10 +81,10 @@ import { PrivacyLawModule } from "./hb-backend-api/privacy-law/privacy-law.modul
     BoardModule,
     ProjectLabelModule,
     PrivacyLawModule,
+    DiscordModule,
   ],
   providers: [
     TraceContext,
-    DiscordWebhookService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TraceInterceptor,
