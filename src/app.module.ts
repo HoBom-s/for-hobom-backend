@@ -28,6 +28,7 @@ import { IssueModule } from "./hb-backend-api/issue/issue.module";
 import { SprintModule } from "./hb-backend-api/sprint/sprint.module";
 import { BoardModule } from "./hb-backend-api/board/board.module";
 import { ProjectLabelModule } from "./hb-backend-api/project-label/project-label.module";
+import { PrivacyLawModule } from "./hb-backend-api/privacy-law/privacy-law.module";
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { ProjectLabelModule } from "./hb-backend-api/project-label/project-label
     SprintModule,
     BoardModule,
     ProjectLabelModule,
+    PrivacyLawModule,
   ],
   providers: [
     TraceContext,

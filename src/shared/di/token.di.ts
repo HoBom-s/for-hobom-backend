@@ -434,4 +434,53 @@ export class DIToken {
       "DeleteProjectLabelUseCase",
     );
   };
+
+  public static readonly PrivacyLawModule = class extends DITokenRegister {
+    public static LawVersionRepository = this.register(
+      "LawVersionRepository",
+    );
+    public static LawDiffRepository = this.register("LawDiffRepository");
+    public static StudyMaterialRepository = this.register(
+      "StudyMaterialRepository",
+    );
+
+    public static LawApiPort = this.register("LawApiPort");
+    public static LlmPort = this.register("LlmPort");
+
+    public static LawVersionPersistencePort = this.register(
+      "LawVersionPersistencePort",
+    );
+    public static LawVersionQueryPort = this.register("LawVersionQueryPort");
+    public static LawDiffPersistencePort = this.register(
+      "LawDiffPersistencePort",
+    );
+    public static LawDiffQueryPort = this.register("LawDiffQueryPort");
+    public static StudyMaterialPersistencePort = this.register(
+      "StudyMaterialPersistencePort",
+    );
+    public static StudyMaterialQueryPort = this.register(
+      "StudyMaterialQueryPort",
+    );
+
+    public static FetchLawVersionUseCase = this.register(
+      "FetchLawVersionUseCase",
+    );
+    public static GetLawVersionsUseCase = this.register(
+      "GetLawVersionsUseCase",
+    );
+    public static GetLawVersionByIdUseCase = this.register(
+      "GetLawVersionByIdUseCase",
+    );
+    public static GetLawDiffsUseCase = this.register("GetLawDiffsUseCase");
+    public static GetLawDiffByIdUseCase = this.register(
+      "GetLawDiffByIdUseCase",
+    );
+    public static GetStudyMaterialsUseCase = this.register(
+      "GetStudyMaterialsUseCase",
+    );
+    public static GetStudyMaterialByIdUseCase = this.register(
+      "GetStudyMaterialByIdUseCase",
+    );
+    public static AskQuestionUseCase = this.register("AskQuestionUseCase");
+  };
 }
