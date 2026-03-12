@@ -7,6 +7,8 @@ import { LawDiffEntity } from "./domain/model/law-diff.entity";
 import { LawDiffSchema } from "./domain/model/law-diff.schema";
 import { StudyMaterialEntity } from "./domain/model/study-material.entity";
 import { StudyMaterialSchema } from "./domain/model/study-material.schema";
+import { QuestionHistoryEntity } from "./domain/model/question-history.entity";
+import { QuestionHistorySchema } from "./domain/model/question-history.schema";
 import { OutboxModule } from "../outbox/outbox.module";
 import { PrivacyLawController } from "./adapters/in/privacy-law.controller";
 import { SaveStudyMaterialGrpcController } from "./adapters/in/save-study-material.grpc-controller";
@@ -30,6 +32,10 @@ import { GetLawDiffByIdService } from "./application/use-cases/get-law-diff-by-i
 import { GetStudyMaterialsService } from "./application/use-cases/get-study-materials.service";
 import { GetStudyMaterialByIdService } from "./application/use-cases/get-study-material-by-id.service";
 import { AskQuestionService } from "./application/use-cases/ask-question.service";
+import { GetQuestionHistoriesService } from "./application/use-cases/get-question-histories.service";
+import { QuestionHistoryRepositoryImpl } from "./infra/repositories/question-history.repository.impl";
+import { QuestionHistoryPersistenceAdapter } from "./adapters/out/question-history-persistence.adapter";
+import { QuestionHistoryQueryAdapter } from "./adapters/out/question-history-query.adapter";
 
 @Module({
   imports: [
@@ -45,6 +51,10 @@ import { AskQuestionService } from "./application/use-cases/ask-question.service
       {
         name: StudyMaterialEntity.name,
         schema: StudyMaterialSchema,
+      },
+      {
+        name: QuestionHistoryEntity.name,
+        schema: QuestionHistorySchema,
       },
     ]),
     OutboxModule,
@@ -127,6 +137,22 @@ import { AskQuestionService } from "./application/use-cases/ask-question.service
     {
       provide: DIToken.PrivacyLawModule.AskQuestionUseCase,
       useClass: AskQuestionService,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.QuestionHistoryRepository,
+      useClass: QuestionHistoryRepositoryImpl,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.QuestionHistoryPersistencePort,
+      useClass: QuestionHistoryPersistenceAdapter,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.QuestionHistoryQueryPort,
+      useClass: QuestionHistoryQueryAdapter,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.GetQuestionHistoriesUseCase,
+      useClass: GetQuestionHistoriesService,
     },
   ],
   exports: [MongooseModule],

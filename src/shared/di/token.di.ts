@@ -485,5 +485,18 @@ export class DIToken {
       "GetStudyMaterialByIdUseCase",
     );
     public static AskQuestionUseCase = this.register("AskQuestionUseCase");
+
+    public static QuestionHistoryRepository = this.register(
+      "QuestionHistoryRepository",
+    );
+    public static QuestionHistoryPersistencePort = this.register(
+      "QuestionHistoryPersistencePort",
+    );
+    public static QuestionHistoryQueryPort = this.register(
+      "QuestionHistoryQueryPort",
+    );
+    public static GetQuestionHistoriesUseCase = this.register(
+      "GetQuestionHistoriesUseCase",
+    );
   };
 }

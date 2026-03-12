@@ -38,7 +38,7 @@ export class FetchLawVersionService implements FetchLawVersionUseCase {
 
   @Transactional()
   public async invoke(): Promise<void> {
-    const lawData = await this.lawApiPort.fetchLaw("개인정보 보호법");
+    const lawData = await this.lawApiPort.fetchLaw();
     const latestVersion = await this.lawVersionQueryPort.findLatest();
 
     if (

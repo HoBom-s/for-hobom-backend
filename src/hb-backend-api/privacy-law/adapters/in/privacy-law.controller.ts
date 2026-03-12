@@ -16,6 +16,7 @@ import { GetLawDiffByIdUseCase } from "../../domain/ports/in/get-law-diff-by-id.
 import { GetStudyMaterialsUseCase } from "../../domain/ports/in/get-study-materials.use-case";
 import { GetStudyMaterialByIdUseCase } from "../../domain/ports/in/get-study-material-by-id.use-case";
 import { AskQuestionUseCase } from "../../domain/ports/in/ask-question.use-case";
+import { GetQuestionHistoriesUseCase } from "../../domain/ports/in/get-question-histories.use-case";
 import { FetchLawVersionUseCase } from "../../domain/ports/in/fetch-law-version.use-case";
 import { LawVersionId } from "../../domain/model/law-version-id.vo";
 import { LawDiffId } from "../../domain/model/law-diff-id.vo";
@@ -28,6 +29,7 @@ import { GetLawDiffDto } from "./dto/get-law-diff.dto";
 import { GetStudyMaterialDto } from "./dto/get-study-material.dto";
 import { AskQuestionDto } from "./dto/ask-question.dto";
 import { AskQuestionResponseDto } from "./dto/ask-question-response.dto";
+import { GetQuestionHistoryDto } from "./dto/get-question-history.dto";
 
 @ApiTags("Privacy Law")
 @Controller(`${EndPointPrefixConstant}/privacy-law`)
@@ -47,6 +49,8 @@ export class PrivacyLawController {
     private readonly getStudyMaterialByIdUseCase: GetStudyMaterialByIdUseCase,
     @Inject(DIToken.PrivacyLawModule.AskQuestionUseCase)
     private readonly askQuestionUseCase: AskQuestionUseCase,
+    @Inject(DIToken.PrivacyLawModule.GetQuestionHistoriesUseCase)
+    private readonly getQuestionHistoriesUseCase: GetQuestionHistoriesUseCase,
     @Inject(DIToken.PrivacyLawModule.FetchLawVersionUseCase)
     private readonly fetchLawVersionUseCase: FetchLawVersionUseCase,
   ) {}
@@ -103,6 +107,14 @@ export class PrivacyLawController {
   ): Promise<GetStudyMaterialDto> {
     const material = await this.getStudyMaterialByIdUseCase.invoke(id);
     return GetStudyMaterialDto.from(material);
+  }
+
+  @ApiOperation({ summary: "질문 이력 목록 조회" })
+  @ApiResponse({ type: [GetQuestionHistoryDto] })
+  @Get("questions")
+  public async getQuestionHistories(): Promise<GetQuestionHistoryDto[]> {
+    const histories = await this.getQuestionHistoriesUseCase.invoke();
+    return histories.map(GetQuestionHistoryDto.from);
   }
 
   @ApiOperation({ summary: "개인정보보호법 질문" })

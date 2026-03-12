@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { LawApiPort } from "../../domain/ports/out/law-api.port";
+import * as puppeteer from "puppeteer";
 
 interface Article {
   articleNo: string;
@@ -15,116 +15,162 @@ interface Article {
 
 @Injectable()
 export class LawApiAdapter implements LawApiPort {
-  private static readonly API_URL =
-    "https://www.law.go.kr/DRF/lawService.do";
+  private static readonly LAW_URL =
+    "https://www.law.go.kr/법령/개인정보보호법";
 
-  constructor(private readonly configService: ConfigService) {}
-
-  public async fetchLaw(lawName: string): Promise<{
+  public async fetchLaw(): Promise<{
     rawXml: string;
     lawId: string;
     proclamationDate: string;
     enforcementDate: string;
     articles: Article[];
   }> {
-    const oc = this.configService.getOrThrow<string>("HOBOM_LAW_API_OC");
-    const url = new URL(LawApiAdapter.API_URL);
-    url.searchParams.set("OC", oc);
-    url.searchParams.set("target", "law");
-    url.searchParams.set("type", "XML");
-    url.searchParams.set("query", lawName);
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
 
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error(
-        `법령 API 호출에 실패했어요. status=${response.status}`,
+    try {
+      const page = await browser.newPage();
+      await page.setUserAgent(
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
       );
-    }
 
-    const rawXml = await response.text();
-    return this.parseXml(rawXml);
-  }
-
-  private parseXml(xml: string): {
-    rawXml: string;
-    lawId: string;
-    proclamationDate: string;
-    enforcementDate: string;
-    articles: Article[];
-  } {
-    const lawId = this.extractTag(xml, "법령ID");
-    const proclamationDate = this.extractTag(xml, "공포일자");
-    const enforcementDate = this.extractTag(xml, "시행일자");
-    const articles = this.parseArticles(xml);
-
-    return { rawXml: xml, lawId, proclamationDate, enforcementDate, articles };
-  }
-
-  private extractTag(xml: string, tagName: string): string {
-    const regex = new RegExp(`<${tagName}>([^<]*)</${tagName}>`);
-    const match = xml.match(regex);
-    return match?.[1] ?? "";
-  }
-
-  private parseArticles(xml: string): Article[] {
-    const articles: Article[] = [];
-    const articleRegex = /<조문단위>([\s\S]*?)<\/조문단위>/g;
-    let match: RegExpExecArray | null;
-    while ((match = articleRegex.exec(xml)) != null) {
-      const block = match[1];
-      const articleNo = this.extractTag(block, "조문번호");
-      const title = this.extractTag(block, "조문제목");
-      const content = this.extractTag(block, "조문내용");
-      const paragraphs = this.parseParagraphs(block);
-
-      articles.push({
-        articleNo: articleNo.trim(),
-        title: title.trim(),
-        content: content.trim(),
-        paragraphs,
+      // Step 1: Navigate to wrapper page to get the iframe URL (resolves lsiSeq)
+      await page.goto(LawApiAdapter.LAW_URL, {
+        waitUntil: "networkidle2",
+        timeout: 60000,
       });
-    }
-    return articles;
-  }
 
-  private parseParagraphs(
-    block: string,
-  ): { no: string; content: string; subItems: { no: string; content: string }[] }[] {
-    const paragraphs: {
-      no: string;
-      content: string;
-      subItems: { no: string; content: string }[];
-    }[] = [];
-    const paraRegex = /<항>([\s\S]*?)<\/항>/g;
-    let match: RegExpExecArray | null;
-    while ((match = paraRegex.exec(block)) != null) {
-      const paraBlock = match[1];
-      const no = this.extractTag(paraBlock, "항번호");
-      const content = this.extractTag(paraBlock, "항내용");
-      const subItems = this.parseSubItems(paraBlock);
-
-      paragraphs.push({
-        no: no.trim(),
-        content: content.trim(),
-        subItems,
+      const iframeSrc = await page.evaluate(() => {
+        const iframe = document.querySelector("iframe");
+        return iframe ? iframe.src : null;
       });
-    }
-    return paragraphs;
-  }
 
-  private parseSubItems(
-    paraBlock: string,
-  ): { no: string; content: string }[] {
-    const subItems: { no: string; content: string }[] = [];
-    const subItemRegex = /<호>([\s\S]*?)<\/호>/g;
-    let match: RegExpExecArray | null;
-    while ((match = subItemRegex.exec(paraBlock)) != null) {
-      const subBlock = match[1];
-      const no = this.extractTag(subBlock, "호번호");
-      const content = this.extractTag(subBlock, "호내용");
+      if (!iframeSrc) {
+        throw new Error("법령 페이지에서 iframe을 찾을 수 없어요.");
+      }
 
-      subItems.push({ no: no.trim(), content: content.trim() });
+      // Step 2: Navigate to the actual content page
+      await page.goto(iframeSrc, {
+        waitUntil: "networkidle2",
+        timeout: 60000,
+      });
+      await new Promise((r) => setTimeout(r, 5000));
+
+      // Step 3: Extract metadata and articles
+      const result = await page.evaluate(() => {
+        const getValue = (id: string) => {
+          const el = document.getElementById(id);
+          return el ? (el as HTMLInputElement).value || "" : "";
+        };
+
+        const lawId = getValue("lsId");
+        const proclamationDate = getValue("ancYd");
+        const enforcementDate = getValue("efYd");
+        const rawHtml = document.body.innerHTML;
+
+        // Parse articles from pgroup elements
+        const conScroll = document.getElementById("conScroll");
+        if (!conScroll) return { rawHtml, lawId, proclamationDate, enforcementDate, articles: [] };
+
+        const pgroups = conScroll.querySelectorAll(".pgroup");
+        const articles: {
+          articleNo: string;
+          title: string;
+          content: string;
+          paragraphs: {
+            no: string;
+            content: string;
+            subItems: { no: string; content: string }[];
+          }[];
+        }[] = [];
+
+        let currentArticle: typeof articles[0] | null = null;
+        let currentParagraphs: typeof articles[0]["paragraphs"] = [];
+        let currentSubItems: { no: string; content: string }[] = [];
+        let paragraphNo = 0;
+
+        for (const pg of pgroups) {
+          const lawcon = pg.querySelector(".lawcon");
+          if (!lawcon) continue;
+
+          const articleEl = lawcon.querySelector("p.pty1_p4");
+          if (articleEl) {
+            // Save previous article
+            if (currentArticle) {
+              currentArticle.paragraphs = currentParagraphs;
+              articles.push(currentArticle);
+            }
+
+            const label = articleEl.querySelector("span.bl label");
+            const titleText = label ? label.textContent?.trim() || "" : "";
+
+            // Extract article number from title (e.g., "제1조(목적)" -> "제1조")
+            const noMatch = titleText.match(/제[\d조의]+/);
+            const articleNo = noMatch ? noMatch[0] : titleText;
+
+            // Get full text content (excluding UI elements)
+            const cloned = articleEl.cloneNode(true) as HTMLElement;
+            cloned.querySelectorAll("input, .lawico01, ul").forEach((e) => e.remove());
+            const fullText = cloned.textContent?.trim() || "";
+
+            currentArticle = {
+              articleNo,
+              title: titleText,
+              content: fullText,
+              paragraphs: [],
+            };
+            currentParagraphs = [];
+            currentSubItems = [];
+            paragraphNo = 0;
+          }
+
+          if (!currentArticle) continue;
+
+          // Parse paragraphs (항) — pty3 class
+          const paragraphEls = lawcon.querySelectorAll("p.pty3, p.pty3_dep1, p.pty3_dep2");
+          for (const pEl of paragraphEls) {
+            paragraphNo++;
+            const text = pEl.textContent?.trim() || "";
+            // Extract paragraph number (e.g., "① ..." -> "1")
+            const pNoMatch = text.match(/^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]/);
+            const pNo = pNoMatch
+              ? String("①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳".indexOf(pNoMatch[0]) + 1)
+              : String(paragraphNo);
+            currentParagraphs.push({ no: pNo, content: text, subItems: [] });
+          }
+
+          // Parse sub-items (호) — pty1_de2h class
+          const subItemEls = lawcon.querySelectorAll("p.pty1_de2h");
+          for (const sEl of subItemEls) {
+            const text = sEl.textContent?.trim() || "";
+            const noMatch = text.match(/^([\d의]+)\./);
+            const no = noMatch ? noMatch[1] : "";
+            if (currentParagraphs.length > 0) {
+              currentParagraphs[currentParagraphs.length - 1].subItems.push({ no, content: text });
+            }
+          }
+        }
+
+        // Push last article
+        if (currentArticle) {
+          currentArticle.paragraphs = currentParagraphs;
+          articles.push(currentArticle);
+        }
+
+        return { rawHtml, lawId, proclamationDate, enforcementDate, articles };
+      });
+
+      return {
+        rawXml: result.rawHtml,
+        lawId: result.lawId,
+        proclamationDate: result.proclamationDate,
+        enforcementDate: result.enforcementDate,
+        articles: result.articles,
+      };
+    } finally {
+      await browser.close();
     }
-    return subItems;
   }
 }

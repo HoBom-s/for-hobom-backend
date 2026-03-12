@@ -1,5 +1,5 @@
 export interface LawApiPort {
-  fetchLaw(lawName: string): Promise<{
+  fetchLaw(): Promise<{
     rawXml: string;
     lawId: string;
     proclamationDate: string;
