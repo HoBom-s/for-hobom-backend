@@ -6,7 +6,7 @@ import {
   Param,
   Post,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { GetLawVersionsUseCase } from "../../domain/ports/in/get-law-versions.use-case";
@@ -27,6 +27,7 @@ import { ParseLawVersionIdPipe } from "./dto/law-version-id.pipe";
 import { ParseLawDiffIdPipe } from "./dto/law-diff-id.pipe";
 import { ParseStudyMaterialIdPipe } from "./dto/study-material-id.pipe";
 import { AskQuestionDto } from "./dto/ask-question.dto";
+import { AskQuestionResponseDto } from "./dto/ask-question-response.dto";
 
 @ApiTags("Privacy Law")
 @Controller(`${EndPointPrefixConstant}/privacy-law`)
@@ -51,12 +52,14 @@ export class PrivacyLawController {
   ) {}
 
   @ApiOperation({ summary: "법률 버전 목록 조회" })
+  @ApiResponse({ type: [LawVersionEntitySchema] })
   @Get("versions")
   public async getVersions(): Promise<LawVersionEntitySchema[]> {
     return this.getLawVersionsUseCase.invoke();
   }
 
   @ApiOperation({ summary: "법률 버전 단건 조회" })
+  @ApiResponse({ type: LawVersionEntitySchema })
   @Get("versions/:id")
   public async getVersionById(
     @Param("id", ParseLawVersionIdPipe) id: LawVersionId,
@@ -65,12 +68,14 @@ export class PrivacyLawController {
   }
 
   @ApiOperation({ summary: "법률 변경 이력 목록 조회" })
+  @ApiResponse({ type: [LawDiffEntitySchema] })
   @Get("diffs")
   public async getDiffs(): Promise<LawDiffEntitySchema[]> {
     return this.getLawDiffsUseCase.invoke();
   }
 
   @ApiOperation({ summary: "법률 변경 이력 단건 조회" })
+  @ApiResponse({ type: LawDiffEntitySchema })
   @Get("diffs/:id")
   public async getDiffById(
     @Param("id", ParseLawDiffIdPipe) id: LawDiffId,
@@ -79,12 +84,14 @@ export class PrivacyLawController {
   }
 
   @ApiOperation({ summary: "학습 자료 목록 조회" })
+  @ApiResponse({ type: [StudyMaterialEntitySchema] })
   @Get("study-materials")
   public async getStudyMaterials(): Promise<StudyMaterialEntitySchema[]> {
     return this.getStudyMaterialsUseCase.invoke();
   }
 
   @ApiOperation({ summary: "학습 자료 단건 조회" })
+  @ApiResponse({ type: StudyMaterialEntitySchema })
   @Get("study-materials/:id")
   public async getStudyMaterialById(
     @Param("id", ParseStudyMaterialIdPipe) id: StudyMaterialId,
@@ -93,6 +100,7 @@ export class PrivacyLawController {
   }
 
   @ApiOperation({ summary: "개인정보보호법 질문" })
+  @ApiResponse({ type: AskQuestionResponseDto })
   @Post("ask")
   public async askQuestion(
     @Body() body: AskQuestionDto,
