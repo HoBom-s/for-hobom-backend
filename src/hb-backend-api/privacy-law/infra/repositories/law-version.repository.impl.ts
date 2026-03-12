@@ -69,9 +69,11 @@ export class LawVersionRepositoryImpl implements LawVersionRepository {
   }
 
   public async findLatest(): Promise<LawVersionDocument | null> {
+    const session = MongoSessionContext.getSession();
     return this.model
       .findOne()
-      .sort({ proclamationDate: -1 })
+      .sort({ createdAt: -1 })
+      .session(session ?? null)
       .exec();
   }
 }

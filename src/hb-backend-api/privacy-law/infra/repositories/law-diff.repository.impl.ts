@@ -65,8 +65,10 @@ export class LawDiffRepositoryImpl implements LawDiffRepository {
   public async findByVersionId(
     versionId: LawVersionId,
   ): Promise<LawDiffDocument[]> {
+    const session = MongoSessionContext.getSession();
     return this.model
-      .find({ toVersionId: versionId.raw })
+      .find({ toVersionId: versionId.toString() })
+      .session(session ?? null)
       .exec();
   }
 }
