@@ -41,9 +41,7 @@ export class LlmRestAdapter implements LlmPort {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `LLM REST 호출에 실패했어요. status=${response.status}`,
-      );
+      throw new Error(`LLM REST 호출에 실패했어요. status=${response.status}`);
     }
 
     return response.json();

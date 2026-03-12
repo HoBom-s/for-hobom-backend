@@ -88,9 +88,7 @@ export class FetchLawVersionService implements FetchLawVersionUseCase {
       })),
     });
 
-    const diffs = await this.lawDiffQueryPort.findByVersionId(
-      newVersion.getId,
-    );
+    const diffs = await this.lawDiffQueryPort.findByVersionId(newVersion.getId);
     if (diffs.length > 0) {
       await this.outboxPersistencePort.save(
         CreateOutboxEntity.of(
@@ -171,12 +169,8 @@ export class FetchLawVersionService implements FetchLawVersionUseCase {
       after: string | null;
     }[] = [];
 
-    const oldMap = new Map(
-      oldArticles.map((a) => [a.getArticleNo, a]),
-    );
-    const newMap = new Map(
-      newArticles.map((a) => [a.articleNo, a]),
-    );
+    const oldMap = new Map(oldArticles.map((a) => [a.getArticleNo, a]));
+    const newMap = new Map(newArticles.map((a) => [a.articleNo, a]));
 
     for (const [articleNo, oldArticle] of oldMap) {
       const newArticle = newMap.get(articleNo);

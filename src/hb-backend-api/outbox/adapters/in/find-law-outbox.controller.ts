@@ -19,9 +19,10 @@ export class FindLawOutboxController {
     "FindHoBomLawOutboxController",
     "FindOutboxByEventTypeAndStatusUseCase",
   )
-  public async findBy(
-    request: { eventType: string; status: string },
-  ): Promise<{ items: FindLawOutboxResultDto[] }> {
+  public async findBy(request: {
+    eventType: string;
+    status: string;
+  }): Promise<{ items: FindLawOutboxResultDto[] }> {
     const outbox = await this.findLawOutboxByEventTypeAndStatusUseCase.invoke(
       request.eventType as EventType,
       request.status as OutboxStatus,

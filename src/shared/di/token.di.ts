@@ -439,9 +439,7 @@ export class DIToken {
   };
 
   public static readonly PrivacyLawModule = class extends DITokenRegister {
-    public static LawVersionRepository = this.register(
-      "LawVersionRepository",
-    );
+    public static LawVersionRepository = this.register("LawVersionRepository");
     public static LawDiffRepository = this.register("LawDiffRepository");
     public static StudyMaterialRepository = this.register(
       "StudyMaterialRepository",

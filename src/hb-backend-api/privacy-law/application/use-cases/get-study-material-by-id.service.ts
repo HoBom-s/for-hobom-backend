@@ -6,7 +6,9 @@ import { StudyMaterialId } from "../../domain/model/study-material-id.vo";
 import { StudyMaterialEntitySchema } from "../../domain/model/study-material.entity";
 
 @Injectable()
-export class GetStudyMaterialByIdService implements GetStudyMaterialByIdUseCase {
+export class GetStudyMaterialByIdService
+  implements GetStudyMaterialByIdUseCase
+{
   constructor(
     @Inject(DIToken.PrivacyLawModule.StudyMaterialQueryPort)
     private readonly studyMaterialQueryPort: StudyMaterialQueryPort,

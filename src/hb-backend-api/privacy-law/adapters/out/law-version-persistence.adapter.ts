@@ -4,9 +4,7 @@ import { DIToken } from "../../../../shared/di/token.di";
 import { LawVersionRepository } from "../../domain/repositories/law-version.repository";
 
 @Injectable()
-export class LawVersionPersistenceAdapter
-  implements LawVersionPersistencePort
-{
+export class LawVersionPersistenceAdapter implements LawVersionPersistencePort {
   constructor(
     @Inject(DIToken.PrivacyLawModule.LawVersionRepository)
     private readonly lawVersionRepository: LawVersionRepository,

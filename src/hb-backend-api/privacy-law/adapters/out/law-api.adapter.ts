@@ -15,8 +15,7 @@ interface Article {
 
 @Injectable()
 export class LawApiAdapter implements LawApiPort {
-  private static readonly LAW_URL =
-    "https://www.law.go.kr/법령/개인정보보호법";
+  private static readonly LAW_URL = "https://www.law.go.kr/법령/개인정보보호법";
 
   public async fetchLaw(): Promise<{
     rawXml: string;
@@ -75,7 +74,14 @@ export class LawApiAdapter implements LawApiPort {
 
         // Parse articles from pgroup elements
         const conScroll = document.getElementById("conScroll");
-        if (!conScroll) return { rawHtml, lawId, proclamationDate, enforcementDate, articles: [] };
+        if (!conScroll)
+          return {
+            rawHtml,
+            lawId,
+            proclamationDate,
+            enforcementDate,
+            articles: [],
+          };
 
         const pgroups = conScroll.querySelectorAll(".pgroup");
         const articles: {
@@ -89,8 +95,8 @@ export class LawApiAdapter implements LawApiPort {
           }[];
         }[] = [];
 
-        let currentArticle: typeof articles[0] | null = null;
-        let currentParagraphs: typeof articles[0]["paragraphs"] = [];
+        let currentArticle: (typeof articles)[0] | null = null;
+        let currentParagraphs: (typeof articles)[0]["paragraphs"] = [];
         let currentSubItems: { no: string; content: string }[] = [];
         let paragraphNo = 0;
 
@@ -115,7 +121,9 @@ export class LawApiAdapter implements LawApiPort {
 
             // Get full text content (excluding UI elements)
             const cloned = articleEl.cloneNode(true) as HTMLElement;
-            cloned.querySelectorAll("input, .lawico01, ul").forEach((e) => e.remove());
+            cloned
+              .querySelectorAll("input, .lawico01, ul")
+              .forEach((e) => e.remove());
             const fullText = cloned.textContent?.trim() || "";
 
             currentArticle = {
@@ -132,7 +140,9 @@ export class LawApiAdapter implements LawApiPort {
           if (!currentArticle) continue;
 
           // Parse paragraphs (항) — pty3 class
-          const paragraphEls = lawcon.querySelectorAll("p.pty3, p.pty3_dep1, p.pty3_dep2");
+          const paragraphEls = lawcon.querySelectorAll(
+            "p.pty3, p.pty3_dep1, p.pty3_dep2",
+          );
           for (const pEl of paragraphEls) {
             paragraphNo++;
             const text = pEl.textContent?.trim() || "";
@@ -151,7 +161,10 @@ export class LawApiAdapter implements LawApiPort {
             const noMatch = text.match(/^([\d의]+)\./);
             const no = noMatch ? noMatch[1] : "";
             if (currentParagraphs.length > 0) {
-              currentParagraphs[currentParagraphs.length - 1].subItems.push({ no, content: text });
+              currentParagraphs[currentParagraphs.length - 1].subItems.push({
+                no,
+                content: text,
+              });
             }
           }
         }

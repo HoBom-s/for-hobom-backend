@@ -42,16 +42,11 @@ export class StudyMaterialRepositoryImpl implements StudyMaterialRepository {
   }
 
   public async findAll(): Promise<StudyMaterialDocument[]> {
-    return this.model
-      .find()
-      .sort({ createdAt: -1 })
-      .exec();
+    return this.model.find().sort({ createdAt: -1 }).exec();
   }
 
   public async findById(id: StudyMaterialId): Promise<StudyMaterialDocument> {
-    const found = await this.model
-      .findOne({ _id: id.raw })
-      .exec();
+    const found = await this.model.findOne({ _id: id.raw }).exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 학습 자료를 찾을 수 없어요. ID: ${id.toString()}`,
@@ -63,8 +58,6 @@ export class StudyMaterialRepositoryImpl implements StudyMaterialRepository {
   public async findByDiffId(
     diffId: LawDiffId,
   ): Promise<StudyMaterialDocument | null> {
-    return this.model
-      .findOne({ diffId: diffId.raw })
-      .exec();
+    return this.model.findOne({ diffId: diffId.raw }).exec();
   }
 }

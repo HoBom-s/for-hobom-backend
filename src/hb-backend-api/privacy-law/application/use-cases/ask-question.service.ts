@@ -44,7 +44,11 @@ export class AskQuestionService implements AskQuestionUseCase {
           }))
         : [];
 
-    const result = await this.llmPort.ask({ question, articles, recentChanges });
+    const result = await this.llmPort.ask({
+      question,
+      articles,
+      recentChanges,
+    });
 
     await this.questionHistoryPersistencePort.save({
       question,

@@ -19,9 +19,7 @@ export class QuestionHistoryQueryAdapter implements QuestionHistoryQueryPort {
     return docs.map((doc) => this.toEntity(doc));
   }
 
-  private toEntity(
-    doc: QuestionHistoryDocument,
-  ): QuestionHistoryEntitySchema {
+  private toEntity(doc: QuestionHistoryDocument): QuestionHistoryEntitySchema {
     return QuestionHistoryEntitySchema.of(
       QuestionHistoryId.fromString(String(doc._id)),
       doc.question,
