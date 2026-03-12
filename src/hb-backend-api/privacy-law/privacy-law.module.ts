@@ -1,7 +1,5 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { ClientsModule, Transport } from "@nestjs/microservices";
-import { join } from "path";
 import { DIToken } from "../../shared/di/token.di";
 import { LawVersionEntity } from "./domain/model/law-version.entity";
 import { LawVersionSchema } from "./domain/model/law-version.schema";
@@ -9,13 +7,15 @@ import { LawDiffEntity } from "./domain/model/law-diff.entity";
 import { LawDiffSchema } from "./domain/model/law-diff.schema";
 import { StudyMaterialEntity } from "./domain/model/study-material.entity";
 import { StudyMaterialSchema } from "./domain/model/study-material.schema";
+import { OutboxModule } from "../outbox/outbox.module";
 import { PrivacyLawController } from "./adapters/in/privacy-law.controller";
+import { SaveStudyMaterialGrpcController } from "./adapters/in/save-study-material.grpc-controller";
 import { FetchLawVersionScheduler } from "./adapters/in/fetch-law-version.scheduler";
 import { LawVersionRepositoryImpl } from "./infra/repositories/law-version.repository.impl";
 import { LawDiffRepositoryImpl } from "./infra/repositories/law-diff.repository.impl";
 import { StudyMaterialRepositoryImpl } from "./infra/repositories/study-material.repository.impl";
 import { LawApiAdapter } from "./adapters/out/law-api.adapter";
-import { LlmGrpcAdapter } from "./adapters/out/llm-grpc.adapter";
+import { LlmRestAdapter } from "./adapters/out/llm-rest.adapter";
 import { LawVersionPersistenceAdapter } from "./adapters/out/law-version-persistence.adapter";
 import { LawVersionQueryAdapter } from "./adapters/out/law-version-query.adapter";
 import { LawDiffPersistenceAdapter } from "./adapters/out/law-diff-persistence.adapter";
@@ -47,28 +47,9 @@ import { AskQuestionService } from "./application/use-cases/ask-question.service
         schema: StudyMaterialSchema,
       },
     ]),
-    ClientsModule.register([
-      {
-        name: "LLM_PACKAGE",
-        transport: Transport.GRPC,
-        options: {
-          url: `${process.env.HOBOM_LLM_GRPC_HOST ?? "localhost"}:${process.env.HOBOM_LLM_GRPC_PORT ?? "50052"}`,
-          package: ["llm"],
-          protoPath: [
-            join(
-              __dirname,
-              "../../../../hobom-buf-proto/llm/v1/generate-study-material.proto",
-            ),
-            join(
-              __dirname,
-              "../../../../hobom-buf-proto/llm/v1/ask-question.proto",
-            ),
-          ],
-        },
-      },
-    ]),
+    OutboxModule,
   ],
-  controllers: [PrivacyLawController],
+  controllers: [PrivacyLawController, SaveStudyMaterialGrpcController],
   providers: [
     FetchLawVersionScheduler,
     {
@@ -89,7 +70,7 @@ import { AskQuestionService } from "./application/use-cases/ask-question.service
     },
     {
       provide: DIToken.PrivacyLawModule.LlmPort,
-      useClass: LlmGrpcAdapter,
+      useClass: LlmRestAdapter,
     },
     {
       provide: DIToken.PrivacyLawModule.LawVersionPersistencePort,

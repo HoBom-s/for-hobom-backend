@@ -2,26 +2,26 @@ import { Inject, Injectable } from "@nestjs/common";
 import { FetchLawVersionUseCase } from "../../domain/ports/in/fetch-law-version.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { LawApiPort } from "../../domain/ports/out/law-api.port";
-import { LlmPort } from "../../domain/ports/out/llm.port";
 import { LawVersionPersistencePort } from "../../domain/ports/out/law-version-persistence.port";
 import { LawVersionQueryPort } from "../../domain/ports/out/law-version-query.port";
 import { LawDiffPersistencePort } from "../../domain/ports/out/law-diff-persistence.port";
 import { LawDiffQueryPort } from "../../domain/ports/out/law-diff-query.port";
-import { StudyMaterialPersistencePort } from "../../domain/ports/out/study-material-persistence.port";
+import { OutboxPersistencePort } from "../../../../hb-backend-api/outbox/domain/ports/out/outbox-persistence.port";
 import { DiscordWebhookService } from "../../../../shared/discord/discord-webhook.service";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { LawArticle } from "../../domain/model/law-article.vo";
 import { LawVersionEntitySchema } from "../../domain/model/law-version.entity";
 import { ChangeType } from "../../domain/enums/change-type.enum";
+import { CreateOutboxEntity } from "../../../../hb-backend-api/outbox/domain/model/create-outbox.entity";
+import { EventType } from "../../../../hb-backend-api/outbox/domain/model/event-type.enum";
+import { OutboxStatus } from "../../../../hb-backend-api/outbox/domain/model/outbox-status.enum";
 
 @Injectable()
 export class FetchLawVersionService implements FetchLawVersionUseCase {
   constructor(
     @Inject(DIToken.PrivacyLawModule.LawApiPort)
     private readonly lawApiPort: LawApiPort,
-    @Inject(DIToken.PrivacyLawModule.LlmPort)
-    private readonly llmPort: LlmPort,
     @Inject(DIToken.PrivacyLawModule.LawVersionPersistencePort)
     private readonly lawVersionPersistencePort: LawVersionPersistencePort,
     @Inject(DIToken.PrivacyLawModule.LawVersionQueryPort)
@@ -30,8 +30,8 @@ export class FetchLawVersionService implements FetchLawVersionUseCase {
     private readonly lawDiffPersistencePort: LawDiffPersistencePort,
     @Inject(DIToken.PrivacyLawModule.LawDiffQueryPort)
     private readonly lawDiffQueryPort: LawDiffQueryPort,
-    @Inject(DIToken.PrivacyLawModule.StudyMaterialPersistencePort)
-    private readonly studyMaterialPersistencePort: StudyMaterialPersistencePort,
+    @Inject(DIToken.OutboxModule.OutboxPersistencePort)
+    private readonly outboxPersistencePort: OutboxPersistencePort,
     private readonly discordWebhookService: DiscordWebhookService,
     public readonly transactionRunner: TransactionRunner,
   ) {}
@@ -88,29 +88,27 @@ export class FetchLawVersionService implements FetchLawVersionUseCase {
       })),
     });
 
-    try {
-      const material = await this.llmPort.generateStudyMaterial(
-        changes.map((c) => ({
-          articleNo: c.articleNo,
-          changeType: c.changeType,
-          before: c.before ?? "",
-          after: c.after ?? "",
-        })),
+    const diffs = await this.lawDiffQueryPort.findByVersionId(
+      newVersion.getId,
+    );
+    if (diffs.length > 0) {
+      await this.outboxPersistencePort.save(
+        CreateOutboxEntity.of(
+          EventType.LAW_CHANGED,
+          {
+            diffId: diffs[0].getId.toString(),
+            changes: changes.map((c) => ({
+              articleNo: c.articleNo,
+              changeType: c.changeType,
+              before: c.before ?? "",
+              after: c.after ?? "",
+            })),
+          },
+          OutboxStatus.PENDING,
+          0,
+          1,
+        ),
       );
-
-      const diffs = await this.lawDiffQueryPort.findByVersionId(
-        newVersion.getId,
-      );
-      if (diffs.length > 0) {
-        await this.studyMaterialPersistencePort.save({
-          diffId: diffs[0].getId.toString(),
-          summary: material.summary,
-          keyPoints: material.keyPoints,
-          quizzes: material.quizzes,
-        });
-      }
-    } catch {
-      // LLM failure should not block the law version save
     }
 
     await this.discordWebhookService.sendErrorMessage(

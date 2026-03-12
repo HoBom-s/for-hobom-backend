@@ -223,6 +223,9 @@ export class DIToken {
     public static ProcessExpiredOutboxCleanupUseCase = this.register(
       "ProcessExpiredOutboxCleanupUseCase",
     );
+    public static FindLawOutboxByEventTypeAndStatusUseCase = this.register(
+      "FindLawOutboxByEventTypeAndStatusUseCase",
+    );
   };
 
   public static readonly DashboardModule = class extends DITokenRegister {

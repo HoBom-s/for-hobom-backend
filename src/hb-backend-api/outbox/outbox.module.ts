@@ -12,6 +12,8 @@ import { PatchOutboxMarkAsSentService } from "./application/use-cases/patch-outb
 import { PatchMessageOutboxMarkAsSentController } from "./adapters/in/patch-message-outbox-mark-as-sent.controller";
 import { FindLogOutboxByEventTypeAndStatusService } from "./application/use-cases/find-log-outbox-by-event-type-and-status.service";
 import { FindLogOutboxController } from "./adapters/in/find-log-outbox.controller";
+import { FindLawOutboxController } from "./adapters/in/find-law-outbox.controller";
+import { FindLawOutboxByEventTypeAndStatusService } from "./application/use-cases/find-law-outbox-by-event-type-and-status.service";
 import { ProcessExpiredOutboxCleanupService } from "./application/use-cases/process-expired-outbox-cleanup.service";
 import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expired-outbox-cleanup.scheduler";
 
@@ -27,6 +29,7 @@ import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expi
   controllers: [
     FindMessageOutboxController,
     FindLogOutboxController,
+    FindLawOutboxController,
     PatchMessageOutboxMarkAsSentController,
   ],
   providers: [
@@ -55,6 +58,10 @@ import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expi
       useClass: PatchOutboxMarkAsSentService,
     },
     {
+      provide: DIToken.OutboxModule.FindLawOutboxByEventTypeAndStatusUseCase,
+      useClass: FindLawOutboxByEventTypeAndStatusService,
+    },
+    {
       provide: DIToken.OutboxModule.ProcessExpiredOutboxCleanupUseCase,
       useClass: ProcessExpiredOutboxCleanupService,
     },
@@ -68,6 +75,7 @@ import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expi
     DIToken.OutboxModule.FindOutboxByEventTypeAndStatusUseCase,
     DIToken.OutboxModule.PatchOutboxMarkAsSentUseCase,
     DIToken.OutboxModule.FindLogOutboxByEventTypeAndStatusUseCase,
+    DIToken.OutboxModule.FindLawOutboxByEventTypeAndStatusUseCase,
   ],
 })
 export class OutboxModule {}
