@@ -49,8 +49,8 @@ export class LawApiAdapter implements LawApiPort {
         return iframe ? iframe.src : null;
       });
 
-      if (!iframeSrc) {
-        throw new Error("법령 페이지에서 iframe을 찾을 수 없어요.");
+      if (!iframeSrc || !iframeSrc.includes("law.go.kr")) {
+        throw new Error("법령 페이지에서 유효한 iframe을 찾을 수 없어요.");
       }
 
       // Step 2: Navigate to the actual content page
