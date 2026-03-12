@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Metadata } from "@grpc/grpc-js";
+import { timingSafeEqual } from "crypto";
 
 @Injectable()
 export class GrpcApiKeyGuard implements CanActivate {
@@ -17,7 +18,11 @@ export class GrpcApiKeyGuard implements CanActivate {
     const expected =
       this.configService.getOrThrow<string>("HOBOM_GRPC_API_KEY");
 
-    if (apiKey == null || apiKey !== expected) {
+    if (
+      apiKey == null ||
+      apiKey.length !== expected.length ||
+      !timingSafeEqual(Buffer.from(apiKey), Buffer.from(expected))
+    ) {
       throw new UnauthorizedException("Invalid gRPC API key");
     }
 

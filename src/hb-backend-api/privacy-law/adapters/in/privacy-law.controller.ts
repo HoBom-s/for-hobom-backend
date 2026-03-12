@@ -5,8 +5,10 @@ import {
   Inject,
   Param,
   Post,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { JwtAuthGuard } from "../../../../shared/adapters/in/rest/guard/jwt-auth.guard";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { DIToken } from "../../../../shared/di/token.di";
 import { GetLawVersionsUseCase } from "../../domain/ports/in/get-law-versions.use-case";
@@ -111,6 +113,7 @@ export class PrivacyLawController {
 
   @ApiOperation({ summary: "질문 이력 목록 조회" })
   @ApiResponse({ type: [GetQuestionHistoryDto] })
+  @UseGuards(JwtAuthGuard)
   @Get("questions")
   public async getQuestionHistories(): Promise<GetQuestionHistoryDto[]> {
     const histories = await this.getQuestionHistoriesUseCase.invoke();
@@ -119,6 +122,7 @@ export class PrivacyLawController {
 
   @ApiOperation({ summary: "개인정보보호법 질문" })
   @ApiResponse({ type: AskQuestionResponseDto })
+  @UseGuards(JwtAuthGuard)
   @Post("ask")
   public async askQuestion(
     @Body() body: AskQuestionDto,
@@ -127,6 +131,7 @@ export class PrivacyLawController {
   }
 
   @ApiOperation({ summary: "법률 데이터 수동 수집" })
+  @UseGuards(JwtAuthGuard)
   @Post("fetch")
   public async fetchLawVersion(): Promise<void> {
     await this.fetchLawVersionUseCase.invoke();
