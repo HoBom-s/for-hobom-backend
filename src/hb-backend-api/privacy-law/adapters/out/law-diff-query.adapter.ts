@@ -17,7 +17,9 @@ export class LawDiffQueryAdapter implements LawDiffQueryPort {
 
   public async findAll(): Promise<LawDiffEntitySchema[]> {
     const docs = await this.lawDiffRepository.findAll();
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 
@@ -30,7 +32,9 @@ export class LawDiffQueryAdapter implements LawDiffQueryPort {
     versionId: LawVersionId,
   ): Promise<LawDiffEntitySchema[]> {
     const docs = await this.lawDiffRepository.findByVersionId(versionId);
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 
@@ -41,6 +45,7 @@ export class LawDiffQueryAdapter implements LawDiffQueryPort {
       LawVersionId.fromString(String(doc.toVersionId)),
       doc.fromProclamationDate,
       doc.toProclamationDate,
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       (doc.changes ?? []).map((c) =>
         ArticleChange.of(c.articleNo, c.changeType, c.before, c.after),
       ),

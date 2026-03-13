@@ -15,7 +15,9 @@ export class ExamSetQueryAdapter implements ExamSetQueryPort {
 
   public async findAll(): Promise<ExamSetEntitySchema[]> {
     const docs = await this.examSetRepository.findAll();
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 

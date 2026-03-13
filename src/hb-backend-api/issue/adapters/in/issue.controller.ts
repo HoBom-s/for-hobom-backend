@@ -123,15 +123,30 @@ export class IssueController {
       UserNickname.fromString(userInfo.nickname),
     );
     const data: Record<string, unknown> = {};
-    if (dto.title != null) data.title = dto.title;
-    if (dto.description != null) data.description = dto.description;
-    if (dto.priority != null) data.priority = dto.priority;
-    if (dto.sprint != null) data.sprint = new Types.ObjectId(dto.sprint);
-    if (dto.storyPoints != null) data.storyPoints = dto.storyPoints;
-    if (dto.labels != null) data.labels = dto.labels;
-    if (dto.dueDate != null) data.dueDate = new Date(dto.dueDate);
-    if (dto.parent !== undefined)
+    if (dto.title != null) {
+      data.title = dto.title;
+    }
+    if (dto.description != null) {
+      data.description = dto.description;
+    }
+    if (dto.priority != null) {
+      data.priority = dto.priority;
+    }
+    if (dto.sprint != null) {
+      data.sprint = new Types.ObjectId(dto.sprint);
+    }
+    if (dto.storyPoints != null) {
+      data.storyPoints = dto.storyPoints;
+    }
+    if (dto.labels != null) {
+      data.labels = dto.labels;
+    }
+    if (dto.dueDate != null) {
+      data.dueDate = new Date(dto.dueDate);
+    }
+    if (dto.parent !== undefined) {
       data.parent = dto.parent != null ? new Types.ObjectId(dto.parent) : null;
+    }
 
     await this.updateIssueUseCase.invoke(issueId, user.getId, data);
   }

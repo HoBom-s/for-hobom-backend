@@ -47,6 +47,7 @@ export class CreateIssueService implements CreateIssueUseCase {
     }
 
     const firstStatus = project.workflow.statuses[0];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (firstStatus == null) {
       throw new BadRequestException("워크플로우에 상태가 정의되지 않았어요.");
     }

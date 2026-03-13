@@ -107,9 +107,8 @@ describe("ProcessScheduleFutureMessageService", () => {
     const savedOutbox = outboxPersistencePort.save.mock.calls[0][0];
     expect(savedOutbox.getPayload).toEqual(
       expect.objectContaining({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         title: expect.stringContaining("생일 축하해"),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         body: expect.stringContaining("생일 축하한다 친구야!"),
         recipient: "recipient@email.com",
         senderId: mockSenderId.toString(),

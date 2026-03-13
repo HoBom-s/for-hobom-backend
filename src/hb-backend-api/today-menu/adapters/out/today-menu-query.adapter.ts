@@ -36,13 +36,13 @@ export class TodayMenuQueryAdapter implements TodayMenuQueryPort {
   }
 
   private async getBy(id: TodayMenuId): Promise<TodayMenuWithRelationsEntity> {
-    return await this.todayMenuRepository.findById(id);
+    return this.todayMenuRepository.findById(id);
   }
 
   private async getRecommendedMenuBy(
     id: TodayMenuId,
   ): Promise<TodayMenuWithRelationsEntity> {
-    return await this.todayMenuRepository.findRecommendedMenuById(id);
+    return this.todayMenuRepository.findRecommendedMenuById(id);
   }
 
   private toRelationEntity(
@@ -50,6 +50,7 @@ export class TodayMenuQueryAdapter implements TodayMenuQueryPort {
   ): TodayMenuRelationEntity {
     return TodayMenuRelationEntity.of(
       TodayMenuId.fromString(entity.id),
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       entity.recommendedMenu?.id == null
         ? null
         : this.toMenuRecommendation(entity.recommendedMenu),

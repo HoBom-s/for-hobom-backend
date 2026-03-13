@@ -31,7 +31,7 @@ export class OutboxPersistenceAdapter implements OutboxPersistencePort {
     olderThan: Date,
     batchSize: number,
   ): Promise<number> {
-    return await this.outboxRepository.deleteExpiredBatch(olderThan, batchSize);
+    return this.outboxRepository.deleteExpiredBatch(olderThan, batchSize);
   }
 
   private async saveEntity(entity: CreateOutboxEntity): Promise<void> {

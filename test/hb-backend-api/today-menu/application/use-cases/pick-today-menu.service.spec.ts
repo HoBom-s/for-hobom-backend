@@ -131,7 +131,6 @@ describe("PickTodayMenuService", () => {
     const savedOutbox = outboxPersistencePort.save.mock.calls[0][0];
     expect(savedOutbox.getPayload).toEqual(
       expect.objectContaining({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         body: expect.stringContaining("비빔밥"),
       }),
     );
@@ -189,7 +188,6 @@ describe("PickTodayMenuService", () => {
     const savedOutbox = outboxPersistencePort.save.mock.calls[0][0];
     expect(savedOutbox.getPayload).toEqual(
       expect.objectContaining({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         body: expect.stringContaining("된장찌개"),
       }),
     );

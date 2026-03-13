@@ -49,7 +49,7 @@ export class LawApiAdapter implements LawApiPort {
         return iframe ? iframe.src : null;
       });
 
-      if (!iframeSrc || !iframeSrc.includes("law.go.kr")) {
+      if (!iframeSrc?.includes("law.go.kr")) {
         throw new Error("법령 페이지에서 유효한 iframe을 찾을 수 없어요.");
       }
 
@@ -74,7 +74,7 @@ export class LawApiAdapter implements LawApiPort {
 
         // Parse articles from pgroup elements
         const conScroll = document.getElementById("conScroll");
-        if (!conScroll)
+        if (!conScroll) {
           return {
             rawHtml,
             lawId,
@@ -82,6 +82,7 @@ export class LawApiAdapter implements LawApiPort {
             enforcementDate,
             articles: [],
           };
+        }
 
         const pgroups = conScroll.querySelectorAll(".pgroup");
         const articles: {
@@ -97,12 +98,14 @@ export class LawApiAdapter implements LawApiPort {
 
         let currentArticle: (typeof articles)[0] | null = null;
         let currentParagraphs: (typeof articles)[0]["paragraphs"] = [];
-        let currentSubItems: { no: string; content: string }[] = [];
+        let _currentSubItems: { no: string; content: string }[] = [];
         let paragraphNo = 0;
 
         for (const pg of pgroups) {
           const lawcon = pg.querySelector(".lawcon");
-          if (!lawcon) continue;
+          if (!lawcon) {
+            continue;
+          }
 
           const articleEl = lawcon.querySelector("p.pty1_p4");
           if (articleEl) {
@@ -113,10 +116,10 @@ export class LawApiAdapter implements LawApiPort {
             }
 
             const label = articleEl.querySelector("span.bl label");
-            const titleText = label ? label.textContent?.trim() || "" : "";
+            const titleText = label ? (label.textContent?.trim() ?? "") : "";
 
             // Extract article number from title (e.g., "제1조(목적)" -> "제1조")
-            const noMatch = titleText.match(/제[\d조의]+/);
+            const noMatch = /제[\d조의]+/.exec(titleText);
             const articleNo = noMatch ? noMatch[0] : titleText;
 
             // Get full text content (excluding UI elements)
@@ -124,7 +127,7 @@ export class LawApiAdapter implements LawApiPort {
             cloned
               .querySelectorAll("input, .lawico01, ul")
               .forEach((e) => e.remove());
-            const fullText = cloned.textContent?.trim() || "";
+            const fullText = cloned.textContent?.trim() ?? "";
 
             currentArticle = {
               articleNo,
@@ -133,11 +136,13 @@ export class LawApiAdapter implements LawApiPort {
               paragraphs: [],
             };
             currentParagraphs = [];
-            currentSubItems = [];
+            _currentSubItems = [];
             paragraphNo = 0;
           }
 
-          if (!currentArticle) continue;
+          if (!currentArticle) {
+            continue;
+          }
 
           // Parse paragraphs (항) — pty3 class
           const paragraphEls = lawcon.querySelectorAll(
@@ -145,9 +150,9 @@ export class LawApiAdapter implements LawApiPort {
           );
           for (const pEl of paragraphEls) {
             paragraphNo++;
-            const text = pEl.textContent?.trim() || "";
+            const text = pEl.textContent?.trim() ?? "";
             // Extract paragraph number (e.g., "① ..." -> "1")
-            const pNoMatch = text.match(/^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]/);
+            const pNoMatch = /^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]/.exec(text);
             const pNo = pNoMatch
               ? String("①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳".indexOf(pNoMatch[0]) + 1)
               : String(paragraphNo);
@@ -157,8 +162,8 @@ export class LawApiAdapter implements LawApiPort {
           // Parse sub-items (호) — pty1_de2h class
           const subItemEls = lawcon.querySelectorAll("p.pty1_de2h");
           for (const sEl of subItemEls) {
-            const text = sEl.textContent?.trim() || "";
-            const noMatch = text.match(/^([\d의]+)\./);
+            const text = sEl.textContent?.trim() ?? "";
+            const noMatch = /^([\d의]+)\./.exec(text);
             const no = noMatch ? noMatch[1] : "";
             if (currentParagraphs.length > 0) {
               currentParagraphs[currentParagraphs.length - 1].subItems.push({

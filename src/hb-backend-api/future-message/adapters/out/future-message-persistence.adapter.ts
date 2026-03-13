@@ -16,7 +16,7 @@ export class FutureMessagePersistenceAdapter
   ) {}
 
   public async load(id: FutureMessageId): Promise<FutureMessageDomain> {
-    return await this.futureMessagePersistenceRepository.load(id);
+    return this.futureMessagePersistenceRepository.load(id);
   }
 
   public async save(entity: CreateFutureMessageEntity): Promise<void> {

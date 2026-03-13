@@ -15,7 +15,9 @@ export class QuestionHistoryQueryAdapter implements QuestionHistoryQueryPort {
 
   public async findAll(): Promise<QuestionHistoryEntitySchema[]> {
     const docs = await this.questionHistoryRepository.findAll();
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 

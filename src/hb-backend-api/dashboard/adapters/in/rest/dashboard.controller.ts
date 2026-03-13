@@ -228,7 +228,9 @@ export class DashboardController {
   private parseDate(date?: string): Date {
     if (date) {
       const parsed = new Date(date + "T00:00:00+09:00");
-      if (!isNaN(parsed.getTime())) return parsed;
+      if (!isNaN(parsed.getTime())) {
+        return parsed;
+      }
     }
     return new Date();
   }

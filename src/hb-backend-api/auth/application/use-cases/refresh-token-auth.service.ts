@@ -30,6 +30,7 @@ export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
 
       const authUser =
         await this.authQueryPort.findByRefreshToken(refreshToken);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (authUser == null || authUser.getNickname !== payload.sub) {
         throw new UnauthorizedException("Token 이 일치하지 않아요.");
       }
@@ -44,13 +45,15 @@ export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
         // 서명은 유효하지만 만료된 경우만 허용 (서명 검증 필수)
         const decoded =
           this.jwtAuthPort.verifyRefreshTokenIgnoreExpiry(refreshToken);
-        if (decoded?.sub == null) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (decoded.sub == null) {
           throw new UnauthorizedException("Token 이 파싱되지 않아요.");
         }
 
         // DB에서 토큰 존재 여부 확인
         const authUser =
           await this.authQueryPort.findByRefreshToken(refreshToken);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (authUser == null || authUser.getNickname !== decoded.sub) {
           throw new UnauthorizedException("Token 이 일치하지 않아요.");
         }

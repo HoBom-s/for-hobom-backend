@@ -68,7 +68,9 @@ export class NotificationRepositoryImpl implements NotificationRepository {
       .select("_id")
       .lean()
       .exec();
-    if (docs.length === 0) return 0;
+    if (docs.length === 0) {
+      return 0;
+    }
     const ids = docs.map((doc) => doc._id);
     const result = await this.notificationModel.deleteMany({
       _id: { $in: ids },

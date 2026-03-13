@@ -74,7 +74,9 @@ export class UpdateIssueService implements UpdateIssueUseCase {
   }
 
   private stringify(v: unknown): string | null {
-    if (v == null) return null;
+    if (v == null) {
+      return null;
+    }
     return typeof v === "string" ? v : JSON.stringify(v);
   }
 }

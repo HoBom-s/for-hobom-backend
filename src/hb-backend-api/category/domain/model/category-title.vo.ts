@@ -5,6 +5,7 @@ export class CategoryTitle {
   }
 
   public static fromString(title: string): CategoryTitle {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (title == null) {
       throw new Error("카테고리 제목이 정의되지 않았어요.");
     }

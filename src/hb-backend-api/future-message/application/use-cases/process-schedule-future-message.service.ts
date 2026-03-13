@@ -38,7 +38,9 @@ export class ProcessScheduleFutureMessageService
   @Transactional()
   public async invoke(): Promise<void> {
     const dueMessages = await this.getDueMessages();
-    if (dueMessages.length === 0) return;
+    if (dueMessages.length === 0) {
+      return;
+    }
     await this.processMessagesSequentially(dueMessages);
   }
 

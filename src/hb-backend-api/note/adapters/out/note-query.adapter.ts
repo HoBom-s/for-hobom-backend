@@ -29,7 +29,9 @@ export class NoteQueryAdapter implements NoteQueryPort {
     status: NoteStatus,
   ): Promise<NoteEntitySchema[]> {
     const docs = await this.noteRepository.findAll(userId, status);
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 
@@ -41,10 +43,12 @@ export class NoteQueryAdapter implements NoteQueryPort {
     return NoteEntitySchema.of(
       NoteId.fromString(String(doc._id)),
       UserId.fromString(String(doc.owner)),
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       (doc.members ?? []).map((m) => UserId.fromString(String(m))),
       doc.title,
       doc.content,
       doc.type,
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       (doc.checklistItems ?? []).map((i) =>
         ChecklistItem.of(i.text, i.checked, i.order),
       ),
@@ -52,6 +56,7 @@ export class NoteQueryAdapter implements NoteQueryPort {
       doc.isPinned,
       doc.status,
       doc.trashedAt,
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       (doc.labels ?? []).map((l) => LabelId.fromString(String(l))),
       doc.reminder
         ? NoteReminder.of(doc.reminder.date, doc.reminder.recurrence)

@@ -6,7 +6,7 @@ import { UserId } from "../../../../user/domain/model/user-id.vo";
 import {
   Category,
   DailyTodoWithRelationEntity,
-  type DailyTodoWithRelations,
+  DailyTodoWithRelations,
   Owner,
   Reaction,
 } from "../../../domain/entity/daily-todo.retations";

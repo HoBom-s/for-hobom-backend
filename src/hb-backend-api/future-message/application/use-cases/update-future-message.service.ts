@@ -32,10 +32,15 @@ export class UpdateFutureMessageService implements UpdateFutureMessageUseCase {
     }
 
     const data: Record<string, unknown> = {};
-    if (command.getTitle !== undefined) data.title = command.getTitle;
-    if (command.getContent !== undefined) data.content = command.getContent;
-    if (command.getScheduledAt !== undefined)
+    if (command.getTitle !== undefined) {
+      data.title = command.getTitle;
+    }
+    if (command.getContent !== undefined) {
+      data.content = command.getContent;
+    }
+    if (command.getScheduledAt !== undefined) {
       data.scheduledAt = command.getScheduledAt;
+    }
 
     if (Object.keys(data).length > 0) {
       await this.futureMessagePersistencePort.update(id, data);

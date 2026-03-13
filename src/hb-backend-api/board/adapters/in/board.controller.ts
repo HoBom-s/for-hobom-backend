@@ -103,8 +103,12 @@ export class BoardController {
     @Body() body: UpdateBoardDto,
   ): Promise<void> {
     const data: Record<string, unknown> = {};
-    if (body.name != null) data.name = body.name;
-    if (body.columns != null) data.columns = body.columns;
+    if (body.name != null) {
+      data.name = body.name;
+    }
+    if (body.columns != null) {
+      data.columns = body.columns;
+    }
     await this.updateBoardUseCase.invoke(boardId, data);
   }
 

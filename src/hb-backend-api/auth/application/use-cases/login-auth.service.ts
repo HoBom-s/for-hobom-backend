@@ -77,14 +77,14 @@ export class LoginAuthService implements LoginAuthUseCase {
   private async findUserByNickname(
     nickname: UserNickname,
   ): Promise<UserEntitySchema> {
-    return await this.userQueryPort.findByNickname(nickname);
+    return this.userQueryPort.findByNickname(nickname);
   }
 
   private async comparePassword(
     commandPassword: string,
     hashedPassword: string,
   ): Promise<boolean> {
-    return await compare(commandPassword, hashedPassword);
+    return compare(commandPassword, hashedPassword);
   }
 
   private generateAccessToken(nickname: string): string {

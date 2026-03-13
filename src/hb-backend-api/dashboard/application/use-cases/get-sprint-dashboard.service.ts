@@ -45,8 +45,7 @@ export class GetSprintDashboardService implements GetSprintDashboardUseCase {
     }
 
     const doneStatusIds =
-      project.workflow?.statuses?.filter((s) => s.isDone).map((s) => s.id) ??
-      [];
+      project.workflow?.statuses.filter((s) => s.isDone).map((s) => s.id) ?? [];
 
     const [summary] = await this.issueModel
       .aggregate<SprintIssueSummary>([
@@ -77,6 +76,7 @@ export class GetSprintDashboardService implements GetSprintDashboardUseCase {
       ])
       .exec();
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const stats = summary ?? {
       totalIssues: 0,
       completedIssues: 0,
@@ -86,7 +86,7 @@ export class GetSprintDashboardService implements GetSprintDashboardUseCase {
 
     return {
       sprint: {
-        id: String(sprint._id),
+        id: String(sprint._id as Types.ObjectId),
         name: sprint.name,
         goal: sprint.goal,
         status: sprint.status,

@@ -15,12 +15,12 @@ export class FindFutureMessageByIdService
   ) {}
 
   public async invoke(id: FutureMessageId): Promise<FutureMessageQueryResult> {
-    return await this.findById(id);
+    return this.findById(id);
   }
 
   private async findById(
     id: FutureMessageId,
   ): Promise<FutureMessageQueryResult> {
-    return await this.futureMessageQueryPort.findById(id);
+    return this.futureMessageQueryPort.findById(id);
   }
 }

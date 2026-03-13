@@ -28,9 +28,15 @@ export class UpdateDailyTodoService implements UpdateDailyTodoUseCase {
     const dailyTodo = await this.dailyTodoQueryPort.findById(id, owner);
     const data: Record<string, unknown> = {};
 
-    if (command.getTitle !== undefined) data.title = command.getTitle;
-    if (command.getDate !== undefined) data.date = command.getDate;
-    if (command.getCategory !== undefined) data.category = command.getCategory;
+    if (command.getTitle !== undefined) {
+      data.title = command.getTitle;
+    }
+    if (command.getDate !== undefined) {
+      data.date = command.getDate;
+    }
+    if (command.getCategory !== undefined) {
+      data.category = command.getCategory;
+    }
 
     if (Object.keys(data).length > 0) {
       await this.dailyTodoPersistencePort.update(

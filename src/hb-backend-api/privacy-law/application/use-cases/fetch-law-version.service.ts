@@ -129,7 +129,9 @@ export class FetchLawVersionService implements FetchLawVersionUseCase {
     }[],
   ): boolean {
     const oldArticles = latestVersion.getArticles;
-    if (oldArticles.length !== newArticles.length) return false;
+    if (oldArticles.length !== newArticles.length) {
+      return false;
+    }
 
     for (let i = 0; i < oldArticles.length; i++) {
       const old = oldArticles[i];

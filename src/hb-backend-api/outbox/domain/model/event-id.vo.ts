@@ -4,6 +4,7 @@ export class EventId {
   }
 
   public static fromString(id: string): EventId {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (id == null || id.length === 0) {
       throw new Error(`올바르지 않은 Event Id 에요. ${id}`);
     }

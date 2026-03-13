@@ -1,6 +1,5 @@
 import { Controller, Inject, Logger, UseGuards } from "@nestjs/common";
-import { GrpcMethod } from "@nestjs/microservices";
-import { RpcException } from "@nestjs/microservices";
+import { GrpcMethod, RpcException } from "@nestjs/microservices";
 import { status } from "@grpc/grpc-js";
 import { DIToken } from "../../../../shared/di/token.di";
 import { StudyMaterialPersistencePort } from "../../domain/ports/out/study-material-persistence.port";
@@ -40,8 +39,8 @@ export class SaveStudyMaterialGrpcController {
       await this.studyMaterialPersistencePort.save({
         diffId: request.diffId,
         summary: request.summary,
-        keyPoints: request.keyPoints ?? [],
-        quizzes: request.quizzes ?? [],
+        keyPoints: request.keyPoints,
+        quizzes: request.quizzes,
       });
       this.logger.log(`학습자료 저장 완료: diffId=${request.diffId}`);
     } catch (error) {

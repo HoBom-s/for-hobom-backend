@@ -9,6 +9,7 @@ export class RefreshToken {
   }
 
   public static fromString(refreshToken: string): RefreshToken {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (refreshToken == null) {
       throw new UnauthorizedException("토큰이 정의되지 않았어요.");
     }

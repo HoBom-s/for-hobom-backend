@@ -3,6 +3,7 @@ export class AggregateResultQuery {
     aggregateQuery: Promise<T[]>,
   ): Promise<T | null> {
     const result = await aggregateQuery;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (result == null || result.length === 0) {
       return null;
     }
@@ -14,6 +15,7 @@ export class AggregateResultQuery {
     aggregateQuery: Promise<T[]>,
   ): Promise<T[]> {
     const result = await aggregateQuery;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (result == null || result.length === 0) {
       return [];
     }

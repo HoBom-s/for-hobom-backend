@@ -189,10 +189,18 @@ export class GetActivityDashboardService
   }
 
   private getLevel(count: number): number {
-    if (count === 0) return 0;
-    if (count <= 2) return 1;
-    if (count <= 5) return 2;
-    if (count <= 10) return 3;
+    if (count === 0) {
+      return 0;
+    }
+    if (count <= 2) {
+      return 1;
+    }
+    if (count <= 5) {
+      return 2;
+    }
+    if (count <= 10) {
+      return 3;
+    }
     return 4;
   }
 
@@ -215,7 +223,9 @@ export class GetActivityDashboardService
     }
 
     for (let i = heatmap.length - 1; i >= 0; i--) {
-      if (heatmap[i].date > todayStr) continue;
+      if (heatmap[i].date > todayStr) {
+        continue;
+      }
       if (heatmap[i].count > 0) {
         currentStreak++;
       } else {

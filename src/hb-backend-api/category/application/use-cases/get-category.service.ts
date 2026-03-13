@@ -27,6 +27,6 @@ export class GetCategoryService implements GetCategoryUseCase {
     id: CategoryId,
     owner: UserId,
   ): Promise<CategoryEntitySchema> {
-    return await this.categoryQueryPort.findById(id, owner);
+    return this.categoryQueryPort.findById(id, owner);
   }
 }

@@ -22,7 +22,7 @@ export class FutureMessageQueryRepositoryImpl
     sendStatus: SendStatus,
   ): Promise<FutureMessageDomain[]> {
     const foundItems = await this.futureMessageModel
-      .find({ sendStatus: sendStatus })
+      .find({ sendStatus })
       .exec();
 
     return foundItems.map((found) =>
@@ -46,7 +46,7 @@ export class FutureMessageQueryRepositoryImpl
   ): Promise<FutureMessageDomain[]> {
     const foundItems = await this.futureMessageModel
       .find({
-        sendStatus: sendStatus,
+        sendStatus,
         senderId: senderId.raw,
       })
       .exec();

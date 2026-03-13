@@ -54,7 +54,7 @@ export class AuthRepositoryImpl implements AuthRepository {
           expiresAt: authEntitySchema.getExpiredAt,
         },
       ],
-      { session: session },
+      { session },
     );
   }
 
@@ -66,7 +66,7 @@ export class AuthRepositoryImpl implements AuthRepository {
     const updateResult = await this.authModel.updateOne(
       { nickname: nickname.raw },
       { $set: { refreshToken: newRefreshToken.raw } },
-      { session: session },
+      { session },
     );
 
     if (updateResult.modifiedCount === 0) {

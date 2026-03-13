@@ -20,6 +20,6 @@ export class FindAllMenuRecommendationService
   }
 
   private async getBy(): Promise<MenuRecommendationRelationEntity[]> {
-    return await this.menuRecommendationQueryPort.findAll();
+    return this.menuRecommendationQueryPort.findAll();
   }
 }

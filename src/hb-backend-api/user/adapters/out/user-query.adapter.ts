@@ -16,6 +16,7 @@ export class UserQueryAdapter implements UserQueryPort {
 
   public async findById(id: UserId): Promise<UserEntitySchema> {
     const foundUser = await this.userRepository.findById(id);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (foundUser == null) {
       throw new NotFoundException(
         `해당 유저를 찾을 수 없어요. ${id.raw.toHexString()}`,
@@ -54,6 +55,7 @@ export class UserQueryAdapter implements UserQueryPort {
     nickname: UserNickname,
   ): Promise<UserEntitySchema> {
     const foundUser = await this.userRepository.findByNickname(nickname);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (foundUser == null) {
       throw new NotFoundException(
         `해당 유저를 찾을 수 없어요. ${nickname.raw}`,

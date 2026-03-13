@@ -18,7 +18,9 @@ export class GetAllNotesService implements GetAllNotesUseCase {
     status: NoteStatus,
   ): Promise<NoteQueryResult[]> {
     const notes = await this.noteQueryPort.findAll(userId, status);
-    if (notes.length === 0) return [];
+    if (notes.length === 0) {
+      return [];
+    }
     return notes.map(NoteQueryResult.from);
   }
 }

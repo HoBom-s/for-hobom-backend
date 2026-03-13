@@ -55,7 +55,7 @@ export class FutureMessagePersistenceRepositoryImpl
         },
       ],
       {
-        session: session,
+        session,
       },
     );
   }
@@ -70,7 +70,7 @@ export class FutureMessagePersistenceRepositoryImpl
           updatedAt: new Date(),
         },
       },
-      { session: session },
+      { session },
     );
   }
 
@@ -82,15 +82,12 @@ export class FutureMessagePersistenceRepositoryImpl
     await this.futureMessageModel.findOneAndUpdate(
       { _id: id.raw },
       { $set: data },
-      { session: session },
+      { session },
     );
   }
 
   public async deleteOne(id: FutureMessageId): Promise<void> {
     const session = MongoSessionContext.getSession();
-    await this.futureMessageModel.deleteOne(
-      { _id: id.raw },
-      { session: session },
-    );
+    await this.futureMessageModel.deleteOne({ _id: id.raw }, { session });
   }
 }

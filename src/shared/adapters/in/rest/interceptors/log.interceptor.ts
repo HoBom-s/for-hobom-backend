@@ -58,8 +58,8 @@ export class HttpLogInterceptor implements NestInterceptor {
               level: TraceInfoConstant.INFO,
               method: convertToHttpMethod(req.method),
               path: req.originalUrl,
-              statusCode: res?.statusCode ?? 200,
-              host: req.hostname ?? "-",
+              statusCode: res.statusCode,
+              host: req.hostname,
               userId: userInfo.getId.toString(),
               payload: {
                 query: req.query,
@@ -96,7 +96,7 @@ export class HttpLogInterceptor implements NestInterceptor {
                   method: convertToHttpMethod(req.method),
                   path: req.originalUrl,
                   statusCode: errorStatusCode,
-                  host: req.hostname ?? "-",
+                  host: req.hostname,
                   userId: userInfo.getId.toString(),
                   payload: {
                     query: req.query,

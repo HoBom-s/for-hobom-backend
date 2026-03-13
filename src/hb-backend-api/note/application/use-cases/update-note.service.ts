@@ -23,12 +23,18 @@ export class UpdateNoteService implements UpdateNoteUseCase {
     const note = await this.noteQueryPort.findById(id, command.getUserId);
     const data: Record<string, unknown> = {};
 
-    if (command.getTitle !== undefined) data.title = command.getTitle;
-    if (command.getContent !== undefined) data.content = command.getContent;
+    if (command.getTitle !== undefined) {
+      data.title = command.getTitle;
+    }
+    if (command.getContent !== undefined) {
+      data.content = command.getContent;
+    }
     if (command.getChecklistItems !== undefined) {
       data.checklistItems = command.getChecklistItems.map((i) => i.toPlain());
     }
-    if (command.getColor !== undefined) data.color = command.getColor.raw;
+    if (command.getColor !== undefined) {
+      data.color = command.getColor.raw;
+    }
     if (command.getLabels !== undefined) {
       data.labels = command.getLabels.map((l) => l.raw);
     }

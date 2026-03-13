@@ -19,7 +19,6 @@ export class AdminGuard implements CanActivate {
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const request = context.switchToHttp().getRequest();
     const user = request.user as JwtAuthPayloadModel | undefined;
 

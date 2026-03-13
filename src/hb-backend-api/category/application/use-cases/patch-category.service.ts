@@ -33,7 +33,7 @@ export class PatchCategoryService implements PatchCategoryUseCase {
     id: CategoryId,
     owner: UserId,
   ): Promise<CategoryEntitySchema> {
-    return await this.categoryQueryPort.findById(id, owner);
+    return this.categoryQueryPort.findById(id, owner);
   }
 
   private async update(categoryId: CategoryId, command: PatchCategoryCommand) {

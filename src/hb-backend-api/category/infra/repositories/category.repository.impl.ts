@@ -32,22 +32,17 @@ export class CategoryRepositoryImpl implements CategoryRepository {
         },
       ],
       {
-        session: session,
+        session,
       },
     );
   }
 
   public async findAll(userId: UserId): Promise<CategoryDocument[]> {
-    const categories = await this.categoryModel
+    return this.categoryModel
       .find({
         owner: userId.raw,
       })
       .exec();
-    if (categories == null) {
-      return [];
-    }
-
-    return categories;
   }
 
   public async findById(
@@ -72,7 +67,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     title: CategoryTitle,
     owner: UserId,
   ): Promise<CategoryDocument | null> {
-    return await this.categoryModel
+    return this.categoryModel
       .findOne({
         title: title.raw,
         owner: owner.raw,
@@ -95,7 +90,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
           title: categoryUpdateEntitySchema.getTitle.raw,
         },
       },
-      { session: session },
+      { session },
     );
   }
 
@@ -103,7 +98,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     const session = MongoSessionContext.getSession();
     await this.categoryModel.deleteOne(
       { _id: categoryId.raw, owner: owner.raw },
-      { session: session },
+      { session },
     );
   }
 }

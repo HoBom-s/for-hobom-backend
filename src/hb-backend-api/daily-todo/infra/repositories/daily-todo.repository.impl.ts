@@ -52,14 +52,16 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
         },
       ],
       {
-        session: session,
+        session,
       },
     );
     cache.clear();
   }
 
   public async saveAll(entities: DailyTodoCreateEntitySchema[]): Promise<void> {
-    if (entities.length === 0) return;
+    if (entities.length === 0) {
+      return;
+    }
     const session = MongoSessionContext.getSession();
     const cache = this.aggregateQuery.cache;
     await this.dailyTodoModel.insertMany(
@@ -104,6 +106,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
       title: doc.title,
       owner: UserId.fromString(doc.owner.toHexString()),
       category: CategoryId.fromString(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (doc.category as any).value?.toHexString?.() ??
           doc.category.toHexString(),
       ),
@@ -201,11 +204,11 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
       },
       {
         $set: {
-          progress: progress,
+          progress,
         },
       },
       {
-        session: session,
+        session,
       },
     );
     cache.clear();
@@ -225,11 +228,11 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
       },
       {
         $set: {
-          cycle: cycle,
+          cycle,
         },
       },
       {
-        session: session,
+        session,
       },
     );
     cache.clear();
@@ -256,7 +259,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
         },
       },
       {
-        session: session,
+        session,
       },
     );
     cache.clear();
@@ -278,7 +281,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
         $set: data,
       },
       {
-        session: session,
+        session,
       },
     );
     cache.clear();
@@ -296,7 +299,7 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
         owner: owner.raw,
       },
       {
-        session: session,
+        session,
       },
     );
     cache.clear();

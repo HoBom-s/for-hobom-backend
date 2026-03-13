@@ -70,7 +70,7 @@ export class GetNotificationsCursorController {
     const result = await this.getNotificationsCursorUseCase.invoke(
       user.getId,
       cursor,
-      size!,
+      size ?? 20,
     );
 
     return new CursorPaginatedResponse(

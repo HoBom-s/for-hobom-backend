@@ -4,6 +4,7 @@ export class LabelTitle {
   }
 
   public static fromString(title: string): LabelTitle {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (title == null) {
       throw new Error("라벨 제목이 정의되지 않았어요.");
     }

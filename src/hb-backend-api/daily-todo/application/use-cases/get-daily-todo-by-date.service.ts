@@ -27,6 +27,6 @@ export class GetDailyTodoByDateService implements GetDailyTodoByDateUseCase {
     owner: UserId,
     date: YearMonthDayString,
   ): Promise<DailyTodoWithRelationEntity[]> {
-    return await this.dailyTodoQueryPort.findByDate(owner, date);
+    return this.dailyTodoQueryPort.findByDate(owner, date);
   }
 }

@@ -41,7 +41,7 @@ export class UpdateDailyTodoCycleService
     id: DailyTodoId,
     owner: UserId,
   ): Promise<DailyTodoWithRelationEntity> {
-    return await this.dailyTodoQueryPort.findById(id, owner);
+    return this.dailyTodoQueryPort.findById(id, owner);
   }
 
   private async changeCycle(

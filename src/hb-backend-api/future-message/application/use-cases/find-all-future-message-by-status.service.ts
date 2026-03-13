@@ -19,16 +19,13 @@ export class FindAllFutureMessageByStatusService
     status: SendStatus,
     senderId: UserId,
   ): Promise<FutureMessageQueryResult[]> {
-    return await this.findAll(status, senderId);
+    return this.findAll(status, senderId);
   }
 
   private async findAll(
     status: SendStatus,
     senderId: UserId,
   ): Promise<FutureMessageQueryResult[]> {
-    return await this.futureMessageQueryPort.findAllBySendStatus(
-      status,
-      senderId,
-    );
+    return this.futureMessageQueryPort.findAllBySendStatus(status, senderId);
   }
 }

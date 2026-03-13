@@ -33,7 +33,7 @@ export class OutboxRepositoryImpl implements OutboxRepository {
         },
       ],
       {
-        session: session,
+        session,
       },
     );
   }
@@ -82,17 +82,12 @@ export class OutboxRepositoryImpl implements OutboxRepository {
     eventType: EventType,
     status: OutboxStatus,
   ): Promise<OutboxDocument[]> {
-    const outbox = await this.outboxModel
+    return this.outboxModel
       .find({
         eventType,
         status,
       })
       .exec();
-    if (outbox == null) {
-      return [];
-    }
-
-    return outbox;
   }
 
   public async deleteExpiredBatch(
@@ -105,7 +100,9 @@ export class OutboxRepositoryImpl implements OutboxRepository {
       .select("_id")
       .lean()
       .exec();
-    if (docs.length === 0) return 0;
+    if (docs.length === 0) {
+      return 0;
+    }
 
     const ids = docs.map((doc) => doc._id);
     const result = await this.outboxModel.deleteMany({ _id: { $in: ids } });

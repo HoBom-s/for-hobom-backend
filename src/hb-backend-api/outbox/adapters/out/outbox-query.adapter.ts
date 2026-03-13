@@ -31,10 +31,7 @@ export class OutboxQueryAdapter implements OutboxQueryPort {
     eventType: EventType,
     status: OutboxStatus,
   ): Promise<OutboxDocument[]> {
-    return await this.outboxRepository.findByEventTypeAndStatus(
-      eventType,
-      status,
-    );
+    return this.outboxRepository.findByEventTypeAndStatus(eventType, status);
   }
 
   private toResult(outboxResults: OutboxDocument[]): FindOutboxEntity[] {

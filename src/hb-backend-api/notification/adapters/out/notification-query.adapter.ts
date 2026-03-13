@@ -19,7 +19,9 @@ export class NotificationQueryAdapter implements NotificationQueryPort {
     owner: UserId,
   ): Promise<NotificationEntitySchema[]> {
     const docs = await this.notificationRepository.findAllByOwner(owner);
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 
@@ -33,7 +35,9 @@ export class NotificationQueryAdapter implements NotificationQueryPort {
       cursor,
       limit,
     );
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 

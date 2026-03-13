@@ -16,7 +16,9 @@ export class StudyMaterialQueryAdapter implements StudyMaterialQueryPort {
 
   public async findAll(): Promise<StudyMaterialEntitySchema[]> {
     const docs = await this.studyMaterialRepository.findAll();
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 
@@ -31,7 +33,9 @@ export class StudyMaterialQueryAdapter implements StudyMaterialQueryPort {
     diffId: LawDiffId,
   ): Promise<StudyMaterialEntitySchema | null> {
     const doc = await this.studyMaterialRepository.findByDiffId(diffId);
-    if (!doc) return null;
+    if (!doc) {
+      return null;
+    }
     return this.toEntity(doc);
   }
 

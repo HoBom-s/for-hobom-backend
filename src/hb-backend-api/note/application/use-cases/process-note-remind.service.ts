@@ -34,7 +34,9 @@ export class ProcessNoteRemindService implements ProcessNoteRemindUseCase {
   @Transactional()
   public async invoke(): Promise<void> {
     const users = await this.userQueryPort.findAll();
-    if (users.length === 0) return;
+    if (users.length === 0) {
+      return;
+    }
 
     const today = new Date();
     await this.processUsersSequentially(users, today);
@@ -72,7 +74,9 @@ export class ProcessNoteRemindService implements ProcessNoteRemindUseCase {
   ): NoteEntitySchema[] {
     return notes.filter((note) => {
       const reminder = note.getReminder;
-      if (reminder == null) return false;
+      if (reminder == null) {
+        return false;
+      }
       return this.isDueToday(reminder, today);
     });
   }

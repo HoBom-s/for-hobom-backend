@@ -25,7 +25,7 @@ export class MenuRecommendationQueryAdapter
   }
 
   private async getBy(): Promise<MenuRecommendationWithRelationsEntity[]> {
-    return await this.menuRecommendationRepository.findAll();
+    return this.menuRecommendationRepository.findAll();
   }
 
   private convertToRelationEntity(

@@ -16,7 +16,9 @@ export class LawVersionQueryAdapter implements LawVersionQueryPort {
 
   public async findAll(): Promise<LawVersionEntitySchema[]> {
     const docs = await this.lawVersionRepository.findAll();
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 
@@ -27,7 +29,9 @@ export class LawVersionQueryAdapter implements LawVersionQueryPort {
 
   public async findLatest(): Promise<LawVersionEntitySchema | null> {
     const doc = await this.lawVersionRepository.findLatest();
-    if (!doc) return null;
+    if (!doc) {
+      return null;
+    }
     return this.toEntity(doc);
   }
 
@@ -38,6 +42,7 @@ export class LawVersionQueryAdapter implements LawVersionQueryPort {
       doc.lawName,
       doc.proclamationDate,
       doc.enforcementDate,
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       (doc.articles ?? []).map((a) =>
         LawArticle.of(a.articleNo, a.title, a.content, a.paragraphs),
       ),

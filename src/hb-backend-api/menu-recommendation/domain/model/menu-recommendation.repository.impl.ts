@@ -31,13 +31,13 @@ export class MenuRecommendationRepositoryImpl
         },
       ],
       {
-        session: session,
+        session,
       },
     );
   }
 
   public async findAll(): Promise<MenuRecommendationWithRelationsEntity[]> {
-    return await this.menuRecommendationModel
+    return this.menuRecommendationModel
       .aggregate([
         ...MenuRecommendationAggregationHelper.buildUserJoin(),
         ...MenuRecommendationAggregationHelper.buildProject(),

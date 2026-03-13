@@ -58,7 +58,9 @@ export class FutureMessageDomain {
   }
 
   public isDueToSend(now: Date): boolean {
-    if (this.isSentMessage()) return false;
+    if (this.isSentMessage()) {
+      return false;
+    }
 
     const scheduledDate = new Date(this.scheduledAt);
     const isScheduledTimeReached = scheduledDate <= now;

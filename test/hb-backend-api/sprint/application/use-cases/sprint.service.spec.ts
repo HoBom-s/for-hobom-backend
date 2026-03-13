@@ -408,7 +408,7 @@ describe("CompleteSprintService", () => {
 
     expect(persistencePort.update).toHaveBeenCalledWith(id, {
       status: "COMPLETED",
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
       completedAt: expect.any(Date),
     });
   });

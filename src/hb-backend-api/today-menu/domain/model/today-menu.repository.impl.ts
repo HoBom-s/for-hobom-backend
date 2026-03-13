@@ -25,19 +25,13 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
       const [todayMenuDocument] = await this.todayMenuModel.create(
         [
           {
-            recommendedMenu:
-              entity.getRecommendedMenu?.raw == null
-                ? null
-                : entity.getRecommendedMenu.raw,
+            recommendedMenu: entity.getRecommendedMenu?.raw ?? null,
             candidates: entity.getCandidates.map((c) => c.raw),
-            recommendationDate:
-              entity.getRecommendationDate == null
-                ? null
-                : entity.getRecommendationDate.value,
+            recommendationDate: entity.getRecommendationDate?.value ?? null,
           },
         ],
         {
-          session: session,
+          session,
         },
       );
 
@@ -49,22 +43,16 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
         },
         {
           $set: {
-            recommendedMenu:
-              entity.getRecommendedMenu?.raw == null
-                ? null
-                : entity.getRecommendedMenu.raw,
+            recommendedMenu: entity.getRecommendedMenu?.raw ?? null,
             candidates: entity.getCandidates.map((item) => item.raw),
-            recommendationDate:
-              entity.getRecommendationDate == null
-                ? null
-                : entity.getRecommendationDate.value,
+            recommendationDate: entity.getRecommendationDate?.value ?? null,
           },
         },
         {
           upsert: true,
           setDefaultsOnInsert: true,
           new: true,
-          session: session,
+          session,
         },
       );
 

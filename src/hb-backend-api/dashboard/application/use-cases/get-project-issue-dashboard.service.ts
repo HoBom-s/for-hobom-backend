@@ -39,8 +39,7 @@ export class GetProjectIssueDashboardService
     }
 
     const doneStatusIds =
-      project.workflow?.statuses?.filter((s) => s.isDone).map((s) => s.id) ??
-      [];
+      project.workflow?.statuses.filter((s) => s.isDone).map((s) => s.id) ?? [];
 
     const [result] = await this.issueModel
       .aggregate<IssueFacetResult>([

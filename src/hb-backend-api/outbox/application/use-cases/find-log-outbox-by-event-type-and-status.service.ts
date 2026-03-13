@@ -29,10 +29,7 @@ export class FindLogOutboxByEventTypeAndStatusService
     eventType: EventType,
     status: OutboxStatus,
   ): Promise<FindOutboxEntity[]> {
-    return await this.outboxQueryPort.findByEventTypeAndStatus(
-      eventType,
-      status,
-    );
+    return this.outboxQueryPort.findByEventTypeAndStatus(eventType, status);
   }
 
   private toResult(outbox: FindOutboxEntity[]): FindOutboxLogQueryResult[] {

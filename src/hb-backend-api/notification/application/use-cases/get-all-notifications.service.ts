@@ -15,7 +15,9 @@ export class GetAllNotificationsService implements GetAllNotificationsUseCase {
   public async invoke(owner: UserId): Promise<NotificationQueryResult[]> {
     const notifications =
       await this.notificationQueryPort.findAllByOwner(owner);
-    if (notifications.length === 0) return [];
+    if (notifications.length === 0) {
+      return [];
+    }
     return notifications.map(NotificationQueryResult.from);
   }
 }

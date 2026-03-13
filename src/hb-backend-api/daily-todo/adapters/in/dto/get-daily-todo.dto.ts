@@ -56,7 +56,7 @@ export class GetDailyTodoDto {
   @ApiProperty({ type: String })
   date: Date;
 
-  @ApiProperty({ type: ReactionDto || null })
+  @ApiProperty({ type: ReactionDto, nullable: true })
   reaction: ReactionType | null;
 
   @ApiProperty({ enum: DailyTodoCompleteStatus })
