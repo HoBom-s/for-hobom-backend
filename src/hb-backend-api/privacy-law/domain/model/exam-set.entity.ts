@@ -20,13 +20,17 @@ export class ExamSetEntity extends BaseEntity {
   @Prop({
     type: [
       {
-        no: Number,
-        subject: String,
-        type: String,
-        question: String,
-        choices: [String],
-        answer: String,
-        explanation: String,
+        no: { type: Number, required: true },
+        subject: { type: String, required: true },
+        type: {
+          type: String,
+          required: true,
+          enum: ["OX", "MULTIPLE_CHOICE"],
+        },
+        question: { type: String, required: true },
+        choices: { type: [String], default: [] },
+        answer: { type: String, required: true },
+        explanation: { type: String, required: true },
       },
     ],
     default: [],

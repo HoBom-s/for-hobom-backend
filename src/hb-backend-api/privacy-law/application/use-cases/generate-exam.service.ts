@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { GenerateExamUseCase } from "../../domain/ports/in/generate-exam.use-case";
 import { DIToken } from "../../../../shared/di/token.di";
 import { LawVersionQueryPort } from "../../domain/ports/out/law-version-query.port";
@@ -21,8 +21,12 @@ const EXAM_BATCHES = [
   },
 ];
 
+const VALID_TYPES = new Set(["OX", "MULTIPLE_CHOICE"]);
+
 @Injectable()
 export class GenerateExamService implements GenerateExamUseCase {
+  private readonly logger = new Logger(GenerateExamService.name);
+
   constructor(
     @Inject(DIToken.PrivacyLawModule.LawVersionQueryPort)
     private readonly lawVersionQueryPort: LawVersionQueryPort,
@@ -59,7 +63,32 @@ export class GenerateExamService implements GenerateExamUseCase {
         subject: batch.subject,
         questionCount: batch.questionCount,
       });
-      allQuestions.push(...result.questions);
+      const validated = result.questions.filter((q, i) => {
+        if (
+          !q.subject ||
+          !q.type ||
+          !q.question ||
+          !q.answer ||
+          !q.explanation
+        ) {
+          this.logger.warn(
+            `Batch "${batch.subject}" 문제 #${i + 1}: 필수 필드 누락`,
+          );
+          return false;
+        }
+        if (!VALID_TYPES.has(q.type)) {
+          this.logger.warn(
+            `Batch "${batch.subject}" 문제 #${i + 1}: 유효하지 않은 type "${q.type}"`,
+          );
+          return false;
+        }
+        return true;
+      });
+      allQuestions.push(...validated);
+    }
+
+    if (allQuestions.length === 0) {
+      throw new Error("모든 배치에서 유효한 문제가 생성되지 않았어요.");
     }
 
     const numberedQuestions = allQuestions.map((q, i) => ({

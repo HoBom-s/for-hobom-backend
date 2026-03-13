@@ -163,6 +163,90 @@ describe("GenerateExamService", () => {
       expect(savedData.title).toBe("제6회 CPPG 모의고사");
     });
 
+    it("should filter out questions with invalid type", async () => {
+      lawVersionQueryPort.findLatest.mockResolvedValue(mockLawVersion);
+      const invalidTypeQuestion = {
+        ...mockQuestion,
+        type: "INVALID_TYPE",
+      };
+      llmExamPort.generateExam.mockResolvedValue({
+        questions: [mockQuestion, invalidTypeQuestion, mockQuestion],
+      });
+      examSetPersistencePort.countAll.mockResolvedValue(0);
+      examSetPersistencePort.save.mockImplementation((data) =>
+        Promise.resolve(
+          ExamSetEntitySchema.of(
+            ExamSetId.fromString(new Types.ObjectId().toHexString()),
+            data.title,
+            data.version,
+            data.lawVersionId,
+            data.totalQuestions,
+            data.questions,
+            new Date(),
+          ),
+        ),
+      );
+
+      await service.invoke();
+
+      const savedData = examSetPersistencePort.save.mock.calls[0][0];
+      expect(savedData.totalQuestions).toBe(6);
+    });
+
+    it("should filter out questions with missing required fields", async () => {
+      lawVersionQueryPort.findLatest.mockResolvedValue(mockLawVersion);
+      const missingFieldQuestion = {
+        subject: "",
+        type: "OX",
+        question: "",
+        choices: [],
+        answer: "O",
+        explanation: "",
+      };
+      llmExamPort.generateExam.mockResolvedValue({
+        questions: [mockQuestion, missingFieldQuestion],
+      });
+      examSetPersistencePort.countAll.mockResolvedValue(0);
+      examSetPersistencePort.save.mockImplementation((data) =>
+        Promise.resolve(
+          ExamSetEntitySchema.of(
+            ExamSetId.fromString(new Types.ObjectId().toHexString()),
+            data.title,
+            data.version,
+            data.lawVersionId,
+            data.totalQuestions,
+            data.questions,
+            new Date(),
+          ),
+        ),
+      );
+
+      await service.invoke();
+
+      const savedData = examSetPersistencePort.save.mock.calls[0][0];
+      expect(savedData.totalQuestions).toBe(3);
+    });
+
+    it("should throw when all batches produce zero valid questions", async () => {
+      lawVersionQueryPort.findLatest.mockResolvedValue(mockLawVersion);
+      llmExamPort.generateExam.mockResolvedValue({
+        questions: [
+          {
+            subject: "",
+            type: "BAD",
+            question: "",
+            choices: [],
+            answer: "",
+            explanation: "",
+          },
+        ],
+      });
+
+      await expect(service.invoke()).rejects.toThrow(
+        "모든 배치에서 유효한 문제가 생성되지 않았어요.",
+      );
+    });
+
     it("should pass law articles to LLM port", async () => {
       lawVersionQueryPort.findLatest.mockResolvedValue(mockLawVersion);
       llmExamPort.generateExam.mockResolvedValue({
