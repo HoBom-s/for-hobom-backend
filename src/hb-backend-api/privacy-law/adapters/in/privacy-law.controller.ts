@@ -20,18 +20,24 @@ import { GetStudyMaterialByIdUseCase } from "../../domain/ports/in/get-study-mat
 import { AskQuestionUseCase } from "../../domain/ports/in/ask-question.use-case";
 import { GetQuestionHistoriesUseCase } from "../../domain/ports/in/get-question-histories.use-case";
 import { FetchLawVersionUseCase } from "../../domain/ports/in/fetch-law-version.use-case";
+import { GenerateExamUseCase } from "../../domain/ports/in/generate-exam.use-case";
+import { GetExamSetsUseCase } from "../../domain/ports/in/get-exam-sets.use-case";
+import { GetExamSetByIdUseCase } from "../../domain/ports/in/get-exam-set-by-id.use-case";
 import { LawVersionId } from "../../domain/model/law-version-id.vo";
 import { LawDiffId } from "../../domain/model/law-diff-id.vo";
 import { StudyMaterialId } from "../../domain/model/study-material-id.vo";
+import { ExamSetId } from "../../domain/model/exam-set-id.vo";
 import { ParseLawVersionIdPipe } from "./dto/law-version-id.pipe";
 import { ParseLawDiffIdPipe } from "./dto/law-diff-id.pipe";
 import { ParseStudyMaterialIdPipe } from "./dto/study-material-id.pipe";
+import { ParseExamSetIdPipe } from "./dto/exam-set-id.pipe";
 import { GetLawVersionDto } from "./dto/get-law-version.dto";
 import { GetLawDiffDto } from "./dto/get-law-diff.dto";
 import { GetStudyMaterialDto } from "./dto/get-study-material.dto";
 import { AskQuestionDto } from "./dto/ask-question.dto";
 import { AskQuestionResponseDto } from "./dto/ask-question-response.dto";
 import { GetQuestionHistoryDto } from "./dto/get-question-history.dto";
+import { GetExamSetDto, GetExamSetDetailDto } from "./dto/get-exam-set.dto";
 
 @ApiTags("Privacy Law")
 @Controller(`${EndPointPrefixConstant}/privacy-law`)
@@ -55,6 +61,12 @@ export class PrivacyLawController {
     private readonly getQuestionHistoriesUseCase: GetQuestionHistoriesUseCase,
     @Inject(DIToken.PrivacyLawModule.FetchLawVersionUseCase)
     private readonly fetchLawVersionUseCase: FetchLawVersionUseCase,
+    @Inject(DIToken.PrivacyLawModule.GenerateExamUseCase)
+    private readonly generateExamUseCase: GenerateExamUseCase,
+    @Inject(DIToken.PrivacyLawModule.GetExamSetsUseCase)
+    private readonly getExamSetsUseCase: GetExamSetsUseCase,
+    @Inject(DIToken.PrivacyLawModule.GetExamSetByIdUseCase)
+    private readonly getExamSetByIdUseCase: GetExamSetByIdUseCase,
   ) {}
 
   @ApiOperation({ summary: "법률 버전 목록 조회" })
@@ -135,5 +147,34 @@ export class PrivacyLawController {
   @Post("fetch")
   public async fetchLawVersion(): Promise<void> {
     await this.fetchLawVersionUseCase.invoke();
+  }
+
+  @ApiOperation({ summary: "CPPG 모의고사 생성" })
+  @ApiResponse({ type: GetExamSetDetailDto })
+  @UseGuards(JwtAuthGuard)
+  @Post("exams")
+  public async generateExam(): Promise<GetExamSetDetailDto> {
+    const examSet = await this.generateExamUseCase.invoke();
+    return GetExamSetDetailDto.from(examSet);
+  }
+
+  @ApiOperation({ summary: "모의고사 히스토리 목록 조회" })
+  @ApiResponse({ type: [GetExamSetDto] })
+  @UseGuards(JwtAuthGuard)
+  @Get("exams")
+  public async getExamSets(): Promise<GetExamSetDto[]> {
+    const examSets = await this.getExamSetsUseCase.invoke();
+    return examSets.map(GetExamSetDto.from);
+  }
+
+  @ApiOperation({ summary: "모의고사 단건 조회" })
+  @ApiResponse({ type: GetExamSetDetailDto })
+  @UseGuards(JwtAuthGuard)
+  @Get("exams/:id")
+  public async getExamSetById(
+    @Param("id", ParseExamSetIdPipe) id: ExamSetId,
+  ): Promise<GetExamSetDetailDto> {
+    const examSet = await this.getExamSetByIdUseCase.invoke(id);
+    return GetExamSetDetailDto.from(examSet);
   }
 }

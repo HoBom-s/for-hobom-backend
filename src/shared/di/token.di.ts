@@ -496,5 +496,17 @@ export class DIToken {
     public static GetQuestionHistoriesUseCase = this.register(
       "GetQuestionHistoriesUseCase",
     );
+
+    public static ExamSetRepository = this.register("ExamSetRepository");
+    public static LlmExamPort = this.register("LlmExamPort");
+    public static ExamSetPersistencePort = this.register(
+      "ExamSetPersistencePort",
+    );
+    public static ExamSetQueryPort = this.register("ExamSetQueryPort");
+    public static GenerateExamUseCase = this.register("GenerateExamUseCase");
+    public static GetExamSetsUseCase = this.register("GetExamSetsUseCase");
+    public static GetExamSetByIdUseCase = this.register(
+      "GetExamSetByIdUseCase",
+    );
   };
 }

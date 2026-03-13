@@ -36,6 +36,15 @@ import { GetQuestionHistoriesService } from "./application/use-cases/get-questio
 import { QuestionHistoryRepositoryImpl } from "./infra/repositories/question-history.repository.impl";
 import { QuestionHistoryPersistenceAdapter } from "./adapters/out/question-history-persistence.adapter";
 import { QuestionHistoryQueryAdapter } from "./adapters/out/question-history-query.adapter";
+import { ExamSetEntity } from "./domain/model/exam-set.entity";
+import { ExamSetSchema } from "./domain/model/exam-set.schema";
+import { ExamSetRepositoryImpl } from "./infra/repositories/exam-set.repository.impl";
+import { ExamSetPersistenceAdapter } from "./adapters/out/exam-set-persistence.adapter";
+import { ExamSetQueryAdapter } from "./adapters/out/exam-set-query.adapter";
+import { LlmExamAdapter } from "./adapters/out/llm-exam.adapter";
+import { GenerateExamService } from "./application/use-cases/generate-exam.service";
+import { GetExamSetsService } from "./application/use-cases/get-exam-sets.service";
+import { GetExamSetByIdService } from "./application/use-cases/get-exam-set-by-id.service";
 
 @Module({
   imports: [
@@ -55,6 +64,10 @@ import { QuestionHistoryQueryAdapter } from "./adapters/out/question-history-que
       {
         name: QuestionHistoryEntity.name,
         schema: QuestionHistorySchema,
+      },
+      {
+        name: ExamSetEntity.name,
+        schema: ExamSetSchema,
       },
     ]),
     OutboxModule,
@@ -153,6 +166,34 @@ import { QuestionHistoryQueryAdapter } from "./adapters/out/question-history-que
     {
       provide: DIToken.PrivacyLawModule.GetQuestionHistoriesUseCase,
       useClass: GetQuestionHistoriesService,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.ExamSetRepository,
+      useClass: ExamSetRepositoryImpl,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.LlmExamPort,
+      useClass: LlmExamAdapter,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.ExamSetPersistencePort,
+      useClass: ExamSetPersistenceAdapter,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.ExamSetQueryPort,
+      useClass: ExamSetQueryAdapter,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.GenerateExamUseCase,
+      useClass: GenerateExamService,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.GetExamSetsUseCase,
+      useClass: GetExamSetsService,
+    },
+    {
+      provide: DIToken.PrivacyLawModule.GetExamSetByIdUseCase,
+      useClass: GetExamSetByIdService,
     },
   ],
   exports: [MongooseModule],
