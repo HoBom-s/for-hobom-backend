@@ -50,25 +50,30 @@ export class LawVersionRepositoryImpl implements LawVersionRepository {
   }
 
   public async findAll(): Promise<LawVersionDocument[]> {
-    return this.model.find().sort({ proclamationDate: -1 }).exec();
+    return (await this.model
+      .find()
+      .sort({ proclamationDate: -1 })
+      .lean()
+      .exec()) as unknown as LawVersionDocument[];
   }
 
   public async findById(id: LawVersionId): Promise<LawVersionDocument> {
-    const found = await this.model.findOne({ _id: id.raw }).exec();
+    const found = await this.model.findOne({ _id: id.raw }).lean().exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 법률 버전을 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as LawVersionDocument;
   }
 
   public async findLatest(): Promise<LawVersionDocument | null> {
     const session = MongoSessionContext.getSession();
-    return this.model
+    return (await this.model
       .findOne()
       .sort({ createdAt: -1 })
       .session(session ?? null)
-      .exec();
+      .lean()
+      .exec()) as unknown as LawVersionDocument | null;
   }
 }

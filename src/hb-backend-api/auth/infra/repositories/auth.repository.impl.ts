@@ -36,7 +36,10 @@ export class AuthRepositoryImpl implements AuthRepository {
   public async findByNickname(
     nickname: UserNickname,
   ): Promise<AuthEntity | null> {
-    const foundAuth = await this.authModel.findOne({ nickname: nickname.raw });
+    const foundAuth = await this.authModel
+      .findOne({ nickname: nickname.raw })
+      .lean()
+      .exec();
     if (foundAuth == null) {
       return null;
     }

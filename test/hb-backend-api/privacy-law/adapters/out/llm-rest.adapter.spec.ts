@@ -1,6 +1,8 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { BadGatewayException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { LlmRestAdapter } from "../../../../../src/hb-backend-api/privacy-law/adapters/out/llm-rest.adapter";
+import { TraceContext } from "../../../../../src/shared/trace/trace.context";
 
 describe("LlmRestAdapter", () => {
   let adapter: LlmRestAdapter;
@@ -27,6 +29,10 @@ describe("LlmRestAdapter", () => {
             }),
             getOrThrow: jest.fn().mockReturnValue("test-api-key"),
           },
+        },
+        {
+          provide: TraceContext,
+          useValue: { getTraceId: jest.fn().mockReturnValue("test-trace-id") },
         },
       ],
     }).compile();
@@ -66,10 +72,11 @@ describe("LlmRestAdapter", () => {
         "http://localhost:3000/api/v1/ask",
         expect.objectContaining({
           method: "POST",
-          headers: {
+          headers: expect.objectContaining({
             "Content-Type": "application/json",
             "x-api-key": "test-api-key",
-          },
+            "x-hobom-trace-id": "test-trace-id",
+          }),
           body: JSON.stringify(mockRequest),
         }),
       );
@@ -91,21 +98,23 @@ describe("LlmRestAdapter", () => {
       expect(result.referencedArticles).toEqual(["제15조", "제17조"]);
     });
 
-    it("should throw when response is not ok", async () => {
+    it("should throw BadGatewayException when response is not ok", async () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 502,
       });
 
       await expect(adapter.ask(mockRequest)).rejects.toThrow(
-        "LLM REST 호출에 실패했어요. status=502",
+        BadGatewayException,
       );
     });
 
-    it("should throw when fetch fails", async () => {
+    it("should throw BadGatewayException when fetch fails", async () => {
       mockFetch.mockRejectedValue(new Error("ECONNREFUSED"));
 
-      await expect(adapter.ask(mockRequest)).rejects.toThrow("ECONNREFUSED");
+      await expect(adapter.ask(mockRequest)).rejects.toThrow(
+        BadGatewayException,
+      );
     });
   });
 });

@@ -35,17 +35,23 @@ export class ProjectLabelRepositoryImpl implements ProjectLabelRepository {
   public async findByProject(
     projectId: ProjectId,
   ): Promise<ProjectLabelDocument[]> {
-    return this.projectLabelModel.find({ project: projectId.raw }).exec();
+    return (await this.projectLabelModel
+      .find({ project: projectId.raw })
+      .lean()
+      .exec()) as unknown as ProjectLabelDocument[];
   }
 
   public async findById(id: ProjectLabelId): Promise<ProjectLabelDocument> {
-    const found = await this.projectLabelModel.findOne({ _id: id.raw }).exec();
+    const found = await this.projectLabelModel
+      .findOne({ _id: id.raw })
+      .lean()
+      .exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 프로젝트 라벨을 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as ProjectLabelDocument;
   }
 
   public async update(

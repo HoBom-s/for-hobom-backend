@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { Module } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
 import { MongooseModule } from "@nestjs/mongoose";
@@ -41,6 +42,10 @@ import { DlqModule } from "./hb-backend-api/dlq/dlq.module";
       useFactory: (configService: ConfigService) => ({
         pinoHttp: {
           level: configService.get<string>("LOG_LEVEL", "info"),
+          genReqId: (req) => {
+            const raw = req.headers["x-hobom-trace-id"];
+            return typeof raw === "string" ? raw : randomUUID();
+          },
           transport:
             configService.get<string>("NODE_ENV") !== "production"
               ? {

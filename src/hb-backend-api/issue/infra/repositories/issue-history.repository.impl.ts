@@ -35,10 +35,11 @@ export class IssueHistoryRepositoryImpl implements IssueHistoryRepository {
   }
 
   public async findByIssue(issueId: IssueId): Promise<IssueHistoryDocument[]> {
-    return this.issueHistoryModel
+    return (await this.issueHistoryModel
       .find({ issue: issueId.raw })
       .sort({ createdAt: -1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as IssueHistoryDocument[];
   }
 
   public async findByProject(
@@ -46,13 +47,14 @@ export class IssueHistoryRepositoryImpl implements IssueHistoryRepository {
     startDate: Date,
     endDate: Date,
   ): Promise<IssueHistoryDocument[]> {
-    return this.issueHistoryModel
+    return (await this.issueHistoryModel
       .find({
         project: projectId.raw,
         createdAt: { $gte: startDate, $lte: endDate },
       })
       .sort({ createdAt: -1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as IssueHistoryDocument[];
   }
 
   public async deleteByProject(projectId: ProjectId): Promise<void> {

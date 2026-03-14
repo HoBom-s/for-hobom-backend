@@ -1,6 +1,8 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { BadGatewayException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { LlmExamAdapter } from "../../../../../src/hb-backend-api/privacy-law/adapters/out/llm-exam.adapter";
+import { TraceContext } from "../../../../../src/shared/trace/trace.context";
 
 describe("LlmExamAdapter", () => {
   let adapter: LlmExamAdapter;
@@ -27,6 +29,10 @@ describe("LlmExamAdapter", () => {
             }),
             getOrThrow: jest.fn().mockReturnValue("test-api-key"),
           },
+        },
+        {
+          provide: TraceContext,
+          useValue: { getTraceId: jest.fn().mockReturnValue("test-trace-id") },
         },
       ],
     }).compile();
@@ -66,10 +72,11 @@ describe("LlmExamAdapter", () => {
         "http://localhost:3000/api/v1/generate-exam",
         expect.objectContaining({
           method: "POST",
-          headers: {
+          headers: expect.objectContaining({
             "Content-Type": "application/json",
             "x-api-key": "test-api-key",
-          },
+            "x-hobom-trace-id": "test-trace-id",
+          }),
           body: JSON.stringify(mockRequest),
         }),
       );
@@ -88,33 +95,33 @@ describe("LlmExamAdapter", () => {
       expect(result.questions[0].answer).toBe("O");
     });
 
-    it("should throw when response is not ok", async () => {
+    it("should throw BadGatewayException when response is not ok", async () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
       });
 
       await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
-        "LLM 모의고사 생성 호출에 실패했어요. status=500",
+        BadGatewayException,
       );
     });
 
-    it("should throw when response is 401", async () => {
+    it("should throw BadGatewayException when response is 401", async () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
       });
 
       await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
-        "status=401",
+        BadGatewayException,
       );
     });
 
-    it("should throw when fetch itself fails", async () => {
+    it("should throw BadGatewayException when fetch itself fails", async () => {
       mockFetch.mockRejectedValue(new Error("Network error"));
 
       await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
-        "Network error",
+        BadGatewayException,
       );
     });
   });

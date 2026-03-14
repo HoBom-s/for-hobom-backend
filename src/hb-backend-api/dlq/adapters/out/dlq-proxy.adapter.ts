@@ -1,12 +1,18 @@
 import { BadGatewayException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { DlqProxyPort } from "../../domain/ports/out/dlq-proxy.port";
+import { TraceContext } from "../../../../shared/trace/trace.context";
+
+const REQUEST_TIMEOUT_MS = 10_000;
 
 @Injectable()
 export class DlqProxyAdapter implements DlqProxyPort {
   private readonly baseUrl: string;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly traceContext: TraceContext,
+  ) {
     const host = this.configService.get<string>(
       "HOBOM_EVENT_PROCESSOR_HOST",
       "localhost",
@@ -66,12 +72,30 @@ export class DlqProxyAdapter implements DlqProxyPort {
   }
 
   private async fetch(url: string, init?: RequestInit): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const traceId = this.traceContext.getTraceId();
+
     try {
-      return await fetch(url, init);
-    } catch {
+      return await fetch(url, {
+        ...init,
+        headers: {
+          ...init?.headers,
+          ...(traceId ? { "x-hobom-trace-id": traceId } : {}),
+        },
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        throw new BadGatewayException(
+          `event-processor 호출이 ${REQUEST_TIMEOUT_MS}ms 내에 응답하지 않았어요.`,
+        );
+      }
       throw new BadGatewayException(
         "event-processor에 연결할 수 없어요. 서비스가 실행 중인지 확인해 주세요.",
       );
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 }

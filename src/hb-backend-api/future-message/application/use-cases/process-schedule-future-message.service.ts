@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { from, lastValueFrom } from "rxjs";
-import { concatMap } from "rxjs/operators";
+import { mergeMap } from "rxjs/operators";
 import { ProcessScheduleFutureMessageUseCase } from "../../domain/ports/in/process-schedule-future-message.use-case";
 import { FutureMessageQueryPort } from "../../domain/ports/out/future-message-query.port";
 import { FutureMessageDomain } from "../../domain/model/future-message.domain";
@@ -41,7 +41,7 @@ export class ProcessScheduleFutureMessageService
     if (dueMessages.length === 0) {
       return;
     }
-    await this.processMessagesSequentially(dueMessages);
+    await this.processMessagesConcurrently(dueMessages);
   }
 
   private async getDueMessages(): Promise<FutureMessageDomain[]> {
@@ -55,12 +55,12 @@ export class ProcessScheduleFutureMessageService
     return domains.filter((message) => message.isDueToSend(now));
   }
 
-  private async processMessagesSequentially(
+  private async processMessagesConcurrently(
     messages: FutureMessageDomain[],
   ): Promise<void> {
     await lastValueFrom(
       from(messages).pipe(
-        concatMap((message) => from(this.sendAndMarkAsSent(message))),
+        mergeMap((message) => from(this.sendAndMarkAsSent(message)), 10),
       ),
     );
   }

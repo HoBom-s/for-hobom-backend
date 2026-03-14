@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { BadGatewayException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { DlqProxyAdapter } from "../../../../../src/hb-backend-api/dlq/adapters/out/dlq-proxy.adapter";
+import { TraceContext } from "../../../../../src/shared/trace/trace.context";
 
 describe("DlqProxyAdapter", () => {
   let adapter: DlqProxyAdapter;
@@ -28,6 +29,10 @@ describe("DlqProxyAdapter", () => {
             }),
           },
         },
+        {
+          provide: TraceContext,
+          useValue: { getTraceId: jest.fn().mockReturnValue("test-trace-id") },
+        },
       ],
     }).compile();
 
@@ -45,7 +50,12 @@ describe("DlqProxyAdapter", () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         "http://localhost:8082/hobom-event-processor/internal/api/v1/dlq",
-        undefined,
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+          headers: expect.objectContaining({
+            "x-hobom-trace-id": "test-trace-id",
+          }),
+        }),
       );
       expect(result.items).toEqual(["dlq:menu:1", "dlq:menu:2"]);
     });
@@ -60,7 +70,12 @@ describe("DlqProxyAdapter", () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         "http://localhost:8082/hobom-event-processor/internal/api/v1/dlq?prefix=dlq%3Amenu%3A",
-        undefined,
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+          headers: expect.objectContaining({
+            "x-hobom-trace-id": "test-trace-id",
+          }),
+        }),
       );
     });
 
@@ -83,7 +98,12 @@ describe("DlqProxyAdapter", () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         "http://localhost:8082/hobom-event-processor/internal/api/v1/dlq/dlq%3Amenu%3A1",
-        undefined,
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+          headers: expect.objectContaining({
+            "x-hobom-trace-id": "test-trace-id",
+          }),
+        }),
       );
       expect(result.item).toEqual(payload);
     });
@@ -108,7 +128,13 @@ describe("DlqProxyAdapter", () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         "http://localhost:8082/hobom-event-processor/internal/api/v1/dlq/retry/dlq%3Amenu%3A1",
-        { method: "POST" },
+        expect.objectContaining({
+          method: "POST",
+          signal: expect.any(AbortSignal),
+          headers: expect.objectContaining({
+            "x-hobom-trace-id": "test-trace-id",
+          }),
+        }),
       );
       expect(result.message).toBe("재시도 성공");
     });

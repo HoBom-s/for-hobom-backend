@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
 import { randomUUID } from "node:crypto";
-import { Request } from "express";
+import { Request, Response } from "express";
 import {
   CallHandler,
   ExecutionContext,
@@ -15,8 +15,11 @@ export class TraceInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const req = context.switchToHttp().getRequest<Request>();
+    const res = context.switchToHttp().getResponse<Response>();
     const rawTraceId = req.headers["x-hobom-trace-id"];
     const traceId = typeof rawTraceId === "string" ? rawTraceId : randomUUID();
+
+    res.setHeader("x-hobom-trace-id", traceId);
 
     return new Observable((observer) => {
       this.traceContext.run(traceId, () => {

@@ -47,53 +47,59 @@ export class IssueRepositoryImpl implements IssueRepository {
   public async findById(id: IssueId): Promise<IssueDocument> {
     const found = await this.issueModel
       .findOne({ _id: id.raw, archivedAt: null })
+      .lean()
       .exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 이슈를 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as IssueDocument;
   }
 
   public async findByIssueKey(
     projectId: ProjectId,
     issueNumber: number,
   ): Promise<IssueDocument | null> {
-    return this.issueModel
+    return (await this.issueModel
       .findOne({
         project: projectId.raw,
         issueNumber,
         archivedAt: null,
       })
-      .exec();
+      .lean()
+      .exec()) as unknown as IssueDocument | null;
   }
 
   public async findByProject(projectId: ProjectId): Promise<IssueDocument[]> {
-    return this.issueModel
+    return (await this.issueModel
       .find({ project: projectId.raw, archivedAt: null })
       .sort({ backlogOrder: 1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as IssueDocument[];
   }
 
   public async findBySprint(sprintId: SprintId): Promise<IssueDocument[]> {
-    return this.issueModel
+    return (await this.issueModel
       .find({ sprint: sprintId.raw, archivedAt: null })
       .sort({ boardOrder: 1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as IssueDocument[];
   }
 
   public async findByAssignee(userId: UserId): Promise<IssueDocument[]> {
-    return this.issueModel
+    return (await this.issueModel
       .find({ assignee: userId.raw, archivedAt: null })
       .sort({ updatedAt: -1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as IssueDocument[];
   }
 
   public async findByParent(parentId: IssueId): Promise<IssueDocument[]> {
-    return this.issueModel
+    return (await this.issueModel
       .find({ parent: parentId.raw, archivedAt: null })
-      .exec();
+      .lean()
+      .exec()) as unknown as IssueDocument[];
   }
 
   public async update(

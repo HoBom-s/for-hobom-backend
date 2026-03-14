@@ -35,22 +35,24 @@ export class IssueCommentRepositoryImpl implements IssueCommentRepository {
   }
 
   public async findByIssue(issueId: IssueId): Promise<IssueCommentDocument[]> {
-    return this.issueCommentModel
+    return (await this.issueCommentModel
       .find({ issue: issueId.raw, deletedAt: null })
       .sort({ createdAt: 1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as IssueCommentDocument[];
   }
 
   public async findById(id: IssueCommentId): Promise<IssueCommentDocument> {
     const found = await this.issueCommentModel
       .findOne({ _id: id.raw, deletedAt: null })
+      .lean()
       .exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 댓글을 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as IssueCommentDocument;
   }
 
   public async update(

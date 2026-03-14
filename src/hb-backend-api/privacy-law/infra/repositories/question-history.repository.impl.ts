@@ -23,6 +23,10 @@ export class QuestionHistoryRepositoryImpl
   }
 
   public async findAll(): Promise<QuestionHistoryDocument[]> {
-    return this.model.find().sort({ createdAt: -1 }).exec();
+    return (await this.model
+      .find()
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec()) as unknown as QuestionHistoryDocument[];
   }
 }

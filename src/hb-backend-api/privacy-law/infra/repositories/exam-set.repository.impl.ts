@@ -31,11 +31,18 @@ export class ExamSetRepositoryImpl implements ExamSetRepository {
   }
 
   public async findAll(): Promise<ExamSetDocument[]> {
-    return this.model.find().sort({ version: -1 }).exec();
+    return (await this.model
+      .find()
+      .sort({ version: -1 })
+      .lean()
+      .exec()) as unknown as ExamSetDocument[];
   }
 
   public async findById(id: string): Promise<ExamSetDocument | null> {
-    return this.model.findById(id).exec();
+    return (await this.model
+      .findById(id)
+      .lean()
+      .exec()) as unknown as ExamSetDocument | null;
   }
 
   public async countAll(): Promise<number> {

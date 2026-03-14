@@ -48,22 +48,19 @@ export class GenerateExamService implements GenerateExamUseCase {
       content: a.getContent,
     }));
 
-    const allQuestions: {
-      subject: string;
-      type: string;
-      question: string;
-      choices: string[];
-      answer: string;
-      explanation: string;
-    }[] = [];
+    const batchResults = await Promise.all(
+      EXAM_BATCHES.map((batch) =>
+        this.llmExamPort.generateExam({
+          articles,
+          subject: batch.subject,
+          questionCount: batch.questionCount,
+        }),
+      ),
+    );
 
-    for (const batch of EXAM_BATCHES) {
-      const result = await this.llmExamPort.generateExam({
-        articles,
-        subject: batch.subject,
-        questionCount: batch.questionCount,
-      });
-      const validated = result.questions.filter((q, i) => {
+    const allQuestions = batchResults.flatMap((result, batchIdx) =>
+      result.questions.filter((q, i) => {
+        const batchSubject = EXAM_BATCHES[batchIdx].subject;
         if (
           !q.subject ||
           !q.type ||
@@ -72,20 +69,19 @@ export class GenerateExamService implements GenerateExamUseCase {
           !q.explanation
         ) {
           this.logger.warn(
-            `Batch "${batch.subject}" 문제 #${i + 1}: 필수 필드 누락`,
+            `Batch "${batchSubject}" 문제 #${i + 1}: 필수 필드 누락`,
           );
           return false;
         }
         if (!VALID_TYPES.has(q.type)) {
           this.logger.warn(
-            `Batch "${batch.subject}" 문제 #${i + 1}: 유효하지 않은 type "${q.type}"`,
+            `Batch "${batchSubject}" 문제 #${i + 1}: 유효하지 않은 type "${q.type}"`,
           );
           return false;
         }
         return true;
-      });
-      allQuestions.push(...validated);
-    }
+      }),
+    );
 
     if (allQuestions.length === 0) {
       throw new Error("모든 배치에서 유효한 문제가 생성되지 않았어요.");

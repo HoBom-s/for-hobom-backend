@@ -37,31 +37,33 @@ export class SprintRepositoryImpl implements SprintRepository {
   }
 
   public async findById(id: SprintId): Promise<SprintDocument> {
-    const found = await this.sprintModel.findOne({ _id: id.raw }).exec();
+    const found = await this.sprintModel.findOne({ _id: id.raw }).lean().exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 스프린트를 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as SprintDocument;
   }
 
   public async findByProject(projectId: ProjectId): Promise<SprintDocument[]> {
-    return this.sprintModel
+    return (await this.sprintModel
       .find({ project: projectId.raw })
       .sort({ startDate: -1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as SprintDocument[];
   }
 
   public async findActiveSprint(
     projectId: ProjectId,
   ): Promise<SprintDocument | null> {
-    return this.sprintModel
+    return (await this.sprintModel
       .findOne({
         project: projectId.raw,
         status: SprintStatus.ACTIVE,
       })
-      .exec();
+      .lean()
+      .exec()) as unknown as SprintDocument | null;
   }
 
   public async update(

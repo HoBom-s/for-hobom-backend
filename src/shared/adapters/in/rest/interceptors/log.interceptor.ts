@@ -1,4 +1,4 @@
-import { catchError, from, mergeMap, Observable, of } from "rxjs";
+import { catchError, from, mergeMap, Observable, tap } from "rxjs";
 import { Request, Response } from "express";
 import {
   CallHandler,
@@ -7,6 +7,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NestInterceptor,
 } from "@nestjs/common";
 import { TraceContext } from "../../../../trace/trace.context";
@@ -22,9 +23,12 @@ import { convertToHttpMethod } from "../../../../constants/http-method.contant";
 import { JwtAuthPayloadModel } from "../../../../../hb-backend-api/auth/domain/model/jwt-auth-payload.model";
 import { UserQueryPort } from "../../../../../hb-backend-api/user/domain/ports/out/user-query.port";
 import { UserNickname } from "../../../../../hb-backend-api/user/domain/model/user-nickname.vo";
+import { UserEntitySchema } from "../../../../../hb-backend-api/user/domain/model/user.entity";
 
 @Injectable()
 export class HttpLogInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(HttpLogInterceptor.name);
+
   constructor(
     private readonly traceContext: TraceContext,
     @Inject(DIToken.OutboxModule.OutboxPersistencePort)
@@ -52,77 +56,17 @@ export class HttpLogInterceptor implements NestInterceptor {
     return from(this.userQueryPort.findByNickname(nickname)).pipe(
       mergeMap((userInfo) =>
         next.handle().pipe(
-          mergeMap((data) => {
-            const payload = OutboxPayloadFactoryRegistry.HOBOM_LOG({
-              traceId: this.traceContext.getTraceId(),
-              level: TraceInfoConstant.INFO,
-              method: convertToHttpMethod(req.method),
-              path: req.originalUrl,
-              statusCode: res.statusCode,
-              host: req.hostname,
-              userId: userInfo.getId.toString(),
-              payload: {
-                query: req.query,
-                body: (typeof req.body === "object" ? req.body : {}) as Record<
-                  string,
-                  unknown
-                >,
-                headers: req.headers,
-              },
-              serviceType: HOBO_BACKEND_SERVICE_TYPE,
-              message: `[${req.method}]-${req.originalUrl}`,
+          tap((data) => {
+            void this.saveLog(req, res, userInfo, data).catch((e) => {
+              this.logger.warn(`Failed to save log: ${String(e)}`);
             });
-
-            const outbox = CreateOutboxEntity.of(
-              EventType.HOBOM_LOG,
-              payload,
-              OutboxStatus.PENDING,
-              1,
-              1,
-            );
-
-            return from(this.outboxPersistencePort.save(outbox)).pipe(
-              mergeMap(() => of(data)),
-            );
           }),
-          catchError((err) =>
-            from(
-              (async () => {
-                const errorStatusCode =
-                  err instanceof HttpException ? err.getStatus() : 500;
-                const payload = OutboxPayloadFactoryRegistry.HOBOM_LOG({
-                  traceId: this.traceContext.getTraceId(),
-                  level: TraceInfoConstant.ERROR,
-                  method: convertToHttpMethod(req.method),
-                  path: req.originalUrl,
-                  statusCode: errorStatusCode,
-                  host: req.hostname,
-                  userId: userInfo.getId.toString(),
-                  payload: {
-                    query: req.query,
-                    body: (typeof req.body === "object"
-                      ? req.body
-                      : {}) as Record<string, unknown>,
-                    headers: req.headers,
-                    error: String(err.message ?? "Unknown error"),
-                  },
-                  serviceType: HOBO_BACKEND_SERVICE_TYPE,
-                  message: `[${req.method}] ${req.originalUrl} - ERROR`,
-                });
-
-                const outbox = CreateOutboxEntity.of(
-                  EventType.HOBOM_LOG,
-                  payload,
-                  OutboxStatus.PENDING,
-                  1,
-                  1,
-                );
-
-                await this.outboxPersistencePort.save(outbox);
-                throw err;
-              })(),
-            ),
-          ),
+          catchError((err) => {
+            void this.saveErrorLog(req, res, userInfo, err).catch((e) => {
+              this.logger.warn(`Failed to save error log: ${String(e)}`);
+            });
+            throw err;
+          }),
         ),
       ),
       catchError((err) => {
@@ -132,5 +76,84 @@ export class HttpLogInterceptor implements NestInterceptor {
         );
       }),
     );
+  }
+
+  private async saveLog(
+    req: Request,
+    res: Response,
+    userInfo: UserEntitySchema,
+    _data: unknown,
+  ): Promise<void> {
+    const payload = OutboxPayloadFactoryRegistry.HOBOM_LOG({
+      traceId: this.traceContext.getTraceId(),
+      level: TraceInfoConstant.INFO,
+      method: convertToHttpMethod(req.method),
+      path: req.originalUrl,
+      statusCode: res.statusCode,
+      host: req.hostname,
+      userId: userInfo.getId.toString(),
+      payload: {
+        query: req.query,
+        body: (typeof req.body === "object" ? req.body : {}) as Record<
+          string,
+          unknown
+        >,
+        headers: req.headers,
+      },
+      serviceType: HOBO_BACKEND_SERVICE_TYPE,
+      message: `[${req.method}]-${req.originalUrl}`,
+    });
+
+    const outbox = CreateOutboxEntity.of(
+      EventType.HOBOM_LOG,
+      payload,
+      OutboxStatus.PENDING,
+      1,
+      1,
+    );
+
+    await this.outboxPersistencePort.save(outbox);
+  }
+
+  private async saveErrorLog(
+    req: Request,
+    res: Response,
+    userInfo: UserEntitySchema,
+    err: unknown,
+  ): Promise<void> {
+    const errorStatusCode =
+      err instanceof HttpException ? err.getStatus() : 500;
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+
+    const payload = OutboxPayloadFactoryRegistry.HOBOM_LOG({
+      traceId: this.traceContext.getTraceId(),
+      level: TraceInfoConstant.ERROR,
+      method: convertToHttpMethod(req.method),
+      path: req.originalUrl,
+      statusCode: errorStatusCode,
+      host: req.hostname,
+      userId: userInfo.getId.toString(),
+      payload: {
+        query: req.query,
+        body: (typeof req.body === "object" ? req.body : {}) as Record<
+          string,
+          unknown
+        >,
+        headers: req.headers,
+        error: errorMessage,
+      },
+      serviceType: HOBO_BACKEND_SERVICE_TYPE,
+      message: `[${req.method}] ${req.originalUrl} - ERROR`,
+    });
+
+    const outbox = CreateOutboxEntity.of(
+      EventType.HOBOM_LOG,
+      payload,
+      OutboxStatus.PENDING,
+      1,
+      1,
+    );
+
+    await this.outboxPersistencePort.save(outbox);
   }
 }

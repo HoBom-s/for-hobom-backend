@@ -63,6 +63,7 @@ async function bootstrap() {
     new GlobalExceptionFilter(app.get(DiscordWebhookService)),
   );
 
+  app.enableShutdownHooks();
   app.connectMicroservice(grpcOptions);
 
   await app.startAllMicroservices();

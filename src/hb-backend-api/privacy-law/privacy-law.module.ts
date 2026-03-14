@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { DIToken } from "../../shared/di/token.di";
+import { TraceContext } from "../../shared/trace/trace.context";
 import { LawVersionEntity } from "./domain/model/law-version.entity";
 import { LawVersionSchema } from "./domain/model/law-version.schema";
 import { LawDiffEntity } from "./domain/model/law-diff.entity";
@@ -74,6 +75,7 @@ import { GetExamSetByIdService } from "./application/use-cases/get-exam-set-by-i
   ],
   controllers: [PrivacyLawController, SaveStudyMaterialGrpcController],
   providers: [
+    TraceContext,
     FetchLawVersionScheduler,
     {
       provide: DIToken.PrivacyLawModule.LawVersionRepository,

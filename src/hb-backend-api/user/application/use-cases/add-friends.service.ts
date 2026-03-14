@@ -19,8 +19,8 @@ export class AddFriendsService implements AddFriendsUseCase {
 
   @Transactional()
   public async invoke(ownerId: UserId, id: UserId): Promise<void> {
-    const foundUser = await this.userQueryPort.findById(id);
-    const friend = foundUser.getFriends.find(
+    const owner = await this.userQueryPort.findById(ownerId);
+    const friend = owner.getFriends.find(
       (item) => item.toString() === id.toString(),
     );
     if (friend) {

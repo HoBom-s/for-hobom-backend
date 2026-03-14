@@ -34,17 +34,20 @@ export class BoardRepositoryImpl implements BoardRepository {
   }
 
   public async findById(id: BoardId): Promise<BoardDocument> {
-    const found = await this.boardModel.findOne({ _id: id.raw }).exec();
+    const found = await this.boardModel.findOne({ _id: id.raw }).lean().exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 보드를 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as BoardDocument;
   }
 
   public async findByProject(projectId: ProjectId): Promise<BoardDocument[]> {
-    return this.boardModel.find({ project: projectId.raw }).exec();
+    return (await this.boardModel
+      .find({ project: projectId.raw })
+      .lean()
+      .exec()) as unknown as BoardDocument[];
   }
 
   public async update(

@@ -36,18 +36,21 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   public async findById(id: UserId): Promise<UserDocument> {
-    const foundUser = await this.userModel.findById(id.raw).exec();
+    const foundUser = await this.userModel.findById(id.raw).lean().exec();
     if (foundUser == null) {
       throw new NotFoundException(
         `해당 유저를 찾을 수 없어요. ${id.raw.toHexString()}`,
       );
     }
 
-    return foundUser;
+    return foundUser as unknown as UserDocument;
   }
 
   public async findAll(): Promise<UserDocument[]> {
-    return this.userModel.find().exec();
+    return (await this.userModel
+      .find()
+      .lean()
+      .exec()) as unknown as UserDocument[];
   }
 
   public async findByNickname(nickname: UserNickname): Promise<UserDocument> {
@@ -55,6 +58,7 @@ export class UserRepositoryImpl implements UserRepository {
       .findOne({
         nickname: nickname.raw,
       })
+      .lean()
       .exec();
     if (foundUser == null) {
       throw new NotFoundException(
@@ -62,13 +66,14 @@ export class UserRepositoryImpl implements UserRepository {
       );
     }
 
-    return foundUser;
+    return foundUser as unknown as UserDocument;
   }
 
   public async findPendingUsers(): Promise<UserDocument[]> {
-    return this.userModel
+    return (await this.userModel
       .find({ approvalStatus: ApprovalStatus.PENDING })
-      .exec();
+      .lean()
+      .exec()) as unknown as UserDocument[];
   }
 
   public async updateApprovalStatus(

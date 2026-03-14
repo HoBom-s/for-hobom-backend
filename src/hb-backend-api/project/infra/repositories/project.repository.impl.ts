@@ -47,25 +47,37 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   }
 
   public async findById(id: ProjectId): Promise<ProjectDocument> {
-    const found = await this.projectModel.findOne({ _id: id.raw }).exec();
+    const found = await this.projectModel
+      .findOne({ _id: id.raw })
+      .lean()
+      .exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 프로젝트를 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as ProjectDocument;
   }
 
   public async findByKey(key: ProjectKey): Promise<ProjectDocument | null> {
-    return this.projectModel.findOne({ key: key.raw }).exec();
+    return (await this.projectModel
+      .findOne({ key: key.raw })
+      .lean()
+      .exec()) as unknown as ProjectDocument | null;
   }
 
   public async findByOwner(owner: UserId): Promise<ProjectDocument[]> {
-    return this.projectModel.find({ owner: owner.raw }).exec();
+    return (await this.projectModel
+      .find({ owner: owner.raw })
+      .lean()
+      .exec()) as unknown as ProjectDocument[];
   }
 
   public async findByMember(userId: UserId): Promise<ProjectDocument[]> {
-    return this.projectModel.find({ "members.userId": userId.raw }).exec();
+    return (await this.projectModel
+      .find({ "members.userId": userId.raw })
+      .lean()
+      .exec()) as unknown as ProjectDocument[];
   }
 
   public async update(

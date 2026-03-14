@@ -45,26 +45,28 @@ export class NoteRepositoryImpl implements NoteRepository {
         _id: id.raw,
         $or: [{ owner: userId.raw }, { members: userId.raw }],
       })
+      .lean()
       .exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 노트를 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as NoteDocument;
   }
 
   public async findAll(
     userId: UserId,
     status: NoteStatus,
   ): Promise<NoteDocument[]> {
-    return this.noteModel
+    return (await this.noteModel
       .find({
         $or: [{ owner: userId.raw }, { members: userId.raw }],
         status,
       })
       .sort({ isPinned: -1, order: 1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as NoteDocument[];
   }
 
   public async update(

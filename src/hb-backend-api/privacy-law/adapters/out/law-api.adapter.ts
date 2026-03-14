@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, OnModuleDestroy } from "@nestjs/common";
 import { LawApiPort } from "../../domain/ports/out/law-api.port";
 import * as puppeteer from "puppeteer";
+import { createPool, Pool } from "generic-pool";
 
 interface Article {
   articleNo: string;
@@ -14,8 +15,28 @@ interface Article {
 }
 
 @Injectable()
-export class LawApiAdapter implements LawApiPort {
+export class LawApiAdapter implements LawApiPort, OnModuleDestroy {
   private static readonly LAW_URL = "https://www.law.go.kr/법령/개인정보보호법";
+
+  private readonly browserPool: Pool<puppeteer.Browser> = createPool(
+    {
+      create: () =>
+        puppeteer.launch({
+          headless: true,
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          ...(process.env.PUPPETEER_EXECUTABLE_PATH && {
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+          }),
+        }),
+      destroy: (browser) => browser.close(),
+    },
+    { min: 0, max: 2 },
+  );
+
+  async onModuleDestroy(): Promise<void> {
+    await this.browserPool.drain();
+    await this.browserPool.clear();
+  }
 
   public async fetchLaw(): Promise<{
     rawXml: string;
@@ -24,13 +45,7 @@ export class LawApiAdapter implements LawApiPort {
     enforcementDate: string;
     articles: Article[];
   }> {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      ...(process.env.PUPPETEER_EXECUTABLE_PATH && {
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-      }),
-    });
+    const browser = await this.browserPool.acquire();
 
     try {
       const page = await browser.newPage();
@@ -58,8 +73,6 @@ export class LawApiAdapter implements LawApiPort {
         waitUntil: "networkidle2",
         timeout: 60000,
       });
-      await new Promise((r) => setTimeout(r, 5000));
-
       // Step 3: Extract metadata and articles
       const result = await page.evaluate(() => {
         const getValue = (id: string) => {
@@ -191,7 +204,7 @@ export class LawApiAdapter implements LawApiPort {
         articles: result.articles,
       };
     } finally {
-      await browser.close();
+      await this.browserPool.release(browser);
     }
   }
 }
