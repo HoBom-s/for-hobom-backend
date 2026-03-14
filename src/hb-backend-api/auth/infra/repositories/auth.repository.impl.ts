@@ -78,8 +78,7 @@ export class AuthRepositoryImpl implements AuthRepository {
   }
 
   public async revokeToken(token: RefreshToken): Promise<void> {
-    await this.authModel.deleteOne({
-      refreshToken: token.raw,
-    });
+    const session = MongoSessionContext.getSession();
+    await this.authModel.deleteOne({ refreshToken: token.raw }, { session });
   }
 }

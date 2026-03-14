@@ -7,9 +7,13 @@ import { TraceContext } from "../../../../../src/shared/trace/trace.context";
 describe("DlqProxyAdapter", () => {
   let adapter: DlqProxyAdapter;
   const mockFetch = jest.fn();
+  const mockTraceContext = {
+    getTraceId: jest.fn().mockReturnValue("test-trace-id"),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockTraceContext.getTraceId.mockReturnValue("test-trace-id");
     global.fetch = mockFetch;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -31,7 +35,7 @@ describe("DlqProxyAdapter", () => {
         },
         {
           provide: TraceContext,
-          useValue: { getTraceId: jest.fn().mockReturnValue("test-trace-id") },
+          useValue: mockTraceContext,
         },
       ],
     }).compile();
@@ -153,6 +157,31 @@ describe("DlqProxyAdapter", () => {
       await expect(adapter.retry("dlq:menu:1")).rejects.toThrow(
         BadGatewayException,
       );
+    });
+
+    it("should throw BadGatewayException with timeout message on AbortError", async () => {
+      mockFetch.mockRejectedValue(new DOMException("Aborted", "AbortError"));
+
+      await expect(adapter.retry("dlq:menu:1")).rejects.toThrow("10000ms");
+    });
+  });
+
+  describe("fetch (traceId header)", () => {
+    it("should not send trace header when traceId is empty", async () => {
+      mockTraceContext.getTraceId.mockReturnValue("");
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ items: [] }),
+      });
+
+      await adapter.getList();
+
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
+      expect(headers["x-hobom-trace-id"]).toBeUndefined();
     });
   });
 });

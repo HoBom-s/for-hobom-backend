@@ -18,9 +18,10 @@ describe("TraceContext", () => {
     expect(traceContext.getTraceId()).toBe("");
   });
 
-  it("should isolate traceIds between nested runs", (done) => {
+  it("should return inner traceId in nested run()", (done) => {
     traceContext.run("outer", () => {
       expect(traceContext.getTraceId()).toBe("outer");
+
       traceContext.run("inner", () => {
         expect(traceContext.getTraceId()).toBe("inner");
         done();

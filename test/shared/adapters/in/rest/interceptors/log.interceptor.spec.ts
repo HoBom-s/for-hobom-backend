@@ -1,193 +1,274 @@
-import { of, throwError } from "rxjs";
-import { HttpException, InternalServerErrorException } from "@nestjs/common";
-import { Test } from "@nestjs/testing";
+import { lastValueFrom, of, throwError } from "rxjs";
+import {
+  BadRequestException,
+  CallHandler,
+  ExecutionContext,
+  InternalServerErrorException,
+  Logger,
+} from "@nestjs/common";
 import { HttpLogInterceptor } from "src/shared/adapters/in/rest/interceptors/log.interceptor";
-import { TraceContext } from "src/shared/trace/trace.context";
-import { DIToken } from "src/shared/di/token.di";
+import { EventType } from "src/hb-backend-api/outbox/domain/model/event-type.enum";
+import { OutboxStatus } from "src/hb-backend-api/outbox/domain/model/outbox-status.enum";
+import { TraceInfoConstant } from "src/shared/constants/trace-info.constant";
 import { UserEntitySchema } from "src/hb-backend-api/user/domain/model/user.entity";
 import { UserId } from "src/hb-backend-api/user/domain/model/user-id.vo";
 import { Types } from "mongoose";
 
 describe("HttpLogInterceptor", () => {
   let interceptor: HttpLogInterceptor;
-  const mockSave = jest.fn().mockResolvedValue(undefined);
-  const mockFindByNickname = jest.fn();
-  const mockGetTraceId = jest.fn().mockReturnValue("trace-123");
 
-  const mockUser = UserEntitySchema.of(
-    new UserId(new Types.ObjectId()),
+  const mockTraceContext = {
+    getTraceId: jest.fn().mockReturnValue("trace-123"),
+  };
+  const mockOutboxPort = { save: jest.fn().mockResolvedValue(undefined) };
+  const mockUserQueryPort = { findByNickname: jest.fn() };
+
+  const mockUserInfo = UserEntitySchema.of(
+    UserId.fromString(new Types.ObjectId().toHexString()),
     "testuser",
-    "test@test.com",
+    "test@example.com",
     "testnick",
-    "pw",
+    "hashed-pw",
   );
 
-  beforeEach(async () => {
-    jest.clearAllMocks();
-    mockFindByNickname.mockResolvedValue(mockUser);
+  const flushPromises = () =>
+    new Promise((resolve) => {
+      setImmediate(resolve);
+    });
 
-    const module = await Test.createTestingModule({
-      providers: [
-        HttpLogInterceptor,
-        {
-          provide: TraceContext,
-          useValue: { getTraceId: mockGetTraceId },
-        },
-        {
-          provide: DIToken.OutboxModule.OutboxPersistencePort,
-          useValue: { save: mockSave },
-        },
-        {
-          provide: DIToken.UserModule.UserQueryPort,
-          useValue: { findByNickname: mockFindByNickname },
-        },
-      ],
-    }).compile();
-
-    interceptor = module.get(HttpLogInterceptor);
-  });
-
-  function createContext(
-    url: string,
-    opts?: { user?: any; method?: string; path?: string },
-  ) {
+  function createRequest(overrides: Record<string, unknown> = {}) {
     return {
-      switchToHttp: () => ({
-        getRequest: () => ({
-          originalUrl: url,
-          path: opts?.path ?? url,
-          method: opts?.method ?? "GET",
-          hostname: "localhost",
-          query: {},
-          body: {},
-          headers: {},
-          user: opts?.user,
-        }),
-        getResponse: () => ({ statusCode: 200 }),
-      }),
-    } as any;
+      originalUrl: "/api/v1/daily-todos",
+      path: "/api/v1/daily-todos",
+      method: "GET",
+      hostname: "localhost",
+      query: {},
+      body: {},
+      headers: {},
+      user: { sub: "testnick" },
+      ...overrides,
+    };
   }
 
-  const mockNext = { handle: () => of("data") };
+  function createContext(req: unknown): ExecutionContext {
+    return {
+      switchToHttp: () => ({
+        getRequest: () => req,
+        getResponse: () => ({ statusCode: 200 }),
+      }),
+    } as unknown as ExecutionContext;
+  }
 
-  it("should skip /auth URL", (done) => {
-    const ctx = createContext("/auth/login");
-    interceptor.intercept(ctx, mockNext).subscribe({
-      next: (val) => expect(val).toBe("data"),
-      complete: () => {
-        expect(mockSave).not.toHaveBeenCalled();
-        done();
-      },
+  function createNext(data: unknown = { success: true }): CallHandler {
+    return { handle: () => of(data) } as unknown as CallHandler;
+  }
+
+  function createErrorNext(err: Error): CallHandler {
+    return {
+      handle: () => throwError(() => err),
+    } as unknown as CallHandler;
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(Logger.prototype, "warn").mockImplementation();
+    mockUserQueryPort.findByNickname.mockResolvedValue(mockUserInfo);
+
+    interceptor = new HttpLogInterceptor(
+      mockTraceContext as never,
+      mockOutboxPort as never,
+      mockUserQueryPort as never,
+    );
+  });
+
+  describe("skip branches (return next.handle() early)", () => {
+    it("should skip logging when URL contains /auth", async () => {
+      const req = createRequest({
+        originalUrl: "/api/v1/auth/login",
+        path: "/api/v1/auth/login",
+      });
+      const result = await lastValueFrom(
+        interceptor.intercept(createContext(req), createNext()),
+      );
+
+      expect(result).toEqual({ success: true });
+      expect(mockUserQueryPort.findByNickname).not.toHaveBeenCalled();
+      expect(mockOutboxPort.save).not.toHaveBeenCalled();
+    });
+
+    it("should skip logging when URL contains /internal", async () => {
+      const req = createRequest({
+        originalUrl: "/internal/health",
+        path: "/internal/health",
+      });
+      const result = await lastValueFrom(
+        interceptor.intercept(createContext(req), createNext()),
+      );
+
+      expect(result).toEqual({ success: true });
+      expect(mockUserQueryPort.findByNickname).not.toHaveBeenCalled();
+      expect(mockOutboxPort.save).not.toHaveBeenCalled();
+    });
+
+    it("should skip logging when path is /", async () => {
+      const req = createRequest({ originalUrl: "/", path: "/" });
+      const result = await lastValueFrom(
+        interceptor.intercept(createContext(req), createNext()),
+      );
+
+      expect(result).toEqual({ success: true });
+      expect(mockUserQueryPort.findByNickname).not.toHaveBeenCalled();
+      expect(mockOutboxPort.save).not.toHaveBeenCalled();
+    });
+
+    it("should skip logging when user.sub is null", async () => {
+      const req = createRequest({ user: { sub: null } });
+      const result = await lastValueFrom(
+        interceptor.intercept(createContext(req), createNext()),
+      );
+
+      expect(result).toEqual({ success: true });
+      expect(mockUserQueryPort.findByNickname).not.toHaveBeenCalled();
+      expect(mockOutboxPort.save).not.toHaveBeenCalled();
+    });
+
+    it("should skip logging when user is undefined", async () => {
+      const req = createRequest({ user: undefined });
+      const result = await lastValueFrom(
+        interceptor.intercept(createContext(req), createNext()),
+      );
+
+      expect(result).toEqual({ success: true });
+      expect(mockUserQueryPort.findByNickname).not.toHaveBeenCalled();
+      expect(mockOutboxPort.save).not.toHaveBeenCalled();
     });
   });
 
-  it("should skip /internal URL", (done) => {
-    const ctx = createContext("/internal/health");
-    interceptor.intercept(ctx, mockNext).subscribe({
-      next: (val) => expect(val).toBe("data"),
-      complete: () => {
-        expect(mockSave).not.toHaveBeenCalled();
-        done();
-      },
+  describe("normal flow", () => {
+    it("should save outbox log on successful request", async () => {
+      const responseData = { id: 1, name: "test" };
+      const req = createRequest({ method: "POST" });
+
+      const result = await lastValueFrom(
+        interceptor.intercept(createContext(req), createNext(responseData)),
+      );
+
+      expect(result).toEqual(responseData);
+      expect(mockUserQueryPort.findByNickname).toHaveBeenCalledTimes(1);
+
+      await flushPromises();
+
+      expect(mockOutboxPort.save).toHaveBeenCalledTimes(1);
+      const savedOutbox = mockOutboxPort.save.mock.calls[0][0];
+      expect(savedOutbox.getEventType).toBe(EventType.HOBOM_LOG);
+      expect(savedOutbox.getStatus).toBe(OutboxStatus.PENDING);
+      expect(savedOutbox.getPayload["level"]).toBe(TraceInfoConstant.INFO);
+      expect(savedOutbox.getPayload["method"]).toBe("POST");
+      expect(savedOutbox.getPayload["path"]).toBe("/api/v1/daily-todos");
+      expect(savedOutbox.getPayload["statusCode"]).toBe(200);
+      expect(savedOutbox.getPayload["userId"]).toBe(
+        mockUserInfo.getId.toString(),
+      );
+      expect(savedOutbox.getPayload["traceId"]).toBe("trace-123");
     });
   });
 
-  it("should skip root path /", (done) => {
-    const ctx = createContext("/", { path: "/" });
-    interceptor.intercept(ctx, mockNext).subscribe({
-      next: (val) => expect(val).toBe("data"),
-      complete: () => {
-        expect(mockSave).not.toHaveBeenCalled();
-        done();
-      },
-    });
-  });
+  describe("error flows", () => {
+    it("should call saveErrorLog and rethrow when next.handle() throws", async () => {
+      const error = new Error("something broke");
 
-  it("should skip when user.sub is null", (done) => {
-    const ctx = createContext("/api/test", { user: { sub: null } });
-    interceptor.intercept(ctx, mockNext).subscribe({
-      next: (val) => expect(val).toBe("data"),
-      complete: () => {
-        expect(mockSave).not.toHaveBeenCalled();
-        done();
-      },
-    });
-  });
+      await expect(
+        lastValueFrom(
+          interceptor.intercept(
+            createContext(createRequest()),
+            createErrorNext(error),
+          ),
+        ),
+      ).rejects.toThrow(InternalServerErrorException);
 
-  it("should skip when user is undefined", (done) => {
-    const ctx = createContext("/api/test", { user: undefined });
-    interceptor.intercept(ctx, mockNext).subscribe({
-      next: (val) => expect(val).toBe("data"),
-      complete: () => {
-        expect(mockSave).not.toHaveBeenCalled();
-        done();
-      },
-    });
-  });
+      await flushPromises();
 
-  it("should save outbox log on success", (done) => {
-    const ctx = createContext("/api/test", {
-      user: { sub: "testnick" },
-      method: "POST",
+      expect(mockOutboxPort.save).toHaveBeenCalledTimes(1);
+      const savedOutbox = mockOutboxPort.save.mock.calls[0][0];
+      expect(savedOutbox.getPayload["level"]).toBe(TraceInfoConstant.ERROR);
     });
 
-    interceptor.intercept(ctx, mockNext).subscribe({
-      next: (val) => expect(val).toBe("data"),
-      complete: () => {
-        expect(mockFindByNickname).toHaveBeenCalled();
-        expect(mockSave).toHaveBeenCalledTimes(1);
-        done();
-      },
-    });
-  });
+    it("should use HttpException status code in saveErrorLog", async () => {
+      const error = new BadRequestException("bad input");
 
-  it("should save error outbox log and rethrow on HttpException", (done) => {
-    const ctx = createContext("/api/test", {
-      user: { sub: "testnick" },
-      method: "GET",
-    });
-    const httpError = new HttpException("Bad Request", 400);
-    const errorNext = { handle: () => throwError(() => httpError) };
+      await expect(
+        lastValueFrom(
+          interceptor.intercept(
+            createContext(createRequest()),
+            createErrorNext(error),
+          ),
+        ),
+      ).rejects.toThrow(InternalServerErrorException);
 
-    interceptor.intercept(ctx, errorNext).subscribe({
-      error: (err: Error) => {
-        expect(mockSave).toHaveBeenCalledTimes(1);
-        expect(err).toBeInstanceOf(InternalServerErrorException);
-        done();
-      },
-    });
-  });
+      await flushPromises();
 
-  it("should save error outbox log with status 500 for non-HttpException", (done) => {
-    const ctx = createContext("/api/test", {
-      user: { sub: "testnick" },
-      method: "GET",
-    });
-    const genericError = new Error("something broke");
-    const errorNext = { handle: () => throwError(() => genericError) };
-
-    interceptor.intercept(ctx, errorNext).subscribe({
-      error: (err: Error) => {
-        expect(mockSave).toHaveBeenCalledTimes(1);
-        expect(err).toBeInstanceOf(InternalServerErrorException);
-        done();
-      },
-    });
-  });
-
-  it("should throw InternalServerErrorException when userQueryPort fails", (done) => {
-    mockFindByNickname.mockRejectedValue(new Error("DB error"));
-
-    const ctx = createContext("/api/test", {
-      user: { sub: "testnick" },
-      method: "GET",
+      expect(mockOutboxPort.save).toHaveBeenCalledTimes(1);
+      const savedOutbox = mockOutboxPort.save.mock.calls[0][0];
+      expect(savedOutbox.getPayload["statusCode"]).toBe(400);
+      expect(savedOutbox.getPayload["payload"]["error"]).toBe("bad input");
     });
 
-    interceptor.intercept(ctx, mockNext).subscribe({
-      error: (err: InternalServerErrorException) => {
-        expect(err).toBeInstanceOf(InternalServerErrorException);
-        done();
-      },
+    it("should use status 500 for non-HttpException errors in saveErrorLog", async () => {
+      const error = new Error("plain error");
+
+      await expect(
+        lastValueFrom(
+          interceptor.intercept(
+            createContext(createRequest()),
+            createErrorNext(error),
+          ),
+        ),
+      ).rejects.toThrow(InternalServerErrorException);
+
+      await flushPromises();
+
+      expect(mockOutboxPort.save).toHaveBeenCalledTimes(1);
+      const savedOutbox = mockOutboxPort.save.mock.calls[0][0];
+      expect(savedOutbox.getPayload["statusCode"]).toBe(500);
+      expect(savedOutbox.getPayload["payload"]["error"]).toBe("plain error");
+    });
+
+    it("should throw InternalServerErrorException when userQueryPort.findByNickname fails", async () => {
+      const dbError = new Error("DB connection lost");
+      mockUserQueryPort.findByNickname.mockRejectedValue(dbError);
+
+      let thrown: InternalServerErrorException | undefined;
+      try {
+        await lastValueFrom(
+          interceptor.intercept(createContext(createRequest()), createNext()),
+        );
+      } catch (e) {
+        thrown = e as InternalServerErrorException;
+      }
+
+      expect(thrown).toBeInstanceOf(InternalServerErrorException);
+      expect(thrown!.getStatus()).toBe(500);
+      expect(mockOutboxPort.save).not.toHaveBeenCalled();
+    });
+
+    it("should log warning and still return data when saveLog fails", async () => {
+      mockOutboxPort.save.mockRejectedValue(new Error("save failed"));
+      const responseData = { ok: true };
+
+      const result = await lastValueFrom(
+        interceptor.intercept(
+          createContext(createRequest()),
+          createNext(responseData),
+        ),
+      );
+
+      expect(result).toEqual(responseData);
+
+      await flushPromises();
+
+      expect(Logger.prototype.warn).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to save log"),
+      );
     });
   });
 });

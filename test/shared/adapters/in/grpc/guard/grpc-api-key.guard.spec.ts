@@ -1,61 +1,63 @@
-import { UnauthorizedException } from "@nestjs/common";
+import { ExecutionContext, UnauthorizedException } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { ConfigService } from "@nestjs/config";
+import { Metadata } from "@grpc/grpc-js";
 import { GrpcApiKeyGuard } from "src/shared/adapters/in/grpc/guard/grpc-api-key.guard";
 
 describe("GrpcApiKeyGuard", () => {
   let guard: GrpcApiKeyGuard;
-  const EXPECTED_KEY = "correct-api-key-12345";
+  const EXPECTED_KEY = "valid-api-key-123";
+
+  const mockConfigService = {
+    getOrThrow: jest.fn().mockReturnValue(EXPECTED_KEY),
+  };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+    mockConfigService.getOrThrow.mockReturnValue(EXPECTED_KEY);
+
     const module = await Test.createTestingModule({
       providers: [
         GrpcApiKeyGuard,
-        {
-          provide: ConfigService,
-          useValue: {
-            getOrThrow: jest.fn().mockReturnValue(EXPECTED_KEY),
-          },
-        },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
     guard = module.get(GrpcApiKeyGuard);
   });
 
-  function createContext(apiKey?: string) {
+  const createContext = (apiKey?: string) => {
+    const metadata = new Metadata();
+    if (apiKey) {
+      metadata.add("x-api-key", apiKey);
+    }
     return {
       switchToRpc: () => ({
-        getContext: () => ({
-          get: (key: string) => {
-            if (key === "x-api-key") {
-              return apiKey !== undefined ? [apiKey] : [undefined];
-            }
-            return [];
-          },
-        }),
+        getContext: () => metadata,
       }),
-    } as any;
-  }
+    } as unknown as ExecutionContext;
+  };
 
-  it("should return true when API key matches", () => {
+  it("API key matches -> true", () => {
     expect(guard.canActivate(createContext(EXPECTED_KEY))).toBe(true);
   });
 
-  it("should throw UnauthorizedException when API key is undefined", () => {
+  it("API key undefined (empty metadata) -> UnauthorizedException", () => {
     expect(() => guard.canActivate(createContext())).toThrow(
       UnauthorizedException,
     );
   });
 
-  it("should throw UnauthorizedException when API key does not match", () => {
-    expect(() => guard.canActivate(createContext("wrong-key-67890"))).toThrow(
+  it("API key length differs -> UnauthorizedException", () => {
+    expect(() => guard.canActivate(createContext("short"))).toThrow(
       UnauthorizedException,
     );
   });
 
-  it("should throw UnauthorizedException when API key length differs", () => {
-    expect(() => guard.canActivate(createContext("short"))).toThrow(
+  it("API key same length but wrong value -> UnauthorizedException", () => {
+    const wrongKey = "x".repeat(EXPECTED_KEY.length);
+
+    expect(() => guard.canActivate(createContext(wrongKey))).toThrow(
       UnauthorizedException,
     );
   });

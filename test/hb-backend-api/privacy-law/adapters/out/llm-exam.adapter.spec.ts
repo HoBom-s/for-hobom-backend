@@ -7,9 +7,13 @@ import { TraceContext } from "../../../../../src/shared/trace/trace.context";
 describe("LlmExamAdapter", () => {
   let adapter: LlmExamAdapter;
   const mockFetch = jest.fn();
+  const mockTraceContext = {
+    getTraceId: jest.fn().mockReturnValue("test-trace-id"),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockTraceContext.getTraceId.mockReturnValue("test-trace-id");
     global.fetch = mockFetch;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -32,7 +36,7 @@ describe("LlmExamAdapter", () => {
         },
         {
           provide: TraceContext,
-          useValue: { getTraceId: jest.fn().mockReturnValue("test-trace-id") },
+          useValue: mockTraceContext,
         },
       ],
     }).compile();
@@ -123,6 +127,31 @@ describe("LlmExamAdapter", () => {
       await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
         BadGatewayException,
       );
+    });
+
+    it("should throw BadGatewayException with timeout message on AbortError", async () => {
+      mockFetch.mockRejectedValue(new DOMException("Aborted", "AbortError"));
+
+      await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
+        "180000ms",
+      );
+    });
+
+    it("should not send trace header when traceId is empty", async () => {
+      mockTraceContext.getTraceId.mockReturnValue("");
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ questions: [] }),
+      });
+
+      await adapter.generateExam(mockRequest);
+
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
+      expect(headers["x-hobom-trace-id"]).toBeUndefined();
     });
   });
 });

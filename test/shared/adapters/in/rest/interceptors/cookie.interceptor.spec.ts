@@ -1,4 +1,5 @@
-import { of } from "rxjs";
+import { CallHandler, ExecutionContext } from "@nestjs/common";
+import { lastValueFrom, of } from "rxjs";
 import { CookiesInterceptor } from "src/shared/adapters/in/rest/interceptors/cookie.interceptor";
 
 describe("CookiesInterceptor", () => {
@@ -8,67 +9,98 @@ describe("CookiesInterceptor", () => {
     interceptor = new CookiesInterceptor();
   });
 
-  function createContext() {
-    const mockCookie = jest.fn();
-    return {
-      context: {
-        switchToHttp: () => ({
-          getResponse: () => ({ cookie: mockCookie }),
-        }),
-      } as any,
-      mockCookie,
-    };
-  }
+  const mockResponse = { cookie: jest.fn() };
 
-  it("should set both cookies when tokens are present", (done) => {
-    const { context, mockCookie } = createContext();
+  const createContext = () =>
+    ({
+      switchToHttp: () => ({
+        getResponse: () => mockResponse,
+      }),
+    }) as unknown as ExecutionContext;
+
+  const createNext = (data: unknown) =>
+    ({
+      handle: () => of(data),
+    }) as unknown as CallHandler;
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    mockResponse.cookie.mockClear();
+  });
+
+  it("정상 토큰 데이터 → response.cookie 2번 호출", async () => {
     const data = { accessToken: "at-123", refreshToken: "rt-456" };
 
-    interceptor.intercept(context, { handle: () => of(data) }).subscribe({
-      next: () => {
-        expect(mockCookie).toHaveBeenCalledTimes(2);
-        expect(mockCookie).toHaveBeenCalledWith(
-          "accessToken",
-          "at-123",
-          expect.objectContaining({
-            httpOnly: true,
-            sameSite: "strict",
-          }),
-        );
-        expect(mockCookie).toHaveBeenCalledWith(
-          "refreshToken",
-          "rt-456",
-          expect.objectContaining({
-            httpOnly: true,
-            sameSite: "strict",
-          }),
-        );
-      },
-      complete: () => done(),
-    });
+    await lastValueFrom(
+      interceptor.intercept(createContext(), createNext(data)),
+    );
+
+    expect(mockResponse.cookie).toHaveBeenCalledTimes(2);
+    expect(mockResponse.cookie).toHaveBeenCalledWith(
+      "accessToken",
+      "at-123",
+      expect.objectContaining({
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      }),
+    );
+    expect(mockResponse.cookie).toHaveBeenCalledWith(
+      "refreshToken",
+      "rt-456",
+      expect.objectContaining({
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      }),
+    );
   });
 
-  it("should throw Error when accessToken is null", (done) => {
-    const { context } = createContext();
+  it("accessToken이 null이면 Error를 throw한다", async () => {
     const data = { accessToken: null, refreshToken: "rt-456" };
 
-    interceptor.intercept(context, { handle: () => of(data) }).subscribe({
-      error: (err: Error) => {
-        expect(err.message).toContain("토큰");
-        done();
-      },
-    });
+    await expect(
+      lastValueFrom(interceptor.intercept(createContext(), createNext(data))),
+    ).rejects.toThrow("검증할 토큰이 존재하지 않아요.");
   });
 
-  it("should throw Error when refreshToken is null", (done) => {
-    const { context } = createContext();
+  it("refreshToken이 null이면 Error를 throw한다", async () => {
     const data = { accessToken: "at-123", refreshToken: null };
 
-    interceptor.intercept(context, { handle: () => of(data) }).subscribe({
-      error: (err: Error) => {
-        expect(err.message).toContain("토큰");
-        done();
-      },
-    });
+    await expect(
+      lastValueFrom(interceptor.intercept(createContext(), createNext(data))),
+    ).rejects.toThrow("검증할 토큰이 존재하지 않아요.");
+  });
+
+  it("accessToken이 undefined이면 Error를 throw한다", async () => {
+    const data = { accessToken: undefined, refreshToken: "rt-456" };
+
+    await expect(
+      lastValueFrom(interceptor.intercept(createContext(), createNext(data))),
+    ).rejects.toThrow("검증할 토큰이 존재하지 않아요.");
+  });
+
+  it("NODE_ENV=production이면 secure: true로 쿠키를 설정한다", async () => {
+    const original = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+
+    const data = { accessToken: "at-123", refreshToken: "rt-456" };
+
+    await lastValueFrom(
+      interceptor.intercept(createContext(), createNext(data)),
+    );
+
+    expect(mockResponse.cookie).toHaveBeenCalledWith(
+      "accessToken",
+      "at-123",
+      expect.objectContaining({ secure: true }),
+    );
+    expect(mockResponse.cookie).toHaveBeenCalledWith(
+      "refreshToken",
+      "rt-456",
+      expect.objectContaining({ secure: true }),
+    );
+
+    process.env.NODE_ENV = original;
   });
 });
