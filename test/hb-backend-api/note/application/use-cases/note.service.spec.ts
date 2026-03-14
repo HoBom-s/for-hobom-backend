@@ -46,6 +46,7 @@ const makeNoteEntity = (
   NoteEntitySchema.of(
     overrides.id ?? makeNoteId(),
     overrides.owner ?? makeOwner(),
+    [],
     "테스트 노트",
     "내용입니다",
     NoteType.TEXT,
@@ -68,6 +69,8 @@ const mockPersistencePort = (): jest.Mocked<NotePersistencePort> => ({
   deleteOne: jest.fn(),
   deleteTrashedBefore: jest.fn(),
   emptyTrash: jest.fn(),
+  addMember: jest.fn(),
+  removeMember: jest.fn(),
 });
 
 const mockQueryPort = (): jest.Mocked<NoteQueryPort> => ({

@@ -44,6 +44,7 @@ const makeNote = (
   NoteEntitySchema.of(
     overrides.id ?? makeNoteId(),
     overrides.owner ?? makeUserId(),
+    [],
     overrides.title ?? "테스트 노트",
     overrides.content ?? "내용입니다",
     NoteType.TEXT,

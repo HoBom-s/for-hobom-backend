@@ -438,6 +438,14 @@ export class DIToken {
     );
   };
 
+  public static readonly DlqModule = class extends DITokenRegister {
+    public static DlqProxyPort = this.register("DlqProxyPort");
+
+    public static GetDlqListUseCase = this.register("GetDlqListUseCase");
+    public static GetDlqDetailUseCase = this.register("GetDlqDetailUseCase");
+    public static RetryDlqUseCase = this.register("RetryDlqUseCase");
+  };
+
   public static readonly PrivacyLawModule = class extends DITokenRegister {
     public static LawVersionRepository = this.register("LawVersionRepository");
     public static LawDiffRepository = this.register("LawDiffRepository");

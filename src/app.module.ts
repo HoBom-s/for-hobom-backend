@@ -29,6 +29,7 @@ import { SprintModule } from "./hb-backend-api/sprint/sprint.module";
 import { BoardModule } from "./hb-backend-api/board/board.module";
 import { ProjectLabelModule } from "./hb-backend-api/project-label/project-label.module";
 import { PrivacyLawModule } from "./hb-backend-api/privacy-law/privacy-law.module";
+import { DlqModule } from "./hb-backend-api/dlq/dlq.module";
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { PrivacyLawModule } from "./hb-backend-api/privacy-law/privacy-law.modul
     BoardModule,
     ProjectLabelModule,
     PrivacyLawModule,
+    DlqModule,
     DiscordModule,
   ],
   providers: [

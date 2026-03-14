@@ -1,0 +1,132 @@
+import { Test, TestingModule } from "@nestjs/testing";
+import { BadGatewayException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { DlqProxyAdapter } from "../../../../../src/hb-backend-api/dlq/adapters/out/dlq-proxy.adapter";
+
+describe("DlqProxyAdapter", () => {
+  let adapter: DlqProxyAdapter;
+  const mockFetch = jest.fn();
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    global.fetch = mockFetch;
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        DlqProxyAdapter,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string, defaultValue: string) => {
+              if (key === "HOBOM_EVENT_PROCESSOR_HOST") {
+                return "localhost";
+              }
+              if (key === "HOBOM_EVENT_PROCESSOR_PORT") {
+                return "8082";
+              }
+              return defaultValue;
+            }),
+          },
+        },
+      ],
+    }).compile();
+
+    adapter = module.get(DlqProxyAdapter);
+  });
+
+  describe("getList", () => {
+    it("should call DLQ list endpoint without prefix", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ items: ["dlq:menu:1", "dlq:menu:2"] }),
+      });
+
+      const result = await adapter.getList();
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "http://localhost:8082/hobom-event-processor/internal/api/v1/dlq",
+        undefined,
+      );
+      expect(result.items).toEqual(["dlq:menu:1", "dlq:menu:2"]);
+    });
+
+    it("should call DLQ list endpoint with prefix", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ items: ["dlq:menu:1"] }),
+      });
+
+      await adapter.getList("dlq:menu:");
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "http://localhost:8082/hobom-event-processor/internal/api/v1/dlq?prefix=dlq%3Amenu%3A",
+        undefined,
+      );
+    });
+
+    it("should throw BadGatewayException when response is not ok", async () => {
+      mockFetch.mockResolvedValue({ ok: false, status: 500 });
+
+      await expect(adapter.getList()).rejects.toThrow(BadGatewayException);
+    });
+  });
+
+  describe("getByKey", () => {
+    it("should call DLQ detail endpoint", async () => {
+      const payload = { eventType: "MESSAGE", data: "test" };
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ item: payload }),
+      });
+
+      const result = await adapter.getByKey("dlq:menu:1");
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "http://localhost:8082/hobom-event-processor/internal/api/v1/dlq/dlq%3Amenu%3A1",
+        undefined,
+      );
+      expect(result.item).toEqual(payload);
+    });
+
+    it("should throw BadGatewayException when response is not ok", async () => {
+      mockFetch.mockResolvedValue({ ok: false, status: 404 });
+
+      await expect(adapter.getByKey("dlq:menu:1")).rejects.toThrow(
+        BadGatewayException,
+      );
+    });
+  });
+
+  describe("retry", () => {
+    it("should call DLQ retry endpoint with POST", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ message: "재시도 성공" }),
+      });
+
+      const result = await adapter.retry("dlq:menu:1");
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "http://localhost:8082/hobom-event-processor/internal/api/v1/dlq/retry/dlq%3Amenu%3A1",
+        { method: "POST" },
+      );
+      expect(result.message).toBe("재시도 성공");
+    });
+
+    it("should throw BadGatewayException when response is not ok", async () => {
+      mockFetch.mockResolvedValue({ ok: false, status: 502 });
+
+      await expect(adapter.retry("dlq:menu:1")).rejects.toThrow(
+        BadGatewayException,
+      );
+    });
+
+    it("should throw BadGatewayException when fetch fails", async () => {
+      mockFetch.mockRejectedValue(new Error("ECONNREFUSED"));
+
+      await expect(adapter.retry("dlq:menu:1")).rejects.toThrow(
+        BadGatewayException,
+      );
+    });
+  });
+});
