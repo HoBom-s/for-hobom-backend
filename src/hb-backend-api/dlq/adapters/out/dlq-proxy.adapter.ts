@@ -8,6 +8,7 @@ const REQUEST_TIMEOUT_MS = 10_000;
 @Injectable()
 export class DlqProxyAdapter implements DlqProxyPort {
   private readonly baseUrl: string;
+  private readonly apiKey: string;
 
   constructor(
     private readonly configService: ConfigService,
@@ -22,6 +23,10 @@ export class DlqProxyAdapter implements DlqProxyPort {
       "8082",
     );
     this.baseUrl = `http://${host}:${port}/hobom-event-processor/internal/api/v1`;
+    this.apiKey = this.configService.get<string>(
+      "HOBOM_EVENT_PROCESSOR_API_KEY",
+      "",
+    );
   }
 
   public async getList(prefix?: string): Promise<{ items: string[] }> {
@@ -82,6 +87,7 @@ export class DlqProxyAdapter implements DlqProxyPort {
         headers: {
           ...init?.headers,
           ...(traceId ? { "x-hobom-trace-id": traceId } : {}),
+          ...(this.apiKey ? { "x-api-key": this.apiKey } : {}),
         },
         signal: controller.signal,
       });

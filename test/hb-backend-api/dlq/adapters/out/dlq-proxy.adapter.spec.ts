@@ -184,4 +184,56 @@ describe("DlqProxyAdapter", () => {
       expect(headers["x-hobom-trace-id"]).toBeUndefined();
     });
   });
+
+  describe("fetch (api-key header)", () => {
+    it("should send x-api-key header when HOBOM_EVENT_PROCESSOR_API_KEY is set", async () => {
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          DlqProxyAdapter,
+          {
+            provide: ConfigService,
+            useValue: {
+              get: jest.fn((key: string, defaultValue: string) => {
+                if (key === "HOBOM_EVENT_PROCESSOR_API_KEY") {
+                  return "test-api-key";
+                }
+                return defaultValue;
+              }),
+            },
+          },
+          { provide: TraceContext, useValue: mockTraceContext },
+        ],
+      }).compile();
+
+      const adapterWithApiKey = module.get(DlqProxyAdapter);
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ items: [] }),
+      });
+
+      await adapterWithApiKey.getList();
+
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
+      expect(headers["x-api-key"]).toBe("test-api-key");
+    });
+
+    it("should not send x-api-key header when HOBOM_EVENT_PROCESSOR_API_KEY is empty", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ items: [] }),
+      });
+
+      await adapter.getList();
+
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
+      expect(headers["x-api-key"]).toBeUndefined();
+    });
+  });
 });
