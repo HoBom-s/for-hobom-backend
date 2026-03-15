@@ -220,6 +220,9 @@ export class DIToken {
     public static PatchOutboxMarkAsSentUseCase = this.register(
       "PatchOutboxMarkAsSentUseCase",
     );
+    public static PatchOutboxMarkAsFailedUseCase = this.register(
+      "PatchOutboxMarkAsFailedUseCase",
+    );
     public static ProcessExpiredOutboxCleanupUseCase = this.register(
       "ProcessExpiredOutboxCleanupUseCase",
     );

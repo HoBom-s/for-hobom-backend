@@ -14,6 +14,8 @@ import { FindLogOutboxByEventTypeAndStatusService } from "./application/use-case
 import { FindLogOutboxController } from "./adapters/in/find-log-outbox.controller";
 import { FindLawOutboxController } from "./adapters/in/find-law-outbox.controller";
 import { FindLawOutboxByEventTypeAndStatusService } from "./application/use-cases/find-law-outbox-by-event-type-and-status.service";
+import { PatchOutboxMarkAsFailedService } from "./application/use-cases/patch-outbox-mark-as-failed.service";
+import { PatchMessageOutboxMarkAsFailedController } from "./adapters/in/patch-message-outbox-mark-as-failed.controller";
 import { ProcessExpiredOutboxCleanupService } from "./application/use-cases/process-expired-outbox-cleanup.service";
 import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expired-outbox-cleanup.scheduler";
 
@@ -31,6 +33,7 @@ import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expi
     FindLogOutboxController,
     FindLawOutboxController,
     PatchMessageOutboxMarkAsSentController,
+    PatchMessageOutboxMarkAsFailedController,
   ],
   providers: [
     {
@@ -58,6 +61,10 @@ import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expi
       useClass: PatchOutboxMarkAsSentService,
     },
     {
+      provide: DIToken.OutboxModule.PatchOutboxMarkAsFailedUseCase,
+      useClass: PatchOutboxMarkAsFailedService,
+    },
+    {
       provide: DIToken.OutboxModule.FindLawOutboxByEventTypeAndStatusUseCase,
       useClass: FindLawOutboxByEventTypeAndStatusService,
     },
@@ -74,6 +81,7 @@ import { ProcessExpiredOutboxCleanupScheduler } from "./adapters/in/process-expi
     DIToken.OutboxModule.OutboxQueryPort,
     DIToken.OutboxModule.FindOutboxByEventTypeAndStatusUseCase,
     DIToken.OutboxModule.PatchOutboxMarkAsSentUseCase,
+    DIToken.OutboxModule.PatchOutboxMarkAsFailedUseCase,
     DIToken.OutboxModule.FindLogOutboxByEventTypeAndStatusUseCase,
     DIToken.OutboxModule.FindLawOutboxByEventTypeAndStatusUseCase,
   ],

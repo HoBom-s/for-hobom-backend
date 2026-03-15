@@ -46,13 +46,11 @@ function buildGrpcCredentials(): ServerCredentials | undefined {
   const keyPath = process.env.HOBOM_GRPC_TLS_KEY;
 
   if (!certPath || !keyPath) {
-    return undefined; // insecure (default)
+    // insecure (default)
+    return undefined;
   }
 
   if (!existsSync(certPath) || !existsSync(keyPath)) {
-    console.warn(
-      `TLS cert/key not found (cert=${certPath}, key=${keyPath}), falling back to insecure`,
-    );
     return undefined;
   }
 
@@ -78,18 +76,12 @@ export const grpcOptions: MicroserviceOptions = {
         __dirname,
         "../../../proto/message/outbox/v1/patch-hobom-message-outbox.proto",
       ),
-      join(
-        __dirname,
-        "../../../proto/log/outbox/v1/hobom-log-outbox.proto",
-      ),
+      join(__dirname, "../../../proto/log/outbox/v1/hobom-log-outbox.proto"),
       join(
         __dirname,
         "../../../proto/law/outbox/v1/find-hobom-law-outbox.proto",
       ),
-      join(
-        __dirname,
-        "../../../proto/law/v1/save-study-material.proto",
-      ),
+      join(__dirname, "../../../proto/law/v1/save-study-material.proto"),
     ],
     credentials: buildGrpcCredentials(),
   },
