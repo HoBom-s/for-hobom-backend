@@ -1,0 +1,31 @@
+name: Auto-update proto
+
+on:
+  repository_dispatch:
+    types: [proto-update]
+
+jobs:
+  update-proto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
+      - name: Export proto
+        run: |
+          rm -rf proto
+          buf export buf.build/hobom/hobom-buf-proto --output proto
+
+      - name: Create PR if changed
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/proto-update
+          title: "chore: update proto files"
+          body: "Auto-generated from hobom-buf-proto BSR update."
+          commit-message: "chore: update proto files"
+          delete-branch: true
