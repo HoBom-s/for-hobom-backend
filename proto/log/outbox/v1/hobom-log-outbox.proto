@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+// HoBom log outbox gRPC service.
 package outbox.log;
 
 option go_package = "github.com/HoBom-s/hobom-event-processor/infra/grpc/v1/hobom-log-outbox;hobomlogpb";
