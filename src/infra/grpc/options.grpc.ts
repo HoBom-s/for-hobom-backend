@@ -1,5 +1,7 @@
+import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { ServerCredentials } from "@grpc/grpc-js";
 
 /**
  * [ADR] gRPC 마이크로서비스 설정
@@ -38,6 +40,30 @@ import { MicroserviceOptions, Transport } from "@nestjs/microservices";
  * BSR(buf.build/hobom/hobom-buf-proto)에서 buf export로 proto/ 디렉토리에 다운로드한다.
  * npm run proto:pull로 최신 proto를 가져온다.
  */
+
+function buildGrpcCredentials(): ServerCredentials | undefined {
+  const certPath = process.env.HOBOM_GRPC_TLS_CERT;
+  const keyPath = process.env.HOBOM_GRPC_TLS_KEY;
+
+  if (!certPath || !keyPath) {
+    return undefined; // insecure (default)
+  }
+
+  if (!existsSync(certPath) || !existsSync(keyPath)) {
+    console.warn(
+      `TLS cert/key not found (cert=${certPath}, key=${keyPath}), falling back to insecure`,
+    );
+    return undefined;
+  }
+
+  return ServerCredentials.createSsl(null, [
+    {
+      cert_chain: readFileSync(certPath),
+      private_key: readFileSync(keyPath),
+    },
+  ]);
+}
+
 export const grpcOptions: MicroserviceOptions = {
   transport: Transport.GRPC,
   options: {
@@ -65,5 +91,6 @@ export const grpcOptions: MicroserviceOptions = {
         "../../../proto/law/v1/save-study-material.proto",
       ),
     ],
+    credentials: buildGrpcCredentials(),
   },
 };
