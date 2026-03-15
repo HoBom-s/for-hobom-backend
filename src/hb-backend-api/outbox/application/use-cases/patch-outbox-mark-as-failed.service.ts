@@ -7,9 +7,7 @@ import { Transactional } from "../../../../infra/mongo/transaction/transaction.d
 import { OutboxPersistencePort } from "../../domain/ports/out/outbox-persistence.port";
 
 @Injectable()
-export class PatchOutboxMarkAsFailedService
-  implements PatchOutboxMarkAsFailedUseCase
-{
+export class PatchOutboxMarkAsFailedService implements PatchOutboxMarkAsFailedUseCase {
   constructor(
     @Inject(DIToken.OutboxModule.OutboxPersistencePort)
     private readonly outboxPersistencePort: OutboxPersistencePort,

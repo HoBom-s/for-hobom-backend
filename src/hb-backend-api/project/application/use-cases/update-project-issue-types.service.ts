@@ -7,9 +7,7 @@ import { ProjectQueryPort } from "../../ports/out/project-query.port";
 import { ProjectId } from "../../domain/model/project-id.vo";
 
 @Injectable()
-export class UpdateProjectIssueTypesService
-  implements UpdateProjectIssueTypesUseCase
-{
+export class UpdateProjectIssueTypesService implements UpdateProjectIssueTypesUseCase {
   constructor(
     @Inject(DIToken.ProjectModule.ProjectPersistencePort)
     private readonly projectPersistencePort: ProjectPersistencePort,

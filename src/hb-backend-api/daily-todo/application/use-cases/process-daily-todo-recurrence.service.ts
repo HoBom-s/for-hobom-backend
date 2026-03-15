@@ -10,9 +10,7 @@ import { Transactional } from "../../../../infra/mongo/transaction/transaction.d
 import { DateHelper } from "../../../../shared/date/date.helper";
 
 @Injectable()
-export class ProcessDailyTodoRecurrenceService
-  implements ProcessDailyTodoRecurrenceUseCase
-{
+export class ProcessDailyTodoRecurrenceService implements ProcessDailyTodoRecurrenceUseCase {
   private static readonly KST_OFFSET_MS = 9 * 60 * 60 * 1000;
   private readonly logger = new Logger(ProcessDailyTodoRecurrenceService.name);
 

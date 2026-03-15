@@ -17,17 +17,15 @@ export class JwtAuthAdapter implements JwtAuthPort {
   }
 
   public signAccessToken(payload: JwtAuthPayloadModel): string {
-    return this.jwtService.sign(payload, {
-      expiresIn: this.configService.getOrThrow<string>(
-        "HOBOM_JWT_ACCESS_TOKEN_EXPIRED",
-      ),
+    return this.jwtService.sign(payload as Record<string, unknown>, {
+      expiresIn: this.configService.getOrThrow("HOBOM_JWT_ACCESS_TOKEN_EXPIRED"),
     });
   }
 
   public signRefreshToken(payload: JwtAuthPayloadModel): string {
-    return this.jwtService.sign(payload, {
+    return this.jwtService.sign(payload as Record<string, unknown>, {
       secret: this.refreshSecret,
-      expiresIn: this.configService.getOrThrow<string>(
+      expiresIn: this.configService.getOrThrow(
         "HOBOM_JWT_REFRESH_TOKEN_EXPIRED",
       ),
     });

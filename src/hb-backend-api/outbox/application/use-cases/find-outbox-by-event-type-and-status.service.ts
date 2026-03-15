@@ -8,9 +8,7 @@ import { DIToken } from "../../../../shared/di/token.di";
 import { OutboxQueryPort } from "../../domain/ports/out/outbox-query.port";
 
 @Injectable()
-export class FindOutboxByEventTypeAndStatusService
-  implements FindOutboxByEventTypeAndStatusUseCase
-{
+export class FindOutboxByEventTypeAndStatusService implements FindOutboxByEventTypeAndStatusUseCase {
   constructor(
     @Inject(DIToken.OutboxModule.OutboxQueryPort)
     private readonly outboxQueryPort: OutboxQueryPort,

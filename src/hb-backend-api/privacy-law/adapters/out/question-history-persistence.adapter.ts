@@ -4,9 +4,7 @@ import { DIToken } from "../../../../shared/di/token.di";
 import { QuestionHistoryRepository } from "../../domain/repositories/question-history.repository";
 
 @Injectable()
-export class QuestionHistoryPersistenceAdapter
-  implements QuestionHistoryPersistencePort
-{
+export class QuestionHistoryPersistenceAdapter implements QuestionHistoryPersistencePort {
   constructor(
     @Inject(DIToken.PrivacyLawModule.QuestionHistoryRepository)
     private readonly questionHistoryRepository: QuestionHistoryRepository,

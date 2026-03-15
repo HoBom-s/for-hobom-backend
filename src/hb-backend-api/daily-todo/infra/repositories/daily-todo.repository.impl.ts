@@ -45,10 +45,9 @@ export class DailyTodoRepositoryImpl implements DailyTodoRepository {
           title: dailyTodoCreateSchemaEntity.getTitle,
           date: dailyTodoCreateSchemaEntity.getDate,
           owner: dailyTodoCreateSchemaEntity.getOwner.raw,
-          reaction: dailyTodoCreateSchemaEntity.getReaction,
           progress: dailyTodoCreateSchemaEntity.getProgress,
           cycle: dailyTodoCreateSchemaEntity.getCycle,
-          category: dailyTodoCreateSchemaEntity.getCategory,
+          category: dailyTodoCreateSchemaEntity.getCategory.raw,
         },
       ],
       {

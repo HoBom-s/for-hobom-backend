@@ -9,9 +9,7 @@ import { UserId } from "../../../user/domain/model/user-id.vo";
 import { MemberRole } from "../../domain/enums/member-role.enum";
 
 @Injectable()
-export class UpdateProjectMemberRoleService
-  implements UpdateProjectMemberRoleUseCase
-{
+export class UpdateProjectMemberRoleService implements UpdateProjectMemberRoleUseCase {
   constructor(
     @Inject(DIToken.ProjectModule.ProjectPersistencePort)
     private readonly projectPersistencePort: ProjectPersistencePort,

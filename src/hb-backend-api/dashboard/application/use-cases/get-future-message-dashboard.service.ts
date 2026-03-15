@@ -21,9 +21,7 @@ interface FutureMessageFacetResult {
 }
 
 @Injectable()
-export class GetFutureMessageDashboardService
-  implements GetFutureMessageDashboardUseCase
-{
+export class GetFutureMessageDashboardService implements GetFutureMessageDashboardUseCase {
   constructor(
     @InjectModel(FutureMessageEntity.name)
     private readonly futureMessageModel: Model<FutureMessageEntity>,

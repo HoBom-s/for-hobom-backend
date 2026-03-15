@@ -14,9 +14,7 @@ import { TransactionRunner } from "../../../../infra/mongo/transaction/transacti
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 
 @Injectable()
-export class TransitionIssueStatusService
-  implements TransitionIssueStatusUseCase
-{
+export class TransitionIssueStatusService implements TransitionIssueStatusUseCase {
   constructor(
     @Inject(DIToken.IssueModule.IssuePersistencePort)
     private readonly issuePersistencePort: IssuePersistencePort,

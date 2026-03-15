@@ -31,7 +31,7 @@ export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
       const authUser =
         await this.authQueryPort.findByRefreshToken(refreshToken);
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (authUser == null || authUser.getNickname !== payload.sub) {
+      if (authUser?.getNickname !== payload.sub) {
         throw new UnauthorizedException("Token 이 일치하지 않아요.");
       }
 
@@ -54,7 +54,7 @@ export class RefreshTokenAuthService implements RefreshAuthTokenUseCase {
         const authUser =
           await this.authQueryPort.findByRefreshToken(refreshToken);
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (authUser == null || authUser.getNickname !== decoded.sub) {
+        if (authUser?.getNickname !== decoded.sub) {
           throw new UnauthorizedException("Token 이 일치하지 않아요.");
         }
 

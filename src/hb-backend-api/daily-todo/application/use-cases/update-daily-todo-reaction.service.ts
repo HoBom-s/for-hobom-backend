@@ -14,9 +14,7 @@ import {
 } from "../../domain/entity/daily-todo.retations";
 
 @Injectable()
-export class UpdateDailyTodoReactionService
-  implements UpdateDailyTodoReactionUseCase
-{
+export class UpdateDailyTodoReactionService implements UpdateDailyTodoReactionUseCase {
   constructor(
     @Inject(DIToken.DailyTodoModule.DailyTodoPersistencePort)
     private readonly dailyTodoPersistencePort: DailyTodoPersistencePort,

@@ -5,9 +5,7 @@ import { QuestionHistoryQueryPort } from "../../domain/ports/out/question-histor
 import { QuestionHistoryEntitySchema } from "../../domain/model/question-history.entity";
 
 @Injectable()
-export class GetQuestionHistoriesService
-  implements GetQuestionHistoriesUseCase
-{
+export class GetQuestionHistoriesService implements GetQuestionHistoriesUseCase {
   constructor(
     @Inject(DIToken.PrivacyLawModule.QuestionHistoryQueryPort)
     private readonly questionHistoryQueryPort: QuestionHistoryQueryPort,

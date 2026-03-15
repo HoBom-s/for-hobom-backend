@@ -6,9 +6,7 @@ import { IssueHistoryRepository } from "../../domain/repositories/issue-history.
 import { CreateIssueHistoryEntity } from "../../domain/model/issue-history.entity";
 
 @Injectable()
-export class IssueHistoryPersistenceAdapter
-  implements IssueHistoryPersistencePort
-{
+export class IssueHistoryPersistenceAdapter implements IssueHistoryPersistencePort {
   constructor(
     @Inject(DIToken.IssueModule.IssueHistoryRepository)
     private readonly issueHistoryRepository: IssueHistoryRepository,

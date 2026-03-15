@@ -8,9 +8,7 @@ import { OutboxQueryPort } from "../../domain/ports/out/outbox-query.port";
 import { FindOutboxEntity } from "../../domain/model/find-outbox.entity";
 
 @Injectable()
-export class FindLogOutboxByEventTypeAndStatusService
-  implements FindLogOutboxByEventTypeAndStatusUseCase
-{
+export class FindLogOutboxByEventTypeAndStatusService implements FindLogOutboxByEventTypeAndStatusUseCase {
   constructor(
     @Inject(DIToken.OutboxModule.OutboxQueryPort)
     private readonly outboxQueryPort: OutboxQueryPort,

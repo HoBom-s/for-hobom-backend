@@ -7,9 +7,7 @@ import { NotificationId } from "../../domain/model/notification-id.vo";
 import { UserId } from "../../../user/domain/model/user-id.vo";
 
 @Injectable()
-export class NotificationPersistenceAdapter
-  implements NotificationPersistencePort
-{
+export class NotificationPersistenceAdapter implements NotificationPersistencePort {
   constructor(
     @Inject(DIToken.NotificationModule.NotificationRepository)
     private readonly notificationRepository: NotificationRepository,

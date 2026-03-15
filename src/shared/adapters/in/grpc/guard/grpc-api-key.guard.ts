@@ -19,8 +19,7 @@ export class GrpcApiKeyGuard implements CanActivate {
       this.configService.getOrThrow<string>("HOBOM_GRPC_API_KEY");
 
     if (
-      apiKey == null ||
-      apiKey.length !== expected.length ||
+      apiKey?.length !== expected.length ||
       !timingSafeEqual(Buffer.from(apiKey), Buffer.from(expected))
     ) {
       throw new UnauthorizedException("Invalid gRPC API key");

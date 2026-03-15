@@ -25,9 +25,9 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
       const [todayMenuDocument] = await this.todayMenuModel.create(
         [
           {
-            recommendedMenu: entity.getRecommendedMenu?.raw ?? null,
+            recommendedMenu: entity.getRecommendedMenu?.raw ?? undefined,
             candidates: entity.getCandidates.map((c) => c.raw),
-            recommendationDate: entity.getRecommendationDate?.value ?? null,
+            recommendationDate: entity.getRecommendationDate?.value ?? undefined,
           },
         ],
         {

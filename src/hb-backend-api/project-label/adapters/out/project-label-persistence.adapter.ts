@@ -7,9 +7,7 @@ import { DIToken } from "../../../../shared/di/token.di";
 import { ProjectLabelRepository } from "../../domain/repositories/project-label.repository";
 
 @Injectable()
-export class ProjectLabelPersistenceAdapter
-  implements ProjectLabelPersistencePort
-{
+export class ProjectLabelPersistenceAdapter implements ProjectLabelPersistencePort {
   constructor(
     @Inject(DIToken.ProjectLabelModule.ProjectLabelRepository)
     private readonly projectLabelRepository: ProjectLabelRepository,

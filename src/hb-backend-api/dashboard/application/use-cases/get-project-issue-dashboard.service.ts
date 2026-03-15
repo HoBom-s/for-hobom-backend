@@ -17,9 +17,7 @@ interface IssueFacetResult {
 }
 
 @Injectable()
-export class GetProjectIssueDashboardService
-  implements GetProjectIssueDashboardUseCase
-{
+export class GetProjectIssueDashboardService implements GetProjectIssueDashboardUseCase {
   constructor(
     @InjectModel(IssueEntity.name)
     private readonly issueModel: Model<IssueEntity>,

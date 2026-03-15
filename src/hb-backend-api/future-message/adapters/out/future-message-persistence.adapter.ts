@@ -7,9 +7,7 @@ import { DIToken } from "../../../../shared/di/token.di";
 import { FutureMessagePersistenceRepository } from "../../infra/repositorries/future-message-persistence.repository";
 
 @Injectable()
-export class FutureMessagePersistenceAdapter
-  implements FutureMessagePersistencePort
-{
+export class FutureMessagePersistenceAdapter implements FutureMessagePersistencePort {
   constructor(
     @Inject(DIToken.FutureMessageModule.FutureMessagePersistenceRepository)
     private readonly futureMessagePersistenceRepository: FutureMessagePersistenceRepository,

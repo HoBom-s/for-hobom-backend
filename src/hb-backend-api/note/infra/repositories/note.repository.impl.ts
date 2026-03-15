@@ -25,13 +25,13 @@ export class NoteRepositoryImpl implements NoteRepository {
       [
         {
           owner: schema.getOwner.raw,
-          title: schema.getTitle,
-          content: schema.getContent,
+          title: schema.getTitle ?? undefined,
+          content: schema.getContent ?? undefined,
           type: schema.getType,
           checklistItems: schema.getChecklistItems.map((i) => i.toPlain()),
           color: schema.getColor.raw,
           labels: schema.getLabels.map((l) => l.raw),
-          reminder: schema.getReminder?.toPlain() ?? null,
+          reminder: schema.getReminder?.toPlain() ?? undefined,
           order: schema.getOrder,
         },
       ],

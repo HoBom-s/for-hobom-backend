@@ -7,9 +7,7 @@ import { CreateIssueCommentEntity } from "../../domain/model/issue-comment.entit
 import { IssueCommentId } from "../../domain/model/issue-comment-id.vo";
 
 @Injectable()
-export class IssueCommentPersistenceAdapter
-  implements IssueCommentPersistencePort
-{
+export class IssueCommentPersistenceAdapter implements IssueCommentPersistencePort {
   constructor(
     @Inject(DIToken.IssueModule.IssueCommentRepository)
     private readonly issueCommentRepository: IssueCommentRepository,

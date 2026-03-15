@@ -147,7 +147,7 @@ describe("NoteRepositoryImpl", () => {
       await repository.save(schema as any);
 
       const createArg = mockModel.create.mock.calls[0][0][0];
-      expect(createArg.reminder).toBeNull();
+      expect(createArg.reminder).toBeUndefined();
     });
   });
 

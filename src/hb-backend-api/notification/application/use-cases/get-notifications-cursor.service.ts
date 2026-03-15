@@ -7,9 +7,7 @@ import { DIToken } from "../../../../shared/di/token.di";
 import { CursorPaginatedResponse } from "../../../../shared/pagination/cursor-paginated.response";
 
 @Injectable()
-export class GetNotificationsCursorService
-  implements GetNotificationsCursorUseCase
-{
+export class GetNotificationsCursorService implements GetNotificationsCursorUseCase {
   constructor(
     @Inject(DIToken.NotificationModule.NotificationQueryPort)
     private readonly notificationQueryPort: NotificationQueryPort,

@@ -86,7 +86,7 @@ export class GetSprintDashboardService implements GetSprintDashboardUseCase {
 
     return {
       sprint: {
-        id: String(sprint._id as Types.ObjectId),
+        id: String(sprint._id),
         name: sprint.name,
         goal: sprint.goal,
         status: sprint.status,

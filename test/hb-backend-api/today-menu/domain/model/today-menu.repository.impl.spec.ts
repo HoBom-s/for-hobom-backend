@@ -70,7 +70,7 @@ describe("TodayMenuRepositoryImpl", () => {
         expect(mockModel.create).toHaveBeenCalledWith(
           [
             {
-              recommendedMenu: null,
+              recommendedMenu: undefined,
               candidates: [candidateId],
               recommendationDate: "2026-03-14",
             },
@@ -117,9 +117,9 @@ describe("TodayMenuRepositoryImpl", () => {
         expect(mockModel.create).toHaveBeenCalledWith(
           [
             {
-              recommendedMenu: null,
+              recommendedMenu: undefined,
               candidates: [],
-              recommendationDate: null,
+              recommendationDate: undefined,
             },
           ],
           { session: undefined },

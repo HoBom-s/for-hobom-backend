@@ -9,9 +9,7 @@ import { ProjectId } from "../../domain/model/project-id.vo";
 import { IssueDocument } from "../../../issue/domain/model/issue.schema";
 
 @Injectable()
-export class UpdateProjectWorkflowService
-  implements UpdateProjectWorkflowUseCase
-{
+export class UpdateProjectWorkflowService implements UpdateProjectWorkflowUseCase {
   constructor(
     @Inject(DIToken.ProjectModule.ProjectPersistencePort)
     private readonly projectPersistencePort: ProjectPersistencePort,

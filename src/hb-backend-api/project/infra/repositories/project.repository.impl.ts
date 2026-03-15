@@ -27,7 +27,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         {
           key: entity.getKey.raw,
           name: entity.getName,
-          description: entity.getDescription,
+          description: entity.getDescription ?? undefined,
           owner: entity.getOwner.raw,
           members: [
             {
@@ -37,9 +37,9 @@ export class ProjectRepositoryImpl implements ProjectRepository {
             },
           ],
           issueSequence: 0,
-          workflow: entity.getWorkflow,
-          issueTypes: entity.getIssueTypes,
-          priorities: entity.getPriorities,
+          workflow: entity.getWorkflow ?? undefined,
+          issueTypes: [...entity.getIssueTypes],
+          priorities: [...entity.getPriorities],
         },
       ],
       { session },

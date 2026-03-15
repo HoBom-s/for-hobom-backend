@@ -6,9 +6,7 @@ import { QuestionHistoryEntity } from "../../domain/model/question-history.entit
 import { QuestionHistoryDocument } from "../../domain/model/question-history.schema";
 
 @Injectable()
-export class QuestionHistoryRepositoryImpl
-  implements QuestionHistoryRepository
-{
+export class QuestionHistoryRepositoryImpl implements QuestionHistoryRepository {
   constructor(
     @InjectModel(QuestionHistoryEntity.name)
     private readonly model: Model<QuestionHistoryDocument>,

@@ -7,9 +7,7 @@ import { FutureMessageQueryPort } from "../../domain/ports/out/future-message-qu
 import { UserId } from "../../../user/domain/model/user-id.vo";
 
 @Injectable()
-export class FindAllFutureMessageByStatusService
-  implements FindAllFutureMessageByStatusUseCase
-{
+export class FindAllFutureMessageByStatusService implements FindAllFutureMessageByStatusUseCase {
   constructor(
     @Inject(DIToken.FutureMessageModule.FutureMessageQueryPort)
     private readonly futureMessageQueryPort: FutureMessageQueryPort,

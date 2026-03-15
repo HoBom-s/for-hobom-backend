@@ -5,9 +5,7 @@ import { DIToken } from "../../../../shared/di/token.di";
 import { CreateMenuRecommendationEntity } from "../../domain/model/create-menu-recommendation.entity";
 
 @Injectable()
-export class MenuRecommendationPersistenceAdapter
-  implements MenuRecommendationPersistencePort
-{
+export class MenuRecommendationPersistenceAdapter implements MenuRecommendationPersistencePort {
   constructor(
     @Inject(DIToken.MenuRecommendationModule.MenuRecommendationRepository)
     private readonly menuRecommendationRepository: MenuRecommendationRepository,

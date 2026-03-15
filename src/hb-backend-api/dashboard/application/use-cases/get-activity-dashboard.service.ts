@@ -18,9 +18,7 @@ interface DateCountRow {
 }
 
 @Injectable()
-export class GetActivityDashboardService
-  implements GetActivityDashboardUseCase
-{
+export class GetActivityDashboardService implements GetActivityDashboardUseCase {
   constructor(
     @InjectModel(DailyTodoEntity.name)
     private readonly dailyTodoModel: Model<DailyTodoEntity>,

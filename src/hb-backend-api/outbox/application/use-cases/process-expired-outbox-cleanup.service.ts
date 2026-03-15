@@ -4,9 +4,7 @@ import { OutboxPersistencePort } from "../../domain/ports/out/outbox-persistence
 import { DIToken } from "../../../../shared/di/token.di";
 
 @Injectable()
-export class ProcessExpiredOutboxCleanupService
-  implements ProcessExpiredOutboxCleanupUseCase
-{
+export class ProcessExpiredOutboxCleanupService implements ProcessExpiredOutboxCleanupUseCase {
   private static readonly BATCH_SIZE = 100;
   private static readonly RETENTION_DAYS = 30;
   private readonly logger = new Logger(ProcessExpiredOutboxCleanupService.name);

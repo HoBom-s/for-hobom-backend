@@ -4,9 +4,7 @@ import { NotificationPersistencePort } from "../../domain/ports/out/notification
 import { DIToken } from "../../../../shared/di/token.di";
 
 @Injectable()
-export class ProcessExpiredNotificationCleanupService
-  implements ProcessExpiredNotificationCleanupUseCase
-{
+export class ProcessExpiredNotificationCleanupService implements ProcessExpiredNotificationCleanupUseCase {
   private static readonly BATCH_SIZE = 100;
   private static readonly RETENTION_DAYS = 30;
   private readonly logger = new Logger(

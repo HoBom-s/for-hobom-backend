@@ -7,9 +7,7 @@ import { ProjectQueryPort } from "../../ports/out/project-query.port";
 import { ProjectId } from "../../domain/model/project-id.vo";
 
 @Injectable()
-export class UpdateProjectPrioritiesService
-  implements UpdateProjectPrioritiesUseCase
-{
+export class UpdateProjectPrioritiesService implements UpdateProjectPrioritiesUseCase {
   constructor(
     @Inject(DIToken.ProjectModule.ProjectPersistencePort)
     private readonly projectPersistencePort: ProjectPersistencePort,

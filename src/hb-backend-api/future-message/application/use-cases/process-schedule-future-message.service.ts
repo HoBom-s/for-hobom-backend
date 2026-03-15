@@ -20,9 +20,7 @@ import { FutureMessageQueryResult } from "../../domain/ports/out/future-message-
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
 @Injectable()
-export class ProcessScheduleFutureMessageService
-  implements ProcessScheduleFutureMessageUseCase
-{
+export class ProcessScheduleFutureMessageService implements ProcessScheduleFutureMessageUseCase {
   constructor(
     @Inject(DIToken.FutureMessageModule.FutureMessageQueryPort)
     private readonly futureMessageQueryPort: FutureMessageQueryPort,

@@ -10,9 +10,7 @@ import { FutureMessageId } from "./future-message-id.vo";
 import { UserId } from "../../../user/domain/model/user-id.vo";
 
 @Injectable()
-export class FutureMessageQueryRepositoryImpl
-  implements FutureMessageQueryRepository
-{
+export class FutureMessageQueryRepositoryImpl implements FutureMessageQueryRepository {
   constructor(
     @InjectModel(FutureMessageEntity.name)
     private readonly futureMessageModel: Model<FutureMessageDocument>,
@@ -27,7 +25,7 @@ export class FutureMessageQueryRepositoryImpl
 
     return foundItems.map((found) =>
       FutureMessageDomain.of(
-        FutureMessageId.fromString(found.id),
+        FutureMessageId.fromString(found._id.toString()),
         UserId.fromString(found.senderId),
         UserId.fromString(found.recipientId),
         found.title,
@@ -47,13 +45,13 @@ export class FutureMessageQueryRepositoryImpl
     const foundItems = await this.futureMessageModel
       .find({
         sendStatus,
-        senderId: senderId.raw,
+        senderId: senderId.raw.toString(),
       })
       .exec();
 
     return foundItems.map((found) =>
       FutureMessageDomain.of(
-        FutureMessageId.fromString(found.id),
+        FutureMessageId.fromString(found._id.toString()),
         UserId.fromString(found.senderId),
         UserId.fromString(found.recipientId),
         found.title,

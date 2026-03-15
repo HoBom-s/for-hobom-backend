@@ -22,9 +22,7 @@ interface NotificationFacetResult {
 }
 
 @Injectable()
-export class GetNotificationDashboardService
-  implements GetNotificationDashboardUseCase
-{
+export class GetNotificationDashboardService implements GetNotificationDashboardUseCase {
   constructor(
     @InjectModel(NotificationEntity.name)
     private readonly notificationModel: Model<NotificationEntity>,

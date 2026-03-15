@@ -6,9 +6,7 @@ import { FutureMessageId } from "../../domain/model/future-message-id.vo";
 import { FutureMessageQueryResult } from "../../domain/ports/out/future-message-query.result";
 
 @Injectable()
-export class FindFutureMessageByIdService
-  implements FindFutureMessageByIdUseCase
-{
+export class FindFutureMessageByIdService implements FindFutureMessageByIdUseCase {
   constructor(
     @Inject(DIToken.FutureMessageModule.FutureMessageQueryPort)
     private readonly futureMessageQueryPort: FutureMessageQueryPort,

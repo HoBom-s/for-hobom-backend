@@ -18,9 +18,7 @@ interface DailyTodoFacetResult {
 }
 
 @Injectable()
-export class GetDailyTodoDashboardService
-  implements GetDailyTodoDashboardUseCase
-{
+export class GetDailyTodoDashboardService implements GetDailyTodoDashboardUseCase {
   constructor(
     @InjectModel(DailyTodoEntity.name)
     private readonly dailyTodoModel: Model<DailyTodoEntity>,
@@ -115,7 +113,6 @@ export class GetDailyTodoDashboardService
       .lean()
       .exec();
     const categoryMap = new Map<string, string>(
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       categories.map((c) => [c._id.toString(), c.title]),
     );
 

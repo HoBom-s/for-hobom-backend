@@ -4,9 +4,7 @@ import { DIToken } from "../../../../shared/di/token.di";
 import { StudyMaterialRepository } from "../../domain/repositories/study-material.repository";
 
 @Injectable()
-export class StudyMaterialPersistenceAdapter
-  implements StudyMaterialPersistencePort
-{
+export class StudyMaterialPersistenceAdapter implements StudyMaterialPersistencePort {
   constructor(
     @Inject(DIToken.PrivacyLawModule.StudyMaterialRepository)
     private readonly studyMaterialRepository: StudyMaterialRepository,
