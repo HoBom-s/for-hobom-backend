@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package llm;
+
+option go_package = "github.com/HoBom-s/hobom-llm-service-backend/infra/grpc/v1/llm;llmpb";
+
+import "llm/v1/generate-study-material.proto";
+
+service AskQuestionService {
+    rpc Ask (AskRequest) returns (AskResponse);
+}
+
+message LawContext {
+    string articleNo = 1;
+    string articleTitle = 2;
+    string content = 3;
+}
+
+message AskRequest {
+    string question = 1;
+    repeated LawContext articles = 2;
+    repeated ArticleChange recentChanges = 3;
+}
+
+message AskResponse {
+    string answer = 1;
+    repeated string referencedArticles = 2;
+}

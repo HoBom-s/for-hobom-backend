@@ -35,8 +35,8 @@ import { MicroserviceOptions, Transport } from "@nestjs/microservices";
  *     - PatchOutboxMarkAsSent로 처리 완료 표시
  *
  * ### proto 파일 위치
- * hobom-buf-proto/ (git submodule) 에서 관리한다.
- * 서버와 consumer 모두 동일한 submodule을 참조하여 계약 일관성을 유지한다.
+ * BSR(buf.build/hobom/hobom-buf-proto)에서 buf export로 proto/ 디렉토리에 다운로드한다.
+ * npm run proto:pull로 최신 proto를 가져온다.
  */
 export const grpcOptions: MicroserviceOptions = {
   transport: Transport.GRPC,
@@ -46,23 +46,23 @@ export const grpcOptions: MicroserviceOptions = {
     protoPath: [
       join(
         __dirname,
-        "../../../hobom-buf-proto/message/outbox/v1/find-hobom-message-outbox.proto",
+        "../../../proto/message/outbox/v1/find-hobom-message-outbox.proto",
       ),
       join(
         __dirname,
-        "../../../hobom-buf-proto/message/outbox/v1/patch-hobom-message-outbox.proto",
+        "../../../proto/message/outbox/v1/patch-hobom-message-outbox.proto",
       ),
       join(
         __dirname,
-        "../../../hobom-buf-proto/log/outbox/v1/hobom-log-outbox.proto",
+        "../../../proto/log/outbox/v1/hobom-log-outbox.proto",
       ),
       join(
         __dirname,
-        "../../../hobom-buf-proto/law/outbox/v1/find-hobom-law-outbox.proto",
+        "../../../proto/law/outbox/v1/find-hobom-law-outbox.proto",
       ),
       join(
         __dirname,
-        "../../../hobom-buf-proto/law/v1/save-study-material.proto",
+        "../../../proto/law/v1/save-study-material.proto",
       ),
     ],
   },

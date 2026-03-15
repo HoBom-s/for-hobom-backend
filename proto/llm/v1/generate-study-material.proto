@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package llm;
+
+option go_package = "github.com/HoBom-s/hobom-llm-service-backend/infra/grpc/v1/llm;llmpb";
+
+service StudyMaterialService {
+    rpc Generate (StudyMaterialRequest) returns (StudyMaterialResponse);
+}
+
+message ArticleChange {
+    string articleNo = 1;
+    string changeType = 2;
+    string before = 3;
+    string after = 4;
+}
+
+message StudyMaterialRequest {
+    repeated ArticleChange changes = 1;
+}
+
+message Quiz {
+    string type = 1;
+    string question = 2;
+    string answer = 3;
+    string explanation = 4;
+    repeated string choices = 5;
+}
+
+message StudyMaterialResponse {
+    string summary = 1;
+    repeated string keyPoints = 2;
+    repeated Quiz quizzes = 3;
+}

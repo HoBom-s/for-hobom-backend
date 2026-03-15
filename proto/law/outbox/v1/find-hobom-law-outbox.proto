@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package outbox.law;
+
+option go_package = "github.com/HoBom-s/hobom-event-processor/infra/grpc/v1/hobom-law-outbox;hobomlawpb";
+
+service FindHoBomLawOutboxController {
+    rpc FindOutboxByEventTypeAndStatusUseCase (Request) returns (Response);
+}
+
+message Request {
+    string eventType = 1;
+    string status = 2;
+}
+
+message Response {
+    repeated QueryResult items = 1;
+}
+
+message QueryResult {
+    string id = 1;
+    string eventId = 2;
+    string eventType = 3;
+    LawChangedPayload payload = 4;
+    string status = 5;
+    int32 retryCount = 6;
+    string sentAt = 7;
+    string failedAt = 8;
+    string lastError = 9;
+    int32 version = 10;
+    string createdAt = 11;
+    string updatedAt = 12;
+}
+
+message LawChangedPayload {
+    string diffId = 1;
+    repeated LawArticleChange changes = 2;
+}
+
+message LawArticleChange {
+    string articleNo = 1;
+    string changeType = 2;
+    string before = 3;
+    string after = 4;
+}

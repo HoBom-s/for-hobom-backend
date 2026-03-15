@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "proto:sync": "git submodule update --remote --merge && echo '🛠 Submodule updated!'",
+    "proto:pull": "rm -rf proto && buf export buf.build/hobom/hobom-buf-proto --output proto",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",

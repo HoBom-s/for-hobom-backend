@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package outbox.message;
+
+option go_package = "github.com/HoBom-s/hobom-event-processor/infra/grpc/v1/hobom-message-outbox;hobommessagepb";
+
+import "google/protobuf/empty.proto";
+
+service PatchOutboxController {
+    rpc PatchOutboxMarkAsSentUseCase (MarkRequest) returns (google.protobuf.Empty);
+    rpc PatchOutboxMarkAsFailedUseCase (MarkFailedRequest) returns (google.protobuf.Empty);
+}
+
+message MarkRequest {
+    string eventId = 1;
+}
+
+message MarkFailedRequest {
+    string eventId = 1;
+    string errorMessage = 2;
+}

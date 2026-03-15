@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package outbox.message;
+
+option go_package = "github.com/HoBom-s/hobom-event-processor/infra/grpc/v1/hobom-message-outbox;hobommessagepb";
+
+service FindHoBomMessageOutboxController {
+    rpc FindOutboxByEventTypeAndStatusUseCase (Request) returns (Response);
+}
+
+message Request {
+    string eventType = 1;
+    string status = 2;
+}
+
+message Response {
+    repeated QueryResult items = 1;
+}
+
+message QueryResult {
+    string id = 1;
+    string eventId = 2;
+    string eventType = 3;
+    MessagePayload payload = 4;
+    string status = 5;
+    int32 retryCount = 6;
+    string sentAt = 7;
+    string failedAt = 8;
+    string lastError = 9;
+    int32 version = 10;
+    string createdAt = 11;
+    string updatedAt = 12;
+}
+
+message MessagePayload {
+    string id = 1;
+    string title = 2;
+    string body = 3;
+    string recipient = 4;
+    string senderId = 5;
+    string type = 6;
+}

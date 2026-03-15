@@ -7,6 +7,6 @@ hobomPipeline(
   cpus:           '1',
   envPath:        '/etc/hobom-dev/dev-for-hobom-backend/.env',
   addHost:        true,
-  submodules:     true,
+  submodules:     false,
   smokeCheckPath: '/'
 )

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package outbox.log;
+
+option go_package = "github.com/HoBom-s/hobom-event-processor/infra/grpc/v1/hobom-log-outbox;hobomlogpb";
+
+service FindHoBomLogOutboxController {
+  rpc FindLogOutboxByEventTypeAndStatusUseCase (Request) returns (Response);
+}
+
+message Request {
+  string eventType = 1;
+  string status = 2;
+}
+
+message Response {
+  repeated QueryResult items = 1;
+}
+
+message QueryResult {
+  string id = 1;
+  string eventId = 2;
+  string eventType = 3;
+  string status = 4;
+  int32 retryCount = 5;
+  string sentAt = 6;
+  string failedAt = 7;
+  string lastError = 8;
+  int32 version = 9;
+  string createdAt = 10;
+  string updatedAt = 11;
+  HoBomLogPayload payload = 12;
+}
+
+message HoBomLogPayload {
+  string traceId = 1;
+  string level = 2;
+  string method = 3;
+  string path = 4;
+  int32 statusCode = 5;
+  string host = 6;
+  string userId = 7;
+  LogPayloadDetail payload = 8;
+  string serviceType = 9;
+  string message = 10;
+}
+
+message LogPayloadDetail {
+  map<string, string> query = 1;
+  map<string, string> body = 2;
+  map<string, string> headers = 3;
+  string error = 4;
+}

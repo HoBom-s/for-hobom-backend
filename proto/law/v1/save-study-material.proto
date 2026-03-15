@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package law;
+
+option go_package = "github.com/HoBom-s/hobom-event-processor/infra/grpc/v1/law;lawpb";
+
+import "google/protobuf/empty.proto";
+
+service SaveStudyMaterialController {
+    rpc SaveStudyMaterial (SaveStudyMaterialRequest) returns (google.protobuf.Empty);
+}
+
+message Quiz {
+    string type = 1;
+    string question = 2;
+    string answer = 3;
+    string explanation = 4;
+    repeated string choices = 5;
+}
+
+message SaveStudyMaterialRequest {
+    string diffId = 1;
+    string summary = 2;
+    repeated string keyPoints = 3;
+    repeated Quiz quizzes = 4;
+}
