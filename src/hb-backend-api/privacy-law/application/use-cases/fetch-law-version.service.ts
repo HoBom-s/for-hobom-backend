@@ -138,9 +138,16 @@ export class FetchLawVersionService implements FetchLawVersionUseCase {
       const next = newArticles[i];
       if (
         old.getArticleNo !== next.articleNo ||
-        old.getContent !== next.content
+        old.getContent !== next.content ||
+        old.getParagraphs.length !== next.paragraphs.length
       ) {
         return false;
+      }
+
+      for (let j = 0; j < old.getParagraphs.length; j++) {
+        if (old.getParagraphs[j].content !== next.paragraphs[j].content) {
+          return false;
+        }
       }
     }
     return true;

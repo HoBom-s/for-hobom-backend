@@ -52,7 +52,7 @@ export class LawVersionRepositoryImpl implements LawVersionRepository {
   public async findAll(): Promise<LawVersionDocument[]> {
     return (await this.model
       .find()
-      .sort({ proclamationDate: -1 })
+      .sort({ createdAt: -1 })
       .lean()
       .exec()) as unknown as LawVersionDocument[];
   }
