@@ -27,7 +27,8 @@ export class TodayMenuRepositoryImpl implements TodayMenuRepository {
           {
             recommendedMenu: entity.getRecommendedMenu?.raw ?? undefined,
             candidates: entity.getCandidates.map((c) => c.raw),
-            recommendationDate: entity.getRecommendationDate?.value ?? undefined,
+            recommendationDate:
+              entity.getRecommendationDate?.value ?? undefined,
           },
         ],
         {

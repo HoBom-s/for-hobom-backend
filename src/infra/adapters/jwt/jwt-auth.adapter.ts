@@ -18,7 +18,9 @@ export class JwtAuthAdapter implements JwtAuthPort {
 
   public signAccessToken(payload: JwtAuthPayloadModel): string {
     return this.jwtService.sign(payload as Record<string, unknown>, {
-      expiresIn: this.configService.getOrThrow("HOBOM_JWT_ACCESS_TOKEN_EXPIRED"),
+      expiresIn: this.configService.getOrThrow(
+        "HOBOM_JWT_ACCESS_TOKEN_EXPIRED",
+      ),
     });
   }
 

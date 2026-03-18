@@ -157,14 +157,14 @@ export class LawApiAdapter implements LawApiPort, OnModuleDestroy {
             continue;
           }
 
-          // Parse paragraphs (항) — pty3 class
-          const paragraphEls = lawcon.querySelectorAll(
-            "p.pty3, p.pty3_dep1, p.pty3_dep2",
-          );
+          // Parse paragraphs (항) — pty1_de2_1 class
+          const paragraphEls = lawcon.querySelectorAll("p.pty1_de2_1");
           for (const pEl of paragraphEls) {
-            paragraphNo++;
             const text = pEl.textContent?.trim() ?? "";
-            // Extract paragraph number (e.g., "① ..." -> "1")
+            if (!text) {
+              continue;
+            }
+            paragraphNo++;
             const pNoMatch = /^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]/.exec(text);
             const pNo = pNoMatch
               ? String("①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳".indexOf(pNoMatch[0]) + 1)
