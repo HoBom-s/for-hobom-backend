@@ -258,6 +258,98 @@ describe("parseLawPgroups", () => {
     expect(result[0].paragraphs[1].subItems).toHaveLength(1);
   });
 
+  it("should extract implicit ① paragraph from article header (real DOM structure)", () => {
+    // law.go.kr 실제 DOM: ①이 p.pty1_p4 (조문 헤더)에 포함됨
+    // 제20조 실제 구조 재현
+    const pgroups: RawPgroupData[] = [
+      {
+        article: {
+          articleNo: "제20조",
+          title: "제20조(정보주체 이외로부터 수집한 개인정보의 수집 출처 등 통지)",
+          content:
+            "제20조(정보주체 이외로부터 수집한 개인정보의 수집 출처 등 통지)   ① 개인정보처리자가 정보주체 이외로부터 수집한 개인정보를 처리하는 때에는 정보주체의 요구가 있으면 즉시 다음 각 호의 모든 사항을 정보주체에게 알려야 한다.",
+        },
+        elements: [
+          { type: "subItem", text: "1. 개인정보의 수집 출처" },
+          { type: "subItem", text: "2. 개인정보의 처리 목적" },
+          {
+            type: "subItem",
+            text: "3. 제37조에 따른 개인정보 처리의 정지를 요구하거나 동의를 철회할 권리가 있다는 사실",
+          },
+          {
+            type: "paragraph",
+            text: "② 제1항에도 불구하고 처리하는 개인정보의 종류ㆍ규모, 종업원 수 및 매출액 규모 등을 고려하여 대통령령으로 정하는 기준에 해당하는 개인정보처리자가 제17조제1항제1호에 따라 정보주체 이외로부터 개인정보를 수집하여 처리하는 때에는 제1항 각 호의 모든 사항을 정보주체에게 알려야 한다.",
+          },
+          {
+            type: "paragraph",
+            text: "③ 제2항 본문에 따라 알리는 경우 정보주체에게 알리는 시기ㆍ방법 및 절차 등 필요한 사항은 대통령령으로 정한다.",
+          },
+          {
+            type: "paragraph",
+            text: "④ 제1항과 제2항 본문은 다음 각 호의 어느 하나에 해당하는 경우에는 적용하지 아니한다.",
+          },
+          {
+            type: "subItem",
+            text: "1. 통지를 요구하는 대상이 되는 개인정보가 제32조제2항 각 호의 어느 하나에 해당하는 개인정보파일에 포함되어 있는 경우",
+          },
+          {
+            type: "subItem",
+            text: "2. 통지로 인하여 다른 사람의 생명ㆍ신체를 해할 우려가 있거나 다른 사람의 재산과 그 밖의 이익을 부당하게 침해할 우려가 있는 경우",
+          },
+        ],
+      },
+    ];
+
+    const result = parseLawPgroups(pgroups);
+
+    expect(result).toHaveLength(1);
+    const art = result[0];
+    expect(art.paragraphs).toHaveLength(4);
+
+    // ① — content에서 추출된 암시적 항, 3개 호
+    expect(art.paragraphs[0].no).toBe("1");
+    expect(art.paragraphs[0].content).toContain("① 개인정보처리자가");
+    expect(art.paragraphs[0].subItems).toHaveLength(3);
+    expect(art.paragraphs[0].subItems[0].no).toBe("1");
+    expect(art.paragraphs[0].subItems[1].no).toBe("2");
+    expect(art.paragraphs[0].subItems[2].no).toBe("3");
+
+    // ② — 호 없음
+    expect(art.paragraphs[1].no).toBe("2");
+    expect(art.paragraphs[1].subItems).toHaveLength(0);
+
+    // ③ — 호 없음
+    expect(art.paragraphs[2].no).toBe("3");
+    expect(art.paragraphs[2].subItems).toHaveLength(0);
+
+    // ④ — 2개 호
+    expect(art.paragraphs[3].no).toBe("4");
+    expect(art.paragraphs[3].subItems).toHaveLength(2);
+
+    // article content에서 ① 이전 부분만 남아야 함
+    expect(art.content).not.toContain("①");
+  });
+
+  it("should not create implicit paragraph when content has no ①", () => {
+    const pgroups: RawPgroupData[] = [
+      {
+        article: {
+          articleNo: "제1조",
+          title: "제1조(목적)",
+          content:
+            "제1조(목적) 이 법은 개인정보의 처리 및 보호에 관한 사항을 정한다.",
+        },
+        elements: [],
+      },
+    ];
+
+    const result = parseLawPgroups(pgroups);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].paragraphs).toHaveLength(0);
+    expect(result[0].content).toContain("이 법은");
+  });
+
   it("should return empty array for empty pgroups", () => {
     expect(parseLawPgroups([])).toEqual([]);
   });

@@ -40,12 +40,26 @@ export function parseLawPgroups(pgroups: RawPgroupData[]): ParsedArticle[] {
         articles.push(currentArticle);
       }
 
-      currentArticle = {
-        ...pg.article,
-        paragraphs: [],
-      };
-      currentParagraphs = [];
-      paragraphNo = 0;
+      // ①이 조문 헤더(p.pty1_p4)에 포함된 경우 암시적 항으로 추출
+      const circledIdx = pg.article.content.indexOf("①");
+      if (circledIdx !== -1) {
+        const paragraphText = pg.article.content.slice(circledIdx).trim();
+        currentArticle = {
+          articleNo: pg.article.articleNo,
+          title: pg.article.title,
+          content: pg.article.content.slice(0, circledIdx).trim(),
+          paragraphs: [],
+        };
+        currentParagraphs = [{ no: "1", content: paragraphText, subItems: [] }];
+        paragraphNo = 1;
+      } else {
+        currentArticle = {
+          ...pg.article,
+          paragraphs: [],
+        };
+        currentParagraphs = [];
+        paragraphNo = 0;
+      }
     }
 
     if (!currentArticle) {
