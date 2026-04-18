@@ -2,17 +2,11 @@ import { Injectable, OnModuleDestroy } from "@nestjs/common";
 import { LawApiPort } from "../../domain/ports/out/law-api.port";
 import * as puppeteer from "puppeteer";
 import { createPool, Pool } from "generic-pool";
-
-interface Article {
-  articleNo: string;
-  title: string;
-  content: string;
-  paragraphs: {
-    no: string;
-    content: string;
-    subItems: { no: string; content: string }[];
-  }[];
-}
+import {
+  parseLawPgroups,
+  ParsedArticle,
+  RawPgroupData,
+} from "./law-article-parser";
 
 @Injectable()
 export class LawApiAdapter implements LawApiPort, OnModuleDestroy {
@@ -43,7 +37,7 @@ export class LawApiAdapter implements LawApiPort, OnModuleDestroy {
     lawId: string;
     proclamationDate: string;
     enforcementDate: string;
-    articles: Article[];
+    articles: ParsedArticle[];
   }> {
     const browser = await this.browserPool.acquire();
 
@@ -73,7 +67,8 @@ export class LawApiAdapter implements LawApiPort, OnModuleDestroy {
         waitUntil: "networkidle2",
         timeout: 60000,
       });
-      // Step 3: Extract metadata and articles
+
+      // Step 3: Extract raw data from DOM
       const result = await page.evaluate(() => {
         const getValue = (id: string) => {
           const el = document.getElementById(id);
@@ -85,7 +80,6 @@ export class LawApiAdapter implements LawApiPort, OnModuleDestroy {
         const enforcementDate = getValue("efYd");
         const rawHtml = document.body.innerHTML;
 
-        // Parse articles from pgroup elements
         const conScroll = document.getElementById("conScroll");
         if (!conScroll) {
           return {
@@ -93,115 +87,76 @@ export class LawApiAdapter implements LawApiPort, OnModuleDestroy {
             lawId,
             proclamationDate,
             enforcementDate,
-            articles: [],
+            pgroups: [] as {
+              article?: { articleNo: string; title: string; content: string };
+              elements: { type: "paragraph" | "subItem"; text: string }[];
+            }[],
           };
         }
 
-        const pgroups = conScroll.querySelectorAll(".pgroup");
-        const articles: {
-          articleNo: string;
-          title: string;
-          content: string;
-          paragraphs: {
-            no: string;
-            content: string;
-            subItems: { no: string; content: string }[];
-          }[];
+        const pgroupEls = conScroll.querySelectorAll(".pgroup");
+        const pgroups: {
+          article?: { articleNo: string; title: string; content: string };
+          elements: { type: "paragraph" | "subItem"; text: string }[];
         }[] = [];
 
-        let currentArticle: (typeof articles)[0] | null = null;
-        let currentParagraphs: (typeof articles)[0]["paragraphs"] = [];
-        let _currentSubItems: { no: string; content: string }[] = [];
-        let paragraphNo = 0;
-
-        for (const pg of pgroups) {
+        for (const pg of pgroupEls) {
           const lawcon = pg.querySelector(".lawcon");
           if (!lawcon) {
             continue;
           }
 
+          let article:
+            | { articleNo: string; title: string; content: string }
+            | undefined;
+
           const articleEl = lawcon.querySelector("p.pty1_p4");
           if (articleEl) {
-            // Save previous article
-            if (currentArticle) {
-              currentArticle.paragraphs = currentParagraphs;
-              articles.push(currentArticle);
-            }
-
             const label = articleEl.querySelector("span.bl label");
             const titleText = label ? (label.textContent?.trim() ?? "") : "";
 
-            // Extract article number from title (e.g., "제1조(목적)" -> "제1조")
             const noMatch = /제[\d조의]+/.exec(titleText);
             const articleNo = noMatch ? noMatch[0] : titleText;
 
-            // Get full text content (excluding UI elements)
             const cloned = articleEl.cloneNode(true) as HTMLElement;
             cloned
               .querySelectorAll("input, .lawico01, ul")
               .forEach((e) => e.remove());
             const fullText = cloned.textContent?.trim() ?? "";
 
-            currentArticle = {
-              articleNo,
-              title: titleText,
-              content: fullText,
-              paragraphs: [],
-            };
-            currentParagraphs = [];
-            _currentSubItems = [];
-            paragraphNo = 0;
+            article = { articleNo, title: titleText, content: fullText };
           }
 
-          if (!currentArticle) {
-            continue;
+          const elements: { type: "paragraph" | "subItem"; text: string }[] =
+            [];
+          const els = lawcon.querySelectorAll("p.pty1_de2_1, p.pty1_de2h");
+          for (const el of els) {
+            const text = el.textContent?.trim() ?? "";
+            elements.push({
+              type: el.classList.contains("pty1_de2_1")
+                ? "paragraph"
+                : "subItem",
+              text,
+            });
           }
 
-          // Parse paragraphs (항) — pty1_de2_1 class
-          const paragraphEls = lawcon.querySelectorAll("p.pty1_de2_1");
-          for (const pEl of paragraphEls) {
-            const text = pEl.textContent?.trim() ?? "";
-            if (!text) {
-              continue;
-            }
-            paragraphNo++;
-            const pNoMatch = /^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]/.exec(text);
-            const pNo = pNoMatch
-              ? String("①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳".indexOf(pNoMatch[0]) + 1)
-              : String(paragraphNo);
-            currentParagraphs.push({ no: pNo, content: text, subItems: [] });
-          }
-
-          // Parse sub-items (호) — pty1_de2h class
-          const subItemEls = lawcon.querySelectorAll("p.pty1_de2h");
-          for (const sEl of subItemEls) {
-            const text = sEl.textContent?.trim() ?? "";
-            const noMatch = /^([\d의]+)\./.exec(text);
-            const no = noMatch ? noMatch[1] : "";
-            if (currentParagraphs.length > 0) {
-              currentParagraphs[currentParagraphs.length - 1].subItems.push({
-                no,
-                content: text,
-              });
-            }
-          }
+          pgroups.push({ article, elements });
         }
 
-        // Push last article
-        if (currentArticle) {
-          currentArticle.paragraphs = currentParagraphs;
-          articles.push(currentArticle);
-        }
-
-        return { rawHtml, lawId, proclamationDate, enforcementDate, articles };
+        return { rawHtml, lawId, proclamationDate, enforcementDate, pgroups };
       });
+
+      // Step 4: Structure articles from raw pgroup data
+      const articles = parseLawPgroups(
+        result.pgroups as RawPgroupData[],
+      );
 
       return {
         rawXml: result.rawHtml,
         lawId: result.lawId,
         proclamationDate: result.proclamationDate,
         enforcementDate: result.enforcementDate,
-        articles: result.articles,
+        articles,
       };
     } finally {
       await this.browserPool.release(browser);
