@@ -26,6 +26,25 @@ export interface ParsedArticle {
 const CIRCLED_NUMBERS = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳";
 const CIRCLED_REGEX = new RegExp(`^[${CIRCLED_NUMBERS}]`);
 
+/**
+ * 호(sub-item)를 붙일 항(paragraph)을 결정한다.
+ * - 마지막 항이 "다음 각 호"를 포함하면 그대로 사용 (인터리빙 DOM)
+ * - 아니면 역순 탐색하여 "다음 각 호"를 가진 항에 붙임 (끝에 몰린 DOM)
+ * - 둘 다 없으면 마지막 항에 폴백
+ */
+function findSubItemTarget(paragraphs: ParsedArticle["paragraphs"]): number {
+  const last = paragraphs.length - 1;
+  if (paragraphs[last].content.includes("다음 각 호")) {
+    return last;
+  }
+  for (let i = last - 1; i >= 0; i--) {
+    if (paragraphs[i].content.includes("다음 각 호")) {
+      return i;
+    }
+  }
+  return last;
+}
+
 export function parseLawPgroups(pgroups: RawPgroupData[]): ParsedArticle[] {
   const articles: ParsedArticle[] = [];
 
@@ -82,7 +101,8 @@ export function parseLawPgroups(pgroups: RawPgroupData[]): ParsedArticle[] {
         const noMatch = /^([\d의]+)\./.exec(el.text);
         const no = noMatch ? noMatch[1] : "";
         if (currentParagraphs.length > 0) {
-          currentParagraphs[currentParagraphs.length - 1].subItems.push({
+          const targetIdx = findSubItemTarget(currentParagraphs);
+          currentParagraphs[targetIdx].subItems.push({
             no,
             content: el.text,
           });
