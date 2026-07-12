@@ -25,8 +25,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const res = ctx.getResponse<Response>();
     const status =
       exception instanceof HttpException ? exception.getStatus() : 500;
+
+    // 클라이언트에게는 HttpException의 응답만 노출, 그 외엔 일반 메시지
     const message =
-      exception instanceof HttpException ? exception.getResponse() : exception;
+      exception instanceof HttpException
+        ? exception.getResponse()
+        : "Internal server error";
 
     // 5xx 서버 오류만 Discord 알람 전송 (4xx 클라이언트 오류 제외)
     if (status >= 500) {

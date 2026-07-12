@@ -1,6 +1,6 @@
 import { OutboxId } from "../../model/outbox-id.vo";
 import { EventType } from "../../model/event-type.enum";
-import type { MessagePayload } from "../../model/message.payload";
+import { MessagePayload } from "../../model/message.payload";
 import { OutboxStatus } from "../../model/outbox-status.enum";
 import { FindOutboxEntity } from "../../model/find-outbox.entity";
 

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { Module } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
 import { MongooseModule } from "@nestjs/mongoose";
@@ -17,10 +18,19 @@ import { TraceInterceptor } from "./shared/adapters/in/rest/interceptors/trace.i
 import { HttpLogInterceptor } from "./shared/adapters/in/rest/interceptors/log.interceptor";
 import { UserModule } from "./hb-backend-api/user/user.module";
 import { FutureMessageModule } from "./hb-backend-api/future-message/future-message.module";
-import { DiscordWebhookService } from "./shared/discord/discord-webhook.service";
+import { DiscordModule } from "./shared/discord/discord.module";
 import { LabelModule } from "./hb-backend-api/label/label.module";
 import { NoteModule } from "./hb-backend-api/note/note.module";
+import { NotificationModule } from "./hb-backend-api/notification/notification.module";
 import { HealthModule } from "./hb-backend-api/health/health.module";
+import { DashboardModule } from "./hb-backend-api/dashboard/dashboard.module";
+import { ProjectModule } from "./hb-backend-api/project/project.module";
+import { IssueModule } from "./hb-backend-api/issue/issue.module";
+import { SprintModule } from "./hb-backend-api/sprint/sprint.module";
+import { BoardModule } from "./hb-backend-api/board/board.module";
+import { ProjectLabelModule } from "./hb-backend-api/project-label/project-label.module";
+import { PrivacyLawModule } from "./hb-backend-api/privacy-law/privacy-law.module";
+import { DlqModule } from "./hb-backend-api/dlq/dlq.module";
 
 @Module({
   imports: [
@@ -32,6 +42,10 @@ import { HealthModule } from "./hb-backend-api/health/health.module";
       useFactory: (configService: ConfigService) => ({
         pinoHttp: {
           level: configService.get<string>("LOG_LEVEL", "info"),
+          genReqId: (req) => {
+            const raw = req.headers["x-hobom-trace-id"];
+            return typeof raw === "string" ? raw : randomUUID();
+          },
           transport:
             configService.get<string>("NODE_ENV") !== "production"
               ? {
@@ -64,11 +78,20 @@ import { HealthModule } from "./hb-backend-api/health/health.module";
     FutureMessageModule,
     LabelModule,
     NoteModule,
+    NotificationModule,
     HealthModule,
+    DashboardModule,
+    ProjectModule,
+    IssueModule,
+    SprintModule,
+    BoardModule,
+    ProjectLabelModule,
+    PrivacyLawModule,
+    DlqModule,
+    DiscordModule,
   ],
   providers: [
     TraceContext,
-    DiscordWebhookService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TraceInterceptor,

@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import * as cookieParser from "cookie-parser";
+import helmet from "helmet";
 import { Logger } from "nestjs-pino";
 import { AppModule } from "./app.module";
 import { ResponseWrapInterceptor } from "./shared/adapters/in/rest/interceptors/wrapped-response.interceptor";
@@ -13,17 +14,43 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useLogger(app.get(Logger));
 
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    }),
+  );
+  app.enableCors({
+    origin: process.env.HOBOM_CORS_ORIGIN ?? "https://hobom-system.com",
+    credentials: true,
+  });
+  app.use(cookieParser());
+
   const config = new DocumentBuilder()
     .setTitle("HoBom Backend API Document 🐻🦊")
     .setDescription("HoBom System Backend")
     .setVersion("1.1.0")
     .setLicense("HoBom", "https://github.com/hobom-s")
+    .addCookieAuth("accessToken", {
+      type: "apiKey",
+      in: "cookie",
+      name: "accessToken",
+      description: "httpOnly 쿠키 (로그인 시 자동 설정)",
+    })
+    .addBearerAuth(
+      {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description: "JWT 액세스 토큰",
+      },
+      "bearer",
+    )
+    .addSecurityRequirements("accessToken")
+    .addSecurityRequirements("bearer")
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api-docs", app, documentFactory);
 
-  app.enableCors();
-  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -36,6 +63,7 @@ async function bootstrap() {
     new GlobalExceptionFilter(app.get(DiscordWebhookService)),
   );
 
+  app.enableShutdownHooks();
   app.connectMicroservice(grpcOptions);
 
   await app.startAllMicroservices();
@@ -50,6 +78,7 @@ async function bootstrap() {
 }
 
 bootstrap().catch((error) => {
+  // eslint-disable-next-line no-console
   console.error("Bootstrap failed", error);
   process.exit(1);
 });

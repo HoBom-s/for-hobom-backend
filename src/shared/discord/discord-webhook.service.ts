@@ -12,7 +12,9 @@ export class DiscordWebhookService {
   }
 
   public async sendErrorMessage(title: string, description: string) {
-    if (!this.webhookUrl) return;
+    if (!this.webhookUrl) {
+      return;
+    }
 
     await fetch(this.webhookUrl, {
       method: "POST",

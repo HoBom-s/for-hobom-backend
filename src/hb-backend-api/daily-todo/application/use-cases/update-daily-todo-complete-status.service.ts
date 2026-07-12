@@ -11,9 +11,7 @@ import { Transactional } from "../../../../infra/mongo/transaction/transaction.d
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
 @Injectable()
-export class UpdateDailyTodoCompleteStatusService
-  implements UpdateDailyTodoCompleteStatusUseCase
-{
+export class UpdateDailyTodoCompleteStatusService implements UpdateDailyTodoCompleteStatusUseCase {
   constructor(
     @Inject(DIToken.DailyTodoModule.DailyTodoPersistencePort)
     private readonly dailyTodoPersistencePort: DailyTodoPersistenceAdapter,
@@ -40,7 +38,7 @@ export class UpdateDailyTodoCompleteStatusService
     id: DailyTodoId,
     owner: UserId,
   ): Promise<DailyTodoWithRelationEntity> {
-    return await this.dailyTodoQueryPort.findById(id, owner);
+    return this.dailyTodoQueryPort.findById(id, owner);
   }
 
   private async changeCompleteStatus(

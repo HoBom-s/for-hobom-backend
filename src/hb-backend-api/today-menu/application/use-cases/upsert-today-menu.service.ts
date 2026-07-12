@@ -18,11 +18,11 @@ export class UpsertTodayMenuService implements UpsertTodayMenuUseCase {
 
   @Transactional()
   public async invoke(command: UpsertTodayMenuCommand): Promise<TodayMenuId> {
-    return await this.upsert(command);
+    return this.upsert(command);
   }
 
   private async upsert(command: UpsertTodayMenuCommand): Promise<TodayMenuId> {
-    return await this.todayMenuPersistencePort.upsert(
+    return this.todayMenuPersistencePort.upsert(
       UpsertTodayMenuEntity.from(command),
     );
   }

@@ -31,13 +31,13 @@ export class UpsertTodayMenuController {
   ): Promise<UpsertTodayMenuResponseDto> {
     const command = UpsertTodayMenuCommand.of(
       body.candidates.map((item) => MenuRecommendationId.fromString(item)),
-      body?.recommendedMenu == null
+      body.recommendedMenu == null
         ? null
         : MenuRecommendationId.fromString(body.recommendedMenu),
-      body?.recommendationDate == null
+      body.recommendationDate == null
         ? null
         : YearMonthDayString.fromString(body.recommendationDate),
-      body?.todayMenuId == null
+      body.todayMenuId == null
         ? null
         : TodayMenuId.fromString(body.todayMenuId),
     );

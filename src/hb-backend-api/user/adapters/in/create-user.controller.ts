@@ -1,4 +1,5 @@
-import { Body, Controller, Inject, Post } from "@nestjs/common";
+import { Body, Controller, Inject, Post, UseGuards } from "@nestjs/common";
+import { ThrottlerGuard, Throttle } from "@nestjs/throttler";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { EndPointPrefixConstant } from "../../../../shared/constants/end-point-prefix.constant";
 import { CreateUserUseCase } from "../../domain/ports/in/create-user.use-case";
@@ -18,6 +19,8 @@ export class CreateUserController {
     summary: "사용자 생성",
     description: "사용자 생성",
   })
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 3 } })
   @Post("")
   public async createUser(@Body() body: CreateUserDto): Promise<void> {
     const { username, password, nickname, email } = body;

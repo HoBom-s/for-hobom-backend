@@ -7,13 +7,14 @@ interface TraceStore {
 
 @Injectable()
 export class TraceContext {
-  private readonly asyncLocalStorage = new AsyncLocalStorage<TraceStore>();
+  private static readonly asyncLocalStorage =
+    new AsyncLocalStorage<TraceStore>();
 
   run(traceId: string, callback: () => void) {
-    this.asyncLocalStorage.run({ traceId }, callback);
+    TraceContext.asyncLocalStorage.run({ traceId }, callback);
   }
 
   getTraceId(): string {
-    return this.asyncLocalStorage.getStore()?.traceId ?? "";
+    return TraceContext.asyncLocalStorage.getStore()?.traceId ?? "";
   }
 }

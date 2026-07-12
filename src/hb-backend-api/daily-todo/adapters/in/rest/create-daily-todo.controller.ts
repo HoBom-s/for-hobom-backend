@@ -46,6 +46,7 @@ export class CreateDailyTodoController {
         body.title,
         DateHelper.parse(body.date, "KST"),
         categoryId,
+        body.cycle,
       ),
       user.getId,
     );

@@ -2,16 +2,13 @@ export class MemoryCache<T> {
   private store = new Map<string, { value: T | T[]; expires: number }>();
 
   constructor(
-    private ttlMs: number = 30000,
-    private readonly maxEntries: number = 1000,
+    private ttlMs = 30000,
+    private readonly maxEntries = 1000,
   ) {
     this.maxEntries = maxEntries;
   }
 
-  public static of<T>(
-    ttlMs: number = 30000,
-    maxEntries: number = 1000,
-  ): MemoryCache<T> {
+  public static of<T>(ttlMs = 30000, maxEntries = 1000): MemoryCache<T> {
     return new MemoryCache<T>(ttlMs, maxEntries);
   }
 

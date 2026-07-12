@@ -8,9 +8,12 @@ import { YearMonthDayString } from "../vo/year-month-day-string.vo";
 import { DailyTodoId } from "../vo/daily-todo-id.vo";
 import { DailyTodoCompleteStatus } from "../enums/daily-todo-complete-status.enum";
 import { DailyTodoCycle } from "../enums/daily-todo-cycle.enum";
+import { CategoryId } from "../../../category/domain/model/category-id.vo";
 
 export interface DailyTodoRepository {
   save(dailyTodoCreateSchemaEntity: DailyTodoCreateEntitySchema): Promise<void>;
+
+  saveAll(entities: DailyTodoCreateEntitySchema[]): Promise<void>;
 
   findAll(
     owner: UserId,
@@ -44,6 +47,25 @@ export interface DailyTodoRepository {
     owner: UserId,
     reaction: Reaction,
   ): Promise<void>;
+
+  update(
+    id: DailyTodoId,
+    owner: UserId,
+    data: Record<string, unknown>,
+  ): Promise<void>;
+
+  findByDateRangeAndCycles(
+    startDate: Date,
+    endDate: Date,
+    cycles: DailyTodoCycle[],
+  ): Promise<
+    {
+      title: string;
+      owner: UserId;
+      category: CategoryId;
+      cycle: DailyTodoCycle;
+    }[]
+  >;
 
   deleteDailyTodoById(id: DailyTodoId, owner: UserId): Promise<void>;
 }

@@ -4,9 +4,7 @@ import { AggregateResultQuery } from "./aggregate-result.query";
 export class AggregateQuery<T> {
   private memoryCache: MemoryCache<T | T[]> = MemoryCache.of<T | T[]>();
 
-  constructor() {}
-
-  public static of<T>(ttlMs: number = 30000): AggregateQuery<T> {
+  public static of<T>(ttlMs = 30000): AggregateQuery<T> {
     const query = new AggregateQuery<T>();
     query.memoryCache.setTTLMs(ttlMs);
 

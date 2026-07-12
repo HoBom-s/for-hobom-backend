@@ -14,6 +14,8 @@ import { UserNickname } from "../../../user/domain/model/user-nickname.vo";
 import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 import { AuthQueryPort } from "../../domain/ports/out/auth-query.port";
+import { RefreshToken } from "../../domain/model/refresh-token.vo";
+import { ApprovalStatus } from "../../../user/domain/enums/approval-status.enum";
 
 @Injectable()
 export class LoginAuthService implements LoginAuthUseCase {
@@ -26,7 +28,7 @@ export class LoginAuthService implements LoginAuthUseCase {
     private readonly authQueryPort: AuthQueryPort,
     @Inject(DIToken.AuthModule.JwtAuthPort)
     private readonly jwtAuthPort: JwtAuthPort,
-    public readonly transactionRunner: TransactionRunner,
+    private readonly transactionRunner: TransactionRunner,
     private readonly configService: ConfigService,
   ) {}
 
@@ -44,28 +46,30 @@ export class LoginAuthService implements LoginAuthUseCase {
       throw new BadRequestException("일치하는 사용자 정보가 없어요.");
     }
 
-    const nickname = UserNickname.fromString(foundUser.getNickname);
-    const existingAuth = await this.authQueryPort.findByNickname(nickname);
-    const now = new Date();
-
-    let refreshToken: string;
-
-    const accessToken = this.generateAccessToken(nickname.raw);
-
-    const isExistingTokenValid =
-      existingAuth != null &&
-      existingAuth.getExpiredAt.getTime() > now.getTime();
-
-    if (isExistingTokenValid) {
-      refreshToken = existingAuth.getRefreshToken;
-    } else {
-      refreshToken = this.generateRefreshToken(nickname.raw);
-      const expiresAt = this.calculateRefreshTokenExpiry();
-
-      await this.authPersistencePort.saveRefreshToken(
-        AuthEntitySchema.of(nickname.raw, refreshToken, expiresAt),
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+    if (foundUser.getApprovalStatus !== ApprovalStatus.APPROVED) {
+      throw new BadRequestException(
+        "승인 대기 중이에요. 관리자 승인 후 이용할 수 있어요.",
       );
     }
+
+    const nickname = UserNickname.fromString(foundUser.getNickname);
+
+    // 기존 토큰이 있으면 무효화 (세션 회전)
+    const existingAuth = await this.authQueryPort.findByNickname(nickname);
+    if (existingAuth != null) {
+      await this.authPersistencePort.revokeToken(
+        RefreshToken.fromString(existingAuth.getRefreshToken),
+      );
+    }
+
+    const accessToken = this.generateAccessToken(nickname.raw);
+    const refreshToken = this.generateRefreshToken(nickname.raw);
+    const expiresAt = this.calculateRefreshTokenExpiry();
+
+    await this.authPersistencePort.saveRefreshToken(
+      AuthEntitySchema.of(nickname.raw, refreshToken, expiresAt),
+    );
 
     return LoginAuthResult.of(accessToken, refreshToken);
   }
@@ -73,14 +77,14 @@ export class LoginAuthService implements LoginAuthUseCase {
   private async findUserByNickname(
     nickname: UserNickname,
   ): Promise<UserEntitySchema> {
-    return await this.userQueryPort.findByNickname(nickname);
+    return this.userQueryPort.findByNickname(nickname);
   }
 
   private async comparePassword(
     commandPassword: string,
     hashedPassword: string,
   ): Promise<boolean> {
-    return await compare(commandPassword, hashedPassword);
+    return compare(commandPassword, hashedPassword);
   }
 
   private generateAccessToken(nickname: string): string {

@@ -14,9 +14,7 @@ import {
 } from "../../domain/entity/daily-todo.retations";
 
 @Injectable()
-export class UpdateDailyTodoReactionService
-  implements UpdateDailyTodoReactionUseCase
-{
+export class UpdateDailyTodoReactionService implements UpdateDailyTodoReactionUseCase {
   constructor(
     @Inject(DIToken.DailyTodoModule.DailyTodoPersistencePort)
     private readonly dailyTodoPersistencePort: DailyTodoPersistencePort,
@@ -43,7 +41,7 @@ export class UpdateDailyTodoReactionService
     id: DailyTodoId,
     owner: UserId,
   ): Promise<DailyTodoWithRelationEntity> {
-    return await this.dailyTodoQueryPort.findById(id, owner);
+    return this.dailyTodoQueryPort.findById(id, owner);
   }
 
   private async updateReaction(

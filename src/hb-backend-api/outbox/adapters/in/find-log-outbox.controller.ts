@@ -1,11 +1,13 @@
-import { Controller, Inject } from "@nestjs/common";
+import { Controller, Inject, UseGuards } from "@nestjs/common";
 import { GrpcMethod } from "@nestjs/microservices";
 import { DIToken } from "../../../../shared/di/token.di";
 import { FindLogOutboxByEventTypeAndStatusUseCase } from "../../domain/ports/in/find-log-outbox-by-event-type-and-status.use-case";
 import { FindLogOutboxResultDto } from "./find-log-outbox-result.dto";
 import { FindLogOutboxDto } from "./find-log-outbox.dto";
+import { GrpcApiKeyGuard } from "../../../../shared/adapters/in/grpc/guard/grpc-api-key.guard";
 
 @Controller()
+@UseGuards(GrpcApiKeyGuard)
 export class FindLogOutboxController {
   constructor(
     @Inject(DIToken.OutboxModule.FindLogOutboxByEventTypeAndStatusUseCase)

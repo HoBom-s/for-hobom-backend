@@ -6,9 +6,7 @@ import { MenuRecommendationQueryPort } from "../../domain/ports/out/menu-recomme
 import { MenuRecommendationRelationEntity } from "../../domain/model/menu-recommendation-with-relations.entity";
 
 @Injectable()
-export class FindAllMenuRecommendationService
-  implements FindAllMenuRecommendationUseCase
-{
+export class FindAllMenuRecommendationService implements FindAllMenuRecommendationUseCase {
   constructor(
     @Inject(DIToken.MenuRecommendationModule.MenuRecommendationQueryPort)
     private readonly menuRecommendationQueryPort: MenuRecommendationQueryPort,
@@ -20,6 +18,6 @@ export class FindAllMenuRecommendationService
   }
 
   private async getBy(): Promise<MenuRecommendationRelationEntity[]> {
-    return await this.menuRecommendationQueryPort.findAll();
+    return this.menuRecommendationQueryPort.findAll();
   }
 }

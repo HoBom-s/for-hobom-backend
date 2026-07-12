@@ -16,6 +16,9 @@ import { JwtStrategy } from "../../shared/adapters/in/rest/strategy/jwt.strategy
 import { AuthRepositoryImpl } from "./infra/repositories/auth.repository.impl";
 import { DIToken } from "../../shared/di/token.di";
 import { AuthLoginController } from "./adapters/in/auth-login.controller";
+import { AuthLogoutController } from "./adapters/in/auth-logout.controller";
+import { AuthMeController } from "./adapters/in/auth-me.controller";
+import { LogoutAuthService } from "./application/use-cases/logout-auth.service";
 
 @Module({
   imports: [
@@ -24,10 +27,7 @@ import { AuthLoginController } from "./adapters/in/auth-login.controller";
       global: true,
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>("HOBOM_JWT_SECRET"),
-        signOptions: {
-          expiresIn: configService.get<string>("HOBOM_JWT_SIGN_EXPIRED_AT"),
-        },
+        secret: configService.getOrThrow<string>("HOBOM_JWT_SECRET"),
       }),
     }),
     PassportModule.register({
@@ -67,8 +67,17 @@ import { AuthLoginController } from "./adapters/in/auth-login.controller";
       provide: DIToken.AuthModule.RefreshAuthTokenUseCase,
       useClass: RefreshTokenAuthService,
     },
+    {
+      provide: DIToken.AuthModule.LogoutAuthUseCase,
+      useClass: LogoutAuthService,
+    },
   ],
-  controllers: [AuthLoginController, AuthRefreshTokenController],
+  controllers: [
+    AuthLoginController,
+    AuthRefreshTokenController,
+    AuthLogoutController,
+    AuthMeController,
+  ],
   exports: [
     JwtModule,
     MongooseModule,
@@ -78,6 +87,7 @@ import { AuthLoginController } from "./adapters/in/auth-login.controller";
     DIToken.AuthModule.AuthQueryPort,
     DIToken.AuthModule.LoginAuthUseCase,
     DIToken.AuthModule.RefreshAuthTokenUseCase,
+    DIToken.AuthModule.LogoutAuthUseCase,
   ],
 })
 export class AuthModule {}

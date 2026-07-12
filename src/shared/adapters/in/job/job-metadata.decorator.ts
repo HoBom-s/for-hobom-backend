@@ -14,7 +14,8 @@ interface Options {
 }
 
 export function RegisterJob(options: Options) {
-  return function (target: any) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  return function (target: Function) {
     const descriptor = Object.getOwnPropertyDescriptor(
       target.prototype,
       "process",

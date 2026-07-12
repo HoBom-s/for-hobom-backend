@@ -21,8 +21,12 @@ import { GetDailyTodoByIdController } from "./adapters/in/rest/get-daily-todo-by
 import { GetAllDailyTodoController } from "./adapters/in/rest/get-all-daily-todo.controller";
 import { UpdateDailyTodoCompleteStatusController } from "./adapters/in/rest/update-daily-todo-complete-status.controller";
 import { UpdateDailyTodoCycleStatusController } from "./adapters/in/rest/update-daily-todo-cycle-status.controller";
+import { UpdateDailyTodoService } from "./application/use-cases/update-daily-todo.service";
+import { UpdateDailyTodoController } from "./adapters/in/rest/update-daily-todo.controller";
 import { DeleteDailyTodoService } from "./application/use-cases/delete-daily-todo.service";
 import { DeleteDailyTodoController } from "./adapters/in/rest/delete-daily-todo.controller";
+import { ProcessDailyTodoRecurrenceService } from "./application/use-cases/process-daily-todo-recurrence.service";
+import { ProcessDailyTodoRecurrenceScheduler } from "./adapters/in/process-daily-todo-recurrence.scheduler";
 
 @Module({
   imports: [
@@ -76,9 +80,18 @@ import { DeleteDailyTodoController } from "./adapters/in/rest/delete-daily-todo.
       useClass: GetDailyTodoByDateService,
     },
     {
+      provide: DIToken.DailyTodoModule.UpdateDailyTodoUseCase,
+      useClass: UpdateDailyTodoService,
+    },
+    {
       provide: DIToken.DailyTodoModule.DeleteDailyTodoUseCase,
       useClass: DeleteDailyTodoService,
     },
+    {
+      provide: DIToken.DailyTodoModule.ProcessDailyTodoRecurrenceUseCase,
+      useClass: ProcessDailyTodoRecurrenceService,
+    },
+    ProcessDailyTodoRecurrenceScheduler,
   ],
   controllers: [
     CreateDailyTodoController,
@@ -88,6 +101,7 @@ import { DeleteDailyTodoController } from "./adapters/in/rest/delete-daily-todo.
     UpdateDailyTodoCompleteStatusController,
     UpdateDailyTodoCycleStatusController,
     UpdateDailyTodoReactionController,
+    UpdateDailyTodoController,
     DeleteDailyTodoController,
   ],
   exports: [
@@ -102,6 +116,7 @@ import { DeleteDailyTodoController } from "./adapters/in/rest/delete-daily-todo.
     DIToken.DailyTodoModule.UpdateDailyTodoCycleUseCase,
     DIToken.DailyTodoModule.UpdateDailyTodoReactionUseCase,
     DIToken.DailyTodoModule.GetDailyTodoByDateUseCase,
+    DIToken.DailyTodoModule.UpdateDailyTodoUseCase,
     DIToken.DailyTodoModule.DeleteDailyTodoUseCase,
   ],
 })

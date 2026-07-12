@@ -6,13 +6,11 @@ export const UserSchema = SchemaFactory.createForClass(UserEntity);
 
 export type UserDocument = UserEntity & Document;
 
-UserSchema.pre<UserDocument>("save", async function (next) {
+UserSchema.pre<UserDocument>("save", async function () {
   if (!this.isModified("password")) {
-    return next;
+    return;
   }
 
   const salt = await genSalt(Number(process.env.HOBOM_GEN_SALT));
   this.password = await hash(this.password, salt);
-
-  next();
 });

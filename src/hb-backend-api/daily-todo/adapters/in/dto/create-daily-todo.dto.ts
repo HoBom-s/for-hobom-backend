@@ -1,5 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
+import {
+  IsEnum,
+  Matches,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from "class-validator";
+import { DailyTodoCycle } from "../../../domain/enums/daily-todo-cycle.enum";
 
 export class CreateDailyTodoDto {
   @ApiProperty({ type: "string", required: true })
@@ -11,6 +19,9 @@ export class CreateDailyTodoDto {
   @ApiProperty({ type: "string", required: true })
   @IsString({ message: "데일리 투두의 날짜를 선택해 주세요." })
   @IsNotEmpty({ message: "데일리 투두의 날짜는 필수로 입력해야 해요." })
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: "날짜 형식은 YYYY-MM-DD여야 해요.",
+  })
   date: string;
 
   @ApiProperty({ type: "string" })
@@ -18,4 +29,11 @@ export class CreateDailyTodoDto {
   @IsString({ message: "카테고리는 문자열이어야 해요." })
   @IsNotEmpty({ message: "데일리 투두의 카테고리는 필수에요." })
   category: string;
+
+  @ApiProperty({ type: "string", required: false, enum: DailyTodoCycle })
+  @IsOptional()
+  @IsEnum(DailyTodoCycle, {
+    message: "데일리 투두의 사이클이 유효하지 않아요.",
+  })
+  cycle?: DailyTodoCycle;
 }

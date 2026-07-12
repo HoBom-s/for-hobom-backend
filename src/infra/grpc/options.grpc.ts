@@ -1,5 +1,7 @@
+import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { ServerCredentials } from "@grpc/grpc-js";
 
 /**
  * [ADR] gRPC 마이크로서비스 설정
@@ -35,27 +37,52 @@ import { MicroserviceOptions, Transport } from "@nestjs/microservices";
  *     - PatchOutboxMarkAsSent로 처리 완료 표시
  *
  * ### proto 파일 위치
- * hobom-buf-proto/ (git submodule) 에서 관리한다.
- * 서버와 consumer 모두 동일한 submodule을 참조하여 계약 일관성을 유지한다.
+ * BSR(buf.build/hobom/hobom-buf-proto)에서 buf export로 proto/ 디렉토리에 다운로드한다.
+ * npm run proto:pull로 최신 proto를 가져온다.
  */
+
+function buildGrpcCredentials(): ServerCredentials | undefined {
+  const certPath = process.env.HOBOM_GRPC_TLS_CERT;
+  const keyPath = process.env.HOBOM_GRPC_TLS_KEY;
+
+  if (!certPath || !keyPath) {
+    // insecure (default)
+    return undefined;
+  }
+
+  if (!existsSync(certPath) || !existsSync(keyPath)) {
+    return undefined;
+  }
+
+  return ServerCredentials.createSsl(null, [
+    {
+      cert_chain: readFileSync(certPath),
+      private_key: readFileSync(keyPath),
+    },
+  ]);
+}
+
 export const grpcOptions: MicroserviceOptions = {
   transport: Transport.GRPC,
   options: {
-    url: "0.0.0.0:50051",
-    package: ["outbox.message", "outbox.log"],
+    url: `${process.env.HOBOM_GRPC_HOST ?? "0.0.0.0"}:50051`,
+    package: ["outbox.message", "outbox.log", "outbox.law", "law"],
     protoPath: [
       join(
         __dirname,
-        "../../../hobom-buf-proto/message/outbox/v1/find-hobom-message-outbox.proto",
+        "../../../proto/message/outbox/v1/find-hobom-message-outbox.proto",
       ),
       join(
         __dirname,
-        "../../../hobom-buf-proto/message/outbox/v1/patch-hobom-message-outbox.proto",
+        "../../../proto/message/outbox/v1/patch-hobom-message-outbox.proto",
       ),
+      join(__dirname, "../../../proto/log/outbox/v1/hobom-log-outbox.proto"),
       join(
         __dirname,
-        "../../../hobom-buf-proto/log/outbox/v1/hobom-log-outbox.proto",
+        "../../../proto/law/outbox/v1/find-hobom-law-outbox.proto",
       ),
+      join(__dirname, "../../../proto/law/v1/save-study-material.proto"),
     ],
+    credentials: buildGrpcCredentials(),
   },
 };

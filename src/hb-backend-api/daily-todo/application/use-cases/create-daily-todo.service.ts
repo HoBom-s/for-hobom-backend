@@ -36,7 +36,7 @@ export class CreateDailyTodoService implements CreateDailyTodoUseCase {
       owner,
       null,
       DailyTodoCompleteStatus.PROGRESS,
-      DailyTodoCycle.EVERYDAY,
+      command.getCycle ?? DailyTodoCycle.EVERYDAY,
       command.getCategory,
     );
     await this.dailyTodoPersistencePort.save(dailyTodoCreateEntitySchema);

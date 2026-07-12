@@ -15,4 +15,6 @@ export interface OutboxRepository {
     eventType: EventType,
     status: OutboxStatus,
   ): Promise<OutboxDocument[]>;
+
+  deleteExpiredBatch(olderThan: Date, batchSize: number): Promise<number>;
 }

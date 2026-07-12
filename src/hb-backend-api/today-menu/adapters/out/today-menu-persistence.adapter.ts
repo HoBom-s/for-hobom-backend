@@ -13,6 +13,6 @@ export class TodayMenuPersistenceAdapter implements TodayMenuPersistencePort {
   ) {}
 
   public async upsert(entity: UpsertTodayMenuEntity): Promise<TodayMenuId> {
-    return await this.todayMenuRepository.upsert(entity);
+    return this.todayMenuRepository.upsert(entity);
   }
 }

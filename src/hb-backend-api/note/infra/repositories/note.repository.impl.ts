@@ -25,13 +25,13 @@ export class NoteRepositoryImpl implements NoteRepository {
       [
         {
           owner: schema.getOwner.raw,
-          title: schema.getTitle,
-          content: schema.getContent,
+          title: schema.getTitle ?? undefined,
+          content: schema.getContent ?? undefined,
           type: schema.getType,
           checklistItems: schema.getChecklistItems.map((i) => i.toPlain()),
           color: schema.getColor.raw,
           labels: schema.getLabels.map((l) => l.raw),
-          reminder: schema.getReminder?.toPlain() ?? null,
+          reminder: schema.getReminder?.toPlain() ?? undefined,
           order: schema.getOrder,
         },
       ],
@@ -39,36 +39,47 @@ export class NoteRepositoryImpl implements NoteRepository {
     );
   }
 
-  public async findById(id: NoteId, owner: UserId): Promise<NoteDocument> {
+  public async findById(id: NoteId, userId: UserId): Promise<NoteDocument> {
     const found = await this.noteModel
-      .findOne({ _id: id.raw, owner: owner.raw })
+      .findOne({
+        _id: id.raw,
+        $or: [{ owner: userId.raw }, { members: userId.raw }],
+      })
+      .lean()
       .exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 노트를 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as NoteDocument;
   }
 
   public async findAll(
-    owner: UserId,
+    userId: UserId,
     status: NoteStatus,
   ): Promise<NoteDocument[]> {
-    return this.noteModel
-      .find({ owner: owner.raw, status })
+    return (await this.noteModel
+      .find({
+        $or: [{ owner: userId.raw }, { members: userId.raw }],
+        status,
+      })
       .sort({ isPinned: -1, order: 1 })
-      .exec();
+      .lean()
+      .exec()) as unknown as NoteDocument[];
   }
 
   public async update(
     id: NoteId,
-    owner: UserId,
+    userId: UserId,
     data: Record<string, unknown>,
   ): Promise<void> {
     const session = MongoSessionContext.getSession();
     await this.noteModel.findOneAndUpdate(
-      { _id: id.raw, owner: owner.raw },
+      {
+        _id: id.raw,
+        $or: [{ owner: userId.raw }, { members: userId.raw }],
+      },
       { $set: data },
       { session },
     );
@@ -90,13 +101,42 @@ export class NoteRepositoryImpl implements NoteRepository {
     );
   }
 
-  public async findMinOrder(owner: UserId): Promise<number> {
+  public async deleteTrashedBefore(threshold: Date): Promise<number> {
+    const session = MongoSessionContext.getSession();
+    const result = await this.noteModel.deleteMany(
+      { status: NoteStatus.TRASHED, trashedAt: { $lte: threshold } },
+      { session },
+    );
+    return result.deletedCount;
+  }
+
+  public async findMinOrder(userId: UserId): Promise<number> {
     const result = await this.noteModel
-      .findOne({ owner: owner.raw })
+      .findOne({
+        $or: [{ owner: userId.raw }, { members: userId.raw }],
+      })
       .sort({ order: 1 })
       .select("order")
       .lean()
       .exec();
     return result?.order ?? 0;
+  }
+
+  public async addMember(id: NoteId, memberUserId: UserId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.noteModel.findOneAndUpdate(
+      { _id: id.raw },
+      { $push: { members: memberUserId.raw } },
+      { session },
+    );
+  }
+
+  public async removeMember(id: NoteId, memberUserId: UserId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.noteModel.findOneAndUpdate(
+      { _id: id.raw },
+      { $pull: { members: memberUserId.raw } },
+      { session },
+    );
   }
 }

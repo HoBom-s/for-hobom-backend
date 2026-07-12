@@ -6,9 +6,7 @@ export interface JwtAuthPort {
 
   signRefreshToken(payload: JwtAuthPayloadModel): string;
 
-  verifyAccessToken(token: RefreshToken): JwtAuthPayloadModel;
-
   verifyRefreshToken(token: RefreshToken): JwtAuthPayloadModel;
 
-  decode(token: RefreshToken): JwtAuthPayloadModel | null;
+  verifyRefreshTokenIgnoreExpiry(token: RefreshToken): JwtAuthPayloadModel;
 }

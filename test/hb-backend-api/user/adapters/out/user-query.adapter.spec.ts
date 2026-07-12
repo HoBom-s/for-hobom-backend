@@ -37,7 +37,7 @@ describe("UserQueryAdapter", () => {
     });
 
     it("should throw NotFoundException when user is not found", async () => {
-      userRepository.findById.mockResolvedValue(null as any);
+      userRepository.findById.mockResolvedValue(null as never);
 
       const userId = new UserId(new Types.ObjectId());
       await expect(userQueryAdapter.findById(userId)).rejects.toThrow(
@@ -66,7 +66,7 @@ describe("UserQueryAdapter", () => {
     });
 
     it("should throw NotFoundException when user is not found", async () => {
-      userRepository.findByNickname.mockResolvedValue(null as any);
+      userRepository.findByNickname.mockResolvedValue(null as never);
 
       const userNickname = UserNickname.fromString("not-found-nickname");
       await expect(

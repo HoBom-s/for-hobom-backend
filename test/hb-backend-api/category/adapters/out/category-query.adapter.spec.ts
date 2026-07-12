@@ -60,7 +60,7 @@ describe("CategoryQueryAdapter", () => {
       });
 
       const notExistTitle = CategoryTitle.fromString("Noooo");
-      categoryRepository.findByTitle.mockResolvedValue(null as any);
+      categoryRepository.findByTitle.mockResolvedValue(null);
       expect(
         await categoryQueryAdapter.findByTitle(notExistTitle, userId),
       ).toBeNull();

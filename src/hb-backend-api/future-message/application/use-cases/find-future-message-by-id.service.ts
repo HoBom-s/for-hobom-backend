@@ -6,21 +6,19 @@ import { FutureMessageId } from "../../domain/model/future-message-id.vo";
 import { FutureMessageQueryResult } from "../../domain/ports/out/future-message-query.result";
 
 @Injectable()
-export class FindFutureMessageByIdService
-  implements FindFutureMessageByIdUseCase
-{
+export class FindFutureMessageByIdService implements FindFutureMessageByIdUseCase {
   constructor(
     @Inject(DIToken.FutureMessageModule.FutureMessageQueryPort)
     private readonly futureMessageQueryPort: FutureMessageQueryPort,
   ) {}
 
   public async invoke(id: FutureMessageId): Promise<FutureMessageQueryResult> {
-    return await this.findById(id);
+    return this.findById(id);
   }
 
   private async findById(
     id: FutureMessageId,
   ): Promise<FutureMessageQueryResult> {
-    return await this.futureMessageQueryPort.findById(id);
+    return this.futureMessageQueryPort.findById(id);
   }
 }

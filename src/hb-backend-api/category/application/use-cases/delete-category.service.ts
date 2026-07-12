@@ -29,7 +29,7 @@ export class DeleteCategoryService implements DeleteCategoryUseCase {
     id: CategoryId,
     owner: UserId,
   ): Promise<CategoryEntitySchema> {
-    return await this.categoryQueryPort.findById(id, owner);
+    return this.categoryQueryPort.findById(id, owner);
   }
 
   private async delete(id: CategoryId, owner: UserId): Promise<void> {

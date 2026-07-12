@@ -7,9 +7,7 @@ import { Transactional } from "../../../../infra/mongo/transaction/transaction.d
 import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
 
 @Injectable()
-export class CreateMenuRecommendationService
-  implements CreateMenuRecommendationUseCase
-{
+export class CreateMenuRecommendationService implements CreateMenuRecommendationUseCase {
   constructor(
     @Inject(DIToken.MenuRecommendationModule.MenuRecommendationPersistencePort)
     private readonly menuRecommendationPersistencePort: MenuRecommendationPersistencePort,

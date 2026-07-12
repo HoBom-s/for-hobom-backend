@@ -25,7 +25,9 @@ export class LabelQueryAdapter implements LabelQueryPort {
 
   public async findAll(owner: UserId): Promise<LabelEntitySchema[]> {
     const docs = await this.labelRepository.findAll(owner);
-    if (docs.length === 0) return [];
+    if (docs.length === 0) {
+      return [];
+    }
     return docs.map((doc) => this.toEntity(doc));
   }
 
@@ -34,7 +36,9 @@ export class LabelQueryAdapter implements LabelQueryPort {
     owner: UserId,
   ): Promise<LabelEntitySchema | null> {
     const doc = await this.labelRepository.findByTitle(title, owner);
-    if (doc == null) return null;
+    if (doc == null) {
+      return null;
+    }
     return this.toEntity(doc);
   }
 

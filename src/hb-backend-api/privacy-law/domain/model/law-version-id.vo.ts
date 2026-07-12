@@ -1,0 +1,26 @@
+import { Types } from "mongoose";
+
+export class LawVersionId {
+  constructor(private readonly value: Types.ObjectId) {
+    Object.freeze(this);
+  }
+
+  public static fromString(id: string): LawVersionId {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error(`올바르지 않은 LawVersion ID 형식이에요. ${id}`);
+    }
+    return new LawVersionId(new Types.ObjectId(id));
+  }
+
+  public equals(other: LawVersionId): boolean {
+    return this.value.equals(other.value);
+  }
+
+  public toString(): string {
+    return this.value.toHexString();
+  }
+
+  public get raw(): Types.ObjectId {
+    return this.value;
+  }
+}

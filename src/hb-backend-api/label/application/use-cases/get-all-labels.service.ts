@@ -14,7 +14,9 @@ export class GetAllLabelsService implements GetAllLabelsUseCase {
 
   public async invoke(owner: UserId): Promise<LabelQueryResult[]> {
     const labels = await this.labelQueryPort.findAll(owner);
-    if (labels.length === 0) return [];
+    if (labels.length === 0) {
+      return [];
+    }
     return labels.map(LabelQueryResult.from);
   }
 }

@@ -14,6 +14,10 @@ import { FindAllFutureMessageByStatusService } from "./application/use-cases/fin
 import { FindAllFutureMessageByStatusController } from "./adapters/in/find-all-future-message-by-status.controller";
 import { FindFutureMessageByIdService } from "./application/use-cases/find-future-message-by-id.service";
 import { FindFutureMessageByIdController } from "./adapters/in/find-future-message-by-id.controller";
+import { UpdateFutureMessageService } from "./application/use-cases/update-future-message.service";
+import { UpdateFutureMessageController } from "./adapters/in/update-future-message.controller";
+import { DeleteFutureMessageService } from "./application/use-cases/delete-future-message.service";
+import { DeleteFutureMessageController } from "./adapters/in/delete-future-message.controller";
 import { ProcessScheduleFutureMessageService } from "./application/use-cases/process-schedule-future-message.service";
 import { ProcessFutureMessageScheduler } from "./adapters/in/process-future-message.scheduler";
 import { OutboxModule } from "../outbox/outbox.module";
@@ -60,12 +64,22 @@ import { OutboxModule } from "../outbox/outbox.module";
       useClass: FindFutureMessageByIdService,
     },
     {
+      provide: DIToken.FutureMessageModule.UpdateFutureMessageUseCase,
+      useClass: UpdateFutureMessageService,
+    },
+    {
+      provide: DIToken.FutureMessageModule.DeleteFutureMessageUseCase,
+      useClass: DeleteFutureMessageService,
+    },
+    {
       provide: DIToken.FutureMessageModule.ProcessScheduleFutureMessageUseCase,
       useClass: ProcessScheduleFutureMessageService,
     },
   ],
   controllers: [
     CreateFutureMessageController,
+    UpdateFutureMessageController,
+    DeleteFutureMessageController,
     FindAllFutureMessageByStatusController,
     FindFutureMessageByIdController,
   ],
@@ -78,6 +92,8 @@ import { OutboxModule } from "../outbox/outbox.module";
     DIToken.FutureMessageModule.CreateFutureMessageUseCase,
     DIToken.FutureMessageModule.FindAllFutureMessageByStatusUseCase,
     DIToken.FutureMessageModule.FindFutureMessageByIdUseCase,
+    DIToken.FutureMessageModule.UpdateFutureMessageUseCase,
+    DIToken.FutureMessageModule.DeleteFutureMessageUseCase,
     DIToken.FutureMessageModule.ProcessScheduleFutureMessageUseCase,
   ],
 })

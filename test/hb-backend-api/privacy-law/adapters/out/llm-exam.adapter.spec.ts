@@ -1,0 +1,157 @@
+import { Test, TestingModule } from "@nestjs/testing";
+import { BadGatewayException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { LlmExamAdapter } from "../../../../../src/hb-backend-api/privacy-law/adapters/out/llm-exam.adapter";
+import { TraceContext } from "../../../../../src/shared/trace/trace.context";
+
+describe("LlmExamAdapter", () => {
+  let adapter: LlmExamAdapter;
+  const mockFetch = jest.fn();
+  const mockTraceContext = {
+    getTraceId: jest.fn().mockReturnValue("test-trace-id"),
+  };
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    mockTraceContext.getTraceId.mockReturnValue("test-trace-id");
+    global.fetch = mockFetch;
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        LlmExamAdapter,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string, defaultValue: string) => {
+              if (key === "HOBOM_LLM_REST_HOST") {
+                return "localhost";
+              }
+              if (key === "HOBOM_LLM_REST_PORT") {
+                return "3000";
+              }
+              return defaultValue;
+            }),
+            getOrThrow: jest.fn().mockReturnValue("test-api-key"),
+          },
+        },
+        {
+          provide: TraceContext,
+          useValue: mockTraceContext,
+        },
+      ],
+    }).compile();
+
+    adapter = module.get(LlmExamAdapter);
+  });
+
+  const mockRequest = {
+    articles: [
+      { articleNo: "제15조", articleTitle: "수집·이용", content: "내용" },
+    ],
+    subject: "개인정보 보호법 총칙",
+    questionCount: 5,
+  };
+
+  const mockQuestions = [
+    {
+      subject: "개인정보 보호법 총칙",
+      type: "OX",
+      question: "테스트 문제",
+      choices: [],
+      answer: "O",
+      explanation: "해설",
+    },
+  ];
+
+  describe("generateExam", () => {
+    it("should call correct URL with API key header", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ questions: mockQuestions }),
+      });
+
+      await adapter.generateExam(mockRequest);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "http://localhost:3000/api/v1/generate-exam",
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+            "x-api-key": "test-api-key",
+            "x-hobom-trace-id": "test-trace-id",
+          }),
+          body: JSON.stringify(mockRequest),
+        }),
+      );
+    });
+
+    it("should return parsed questions from response", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ questions: mockQuestions }),
+      });
+
+      const result = await adapter.generateExam(mockRequest);
+
+      expect(result.questions).toHaveLength(1);
+      expect(result.questions[0].type).toBe("OX");
+      expect(result.questions[0].answer).toBe("O");
+    });
+
+    it("should throw BadGatewayException when response is not ok", async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+      });
+
+      await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
+        BadGatewayException,
+      );
+    });
+
+    it("should throw BadGatewayException when response is 401", async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 401,
+      });
+
+      await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
+        BadGatewayException,
+      );
+    });
+
+    it("should throw BadGatewayException when fetch itself fails", async () => {
+      mockFetch.mockRejectedValue(new Error("Network error"));
+
+      await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
+        BadGatewayException,
+      );
+    });
+
+    it("should throw BadGatewayException with timeout message on AbortError", async () => {
+      mockFetch.mockRejectedValue(new DOMException("Aborted", "AbortError"));
+
+      await expect(adapter.generateExam(mockRequest)).rejects.toThrow(
+        "180000ms",
+      );
+    });
+
+    it("should not send trace header when traceId is empty", async () => {
+      mockTraceContext.getTraceId.mockReturnValue("");
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ questions: [] }),
+      });
+
+      await adapter.generateExam(mockRequest);
+
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
+      expect(headers["x-hobom-trace-id"]).toBeUndefined();
+    });
+  });
+});

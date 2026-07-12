@@ -11,9 +11,7 @@ import { UserId } from "../../../user/domain/model/user-id.vo";
 import { MenuRecommendationId } from "../../domain/model/menu-recommendation-id.vo";
 
 @Injectable()
-export class MenuRecommendationQueryAdapter
-  implements MenuRecommendationQueryPort
-{
+export class MenuRecommendationQueryAdapter implements MenuRecommendationQueryPort {
   constructor(
     @Inject(DIToken.MenuRecommendationModule.MenuRecommendationRepository)
     private readonly menuRecommendationRepository: MenuRecommendationRepository,
@@ -25,7 +23,7 @@ export class MenuRecommendationQueryAdapter
   }
 
   private async getBy(): Promise<MenuRecommendationWithRelationsEntity[]> {
-    return await this.menuRecommendationRepository.findAll();
+    return this.menuRecommendationRepository.findAll();
   }
 
   private convertToRelationEntity(

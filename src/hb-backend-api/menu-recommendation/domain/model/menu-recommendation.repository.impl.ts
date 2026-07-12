@@ -10,9 +10,7 @@ import { MenuRecommendationWithRelationsEntity } from "./menu-recommendation-wit
 import { MenuRecommendationAggregationHelper } from "./menu-recommendation-aggregation.helper";
 
 @Injectable()
-export class MenuRecommendationRepositoryImpl
-  implements MenuRecommendationRepository
-{
+export class MenuRecommendationRepositoryImpl implements MenuRecommendationRepository {
   constructor(
     @InjectModel(MenuRecommendationEntity.name)
     private readonly menuRecommendationModel: Model<MenuRecommendationDocument>,
@@ -31,13 +29,13 @@ export class MenuRecommendationRepositoryImpl
         },
       ],
       {
-        session: session,
+        session,
       },
     );
   }
 
   public async findAll(): Promise<MenuRecommendationWithRelationsEntity[]> {
-    return await this.menuRecommendationModel
+    return this.menuRecommendationModel
       .aggregate([
         ...MenuRecommendationAggregationHelper.buildUserJoin(),
         ...MenuRecommendationAggregationHelper.buildProject(),

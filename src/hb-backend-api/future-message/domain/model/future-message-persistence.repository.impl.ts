@@ -12,9 +12,7 @@ import { MongoSessionContext } from "../../../../infra/mongo/transaction/transac
 import { SendStatus } from "./send-status.enum";
 
 @Injectable()
-export class FutureMessagePersistenceRepositoryImpl
-  implements FutureMessagePersistenceRepository
-{
+export class FutureMessagePersistenceRepositoryImpl implements FutureMessagePersistenceRepository {
   constructor(
     @InjectModel(FutureMessageEntity.name)
     private readonly futureMessageModel: Model<FutureMessageDocument>,
@@ -46,8 +44,8 @@ export class FutureMessagePersistenceRepositoryImpl
     await this.futureMessageModel.create(
       [
         {
-          senderId: entity.getSenderId.raw,
-          recipientId: entity.getRecipientId.raw,
+          senderId: entity.getSenderId.raw.toString(),
+          recipientId: entity.getRecipientId.raw.toString(),
           title: entity.getTitle,
           content: entity.getContent,
           sendStatus: entity.getSendStatus,
@@ -55,7 +53,7 @@ export class FutureMessagePersistenceRepositoryImpl
         },
       ],
       {
-        session: session,
+        session,
       },
     );
   }
@@ -70,7 +68,24 @@ export class FutureMessagePersistenceRepositoryImpl
           updatedAt: new Date(),
         },
       },
-      { session: session },
+      { session },
     );
+  }
+
+  public async update(
+    id: FutureMessageId,
+    data: Record<string, unknown>,
+  ): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.futureMessageModel.findOneAndUpdate(
+      { _id: id.raw },
+      { $set: data },
+      { session },
+    );
+  }
+
+  public async deleteOne(id: FutureMessageId): Promise<void> {
+    const session = MongoSessionContext.getSession();
+    await this.futureMessageModel.deleteOne({ _id: id.raw }, { session });
   }
 }

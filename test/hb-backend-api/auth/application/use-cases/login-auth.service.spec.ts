@@ -13,6 +13,7 @@ import { TransactionRunner } from "../../../../../src/infra/mongo/transaction/tr
 import { UserEntitySchema } from "../../../../../src/hb-backend-api/user/domain/model/user.entity";
 import { AuthEntitySchema } from "../../../../../src/hb-backend-api/auth/domain/model/auth.entity";
 import { UserId } from "../../../../../src/hb-backend-api/user/domain/model/user-id.vo";
+import { ApprovalStatus } from "../../../../../src/hb-backend-api/user/domain/enums/approval-status.enum";
 import { Types } from "mongoose";
 
 jest.mock("bcrypt");
@@ -31,6 +32,8 @@ describe("LoginAuthService", () => {
     "Robin",
     "hashedPassword",
     [],
+    ApprovalStatus.APPROVED,
+    false,
   );
 
   beforeEach(async () => {
@@ -43,7 +46,10 @@ describe("LoginAuthService", () => {
         },
         {
           provide: DIToken.AuthModule.AuthPersistencePort,
-          useValue: { saveRefreshToken: jest.fn() },
+          useValue: {
+            saveRefreshToken: jest.fn(),
+            revokeToken: jest.fn(),
+          },
         },
         {
           provide: DIToken.AuthModule.AuthQueryPort,
@@ -75,7 +81,7 @@ describe("LoginAuthService", () => {
   });
 
   describe("invoke()", () => {
-    it("should return access and refresh tokens on successful login", async () => {
+    it("should always issue a new refresh token (session rotation)", async () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       userQueryPort.findByNickname.mockResolvedValue(mockUser);
       authQueryPort.findByNickname.mockResolvedValue(null);
@@ -88,26 +94,31 @@ describe("LoginAuthService", () => {
 
       expect(result.getAccessToken).toBe("access-token");
       expect(result.getRefreshToken).toBe("refresh-token");
+      expect(authPersistencePort.saveRefreshToken).toHaveBeenCalled();
     });
 
-    it("should reuse existing valid refresh token", async () => {
+    it("should revoke existing token before issuing new one", async () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       userQueryPort.findByNickname.mockResolvedValue(mockUser);
 
       const futureExpiry = new Date(Date.now() + 1000 * 60 * 60 * 24);
       const existingAuth = AuthEntitySchema.of(
         "Robin",
-        "existing-refresh-token",
+        "existing.refresh.token",
         futureExpiry,
       );
       authQueryPort.findByNickname.mockResolvedValue(existingAuth);
       jwtAuthPort.signAccessToken.mockReturnValue("new-access-token");
+      jwtAuthPort.signRefreshToken.mockReturnValue("new-refresh-token");
+      authPersistencePort.revokeToken.mockResolvedValue(undefined);
+      authPersistencePort.saveRefreshToken.mockResolvedValue(undefined);
 
       const command = LoginAuthCommand.of("Robin", "Password1!");
       const result = await service.invoke(command);
 
-      expect(result.getRefreshToken).toBe("existing-refresh-token");
-      expect(authPersistencePort.saveRefreshToken).not.toHaveBeenCalled();
+      expect(authPersistencePort.revokeToken).toHaveBeenCalled();
+      expect(authPersistencePort.saveRefreshToken).toHaveBeenCalled();
+      expect(result.getRefreshToken).toBe("new-refresh-token");
     });
 
     it("should throw BadRequestException when password does not match", async () => {
@@ -115,6 +126,28 @@ describe("LoginAuthService", () => {
       userQueryPort.findByNickname.mockResolvedValue(mockUser);
 
       const command = LoginAuthCommand.of("Robin", "WrongPassword1!");
+
+      await expect(service.invoke(command)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it("should throw BadRequestException when user is not approved", async () => {
+      const pendingUser = UserEntitySchema.of(
+        new UserId(new Types.ObjectId()),
+        "Pending User",
+        "pending@hobom.com",
+        "PendingUser",
+        "hashedPassword",
+        [],
+        ApprovalStatus.PENDING,
+        false,
+      );
+
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      userQueryPort.findByNickname.mockResolvedValue(pendingUser);
+
+      const command = LoginAuthCommand.of("PendingUser", "Password1!");
 
       await expect(service.invoke(command)).rejects.toThrow(
         BadRequestException,

@@ -1,0 +1,52 @@
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { CreateProjectUseCase } from "../../ports/in/create-project.use-case";
+import { DIToken } from "../../../../shared/di/token.di";
+import { ProjectPersistencePort } from "../../ports/out/project-persistence.port";
+import { ProjectQueryPort } from "../../ports/out/project-query.port";
+import { ProjectKey } from "../../domain/model/project-key.vo";
+import { UserId } from "../../../user/domain/model/user-id.vo";
+import { TransactionRunner } from "../../../../infra/mongo/transaction/transaction.runner";
+import { Transactional } from "../../../../infra/mongo/transaction/transaction.decorator";
+import { CreateProjectEntity } from "../../domain/model/project.entity";
+import {
+  DEFAULT_ISSUE_TYPES,
+  DEFAULT_PRIORITIES,
+} from "../../domain/constants/project-defaults.constant";
+
+@Injectable()
+export class CreateProjectService implements CreateProjectUseCase {
+  constructor(
+    @Inject(DIToken.ProjectModule.ProjectPersistencePort)
+    private readonly projectPersistencePort: ProjectPersistencePort,
+    @Inject(DIToken.ProjectModule.ProjectQueryPort)
+    private readonly projectQueryPort: ProjectQueryPort,
+    public readonly transactionRunner: TransactionRunner,
+  ) {}
+
+  @Transactional()
+  public async invoke(
+    key: ProjectKey,
+    name: string,
+    description: string | null,
+    owner: UserId,
+  ): Promise<void> {
+    const existing = await this.projectQueryPort.findByKey(key);
+    if (existing != null) {
+      throw new BadRequestException(
+        `이미 존재하는 프로젝트 키에요. ${key.raw}`,
+      );
+    }
+
+    await this.projectPersistencePort.save(
+      CreateProjectEntity.of(
+        key,
+        name,
+        description,
+        owner,
+        null,
+        DEFAULT_ISSUE_TYPES as unknown as readonly Record<string, unknown>[],
+        DEFAULT_PRIORITIES as unknown as readonly Record<string, unknown>[],
+      ),
+    );
+  }
+}

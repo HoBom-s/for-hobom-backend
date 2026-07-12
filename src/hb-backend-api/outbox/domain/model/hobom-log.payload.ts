@@ -12,8 +12,11 @@ export interface HoBomLogPayloadType {
   serviceType: string;
   message: string;
   payload: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query?: Record<string, any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body?: Record<string, any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     headers?: Record<string, any>;
     error?: string;
   };
@@ -21,6 +24,7 @@ export interface HoBomLogPayloadType {
 
 export function createHoBomLogPayload(
   input: HoBomLogPayloadType,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Record<string, string | number | Record<string, any>> {
   return {
     traceId: input.traceId,

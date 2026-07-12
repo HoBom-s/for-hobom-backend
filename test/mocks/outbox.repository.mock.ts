@@ -6,5 +6,6 @@ export function createOutboxRepository(): jest.Mocked<OutboxRepository> {
     markAsSent: jest.fn(),
     markAsFailed: jest.fn(),
     findByEventTypeAndStatus: jest.fn(),
+    deleteExpiredBatch: jest.fn(),
   };
 }

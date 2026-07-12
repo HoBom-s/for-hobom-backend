@@ -29,28 +29,33 @@ export class LabelRepositoryImpl implements LabelRepository {
   }
 
   public async findAll(owner: UserId): Promise<LabelDocument[]> {
-    return this.labelModel.find({ owner: owner.raw }).exec();
+    return (await this.labelModel
+      .find({ owner: owner.raw })
+      .lean()
+      .exec()) as unknown as LabelDocument[];
   }
 
   public async findById(id: LabelId, owner: UserId): Promise<LabelDocument> {
     const found = await this.labelModel
       .findOne({ _id: id.raw, owner: owner.raw })
+      .lean()
       .exec();
     if (found == null) {
       throw new NotFoundException(
         `해당 라벨을 찾을 수 없어요. ID: ${id.toString()}`,
       );
     }
-    return found;
+    return found as unknown as LabelDocument;
   }
 
   public async findByTitle(
     title: LabelTitle,
     owner: UserId,
   ): Promise<LabelDocument | null> {
-    return this.labelModel
+    return (await this.labelModel
       .findOne({ title: title.raw, owner: owner.raw })
-      .exec();
+      .lean()
+      .exec()) as unknown as LabelDocument | null;
   }
 
   public async updateTitle(

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, Matches } from "class-validator";
 
 export class CreateFutureMessageDto {
   @ApiProperty({ type: "string", required: true })
@@ -22,5 +22,8 @@ export class CreateFutureMessageDto {
     message: "Future Message 를 보낼 날짜의 타입이 올바르지 않아요.",
   })
   @IsNotEmpty({ message: "Future Message 를 언제 보낼지 결정해주세요." })
+  @Matches(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?)?$/, {
+    message: "날짜 형식은 YYYY-MM-DD 또는 YYYY-MM-DDTHH:mm 이어야 해요.",
+  })
   scheduledAt: string;
 }

@@ -5,6 +5,7 @@ import { UserRepository } from "../../domain/model/user.repository";
 import { DIToken } from "../../../../shared/di/token.di";
 import { UserId } from "../../domain/model/user-id.vo";
 import { UserNickname } from "../../domain/model/user-nickname.vo";
+import { ApprovalStatus } from "../../domain/enums/approval-status.enum";
 
 @Injectable()
 export class UserQueryAdapter implements UserQueryPort {
@@ -15,6 +16,7 @@ export class UserQueryAdapter implements UserQueryPort {
 
   public async findById(id: UserId): Promise<UserEntitySchema> {
     const foundUser = await this.userRepository.findById(id);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (foundUser == null) {
       throw new NotFoundException(
         `해당 유저를 찾을 수 없어요. ${id.raw.toHexString()}`,
@@ -28,6 +30,8 @@ export class UserQueryAdapter implements UserQueryPort {
       foundUser.nickname,
       foundUser.password,
       foundUser.friends,
+      foundUser.approvalStatus,
+      foundUser.isAdmin,
     );
   }
 
@@ -41,6 +45,8 @@ export class UserQueryAdapter implements UserQueryPort {
         foundUser.nickname,
         foundUser.password,
         foundUser.friends,
+        foundUser.approvalStatus,
+        foundUser.isAdmin,
       ),
     );
   }
@@ -49,6 +55,7 @@ export class UserQueryAdapter implements UserQueryPort {
     nickname: UserNickname,
   ): Promise<UserEntitySchema> {
     const foundUser = await this.userRepository.findByNickname(nickname);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (foundUser == null) {
       throw new NotFoundException(
         `해당 유저를 찾을 수 없어요. ${nickname.raw}`,
@@ -62,6 +69,31 @@ export class UserQueryAdapter implements UserQueryPort {
       foundUser.nickname,
       foundUser.password,
       foundUser.friends,
+      foundUser.approvalStatus,
+      foundUser.isAdmin,
     );
+  }
+
+  public async findPendingUsers(): Promise<UserEntitySchema[]> {
+    const founds = await this.userRepository.findPendingUsers();
+    return founds.map((foundUser) =>
+      UserEntitySchema.of(
+        UserId.fromString(String(foundUser._id)),
+        foundUser.username,
+        foundUser.email,
+        foundUser.nickname,
+        foundUser.password,
+        foundUser.friends,
+        foundUser.approvalStatus,
+        foundUser.isAdmin,
+      ),
+    );
+  }
+
+  public async updateApprovalStatus(
+    id: UserId,
+    status: ApprovalStatus,
+  ): Promise<void> {
+    await this.userRepository.updateApprovalStatus(id, status);
   }
 }

@@ -12,6 +12,13 @@ RUN npm run build
 
 FROM node:20-alpine
 
+# Chromium for Puppeteer
+RUN apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-freefont
+
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -23,7 +30,7 @@ RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 
 # proto for gRPC
-COPY hobom-buf-proto ./hobom-buf-proto
+COPY proto ./proto
 
 EXPOSE 8080
 

@@ -1,0 +1,6 @@
+export enum IssueResolution {
+  FIXED = "FIXED",
+  WONT_FIX = "WONT_FIX",
+  DUPLICATE = "DUPLICATE",
+  CANNOT_REPRODUCE = "CANNOT_REPRODUCE",
+}

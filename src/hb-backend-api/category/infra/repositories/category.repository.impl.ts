@@ -32,22 +32,18 @@ export class CategoryRepositoryImpl implements CategoryRepository {
         },
       ],
       {
-        session: session,
+        session,
       },
     );
   }
 
   public async findAll(userId: UserId): Promise<CategoryDocument[]> {
-    const categories = await this.categoryModel
+    return (await this.categoryModel
       .find({
         owner: userId.raw,
       })
-      .exec();
-    if (categories == null) {
-      return [];
-    }
-
-    return categories;
+      .lean()
+      .exec()) as unknown as CategoryDocument[];
   }
 
   public async findById(
@@ -59,6 +55,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
         _id: id.raw,
         owner: owner.raw,
       })
+      .lean()
       .exec();
     if (foundCategory == null) {
       throw new NotFoundException(
@@ -66,18 +63,19 @@ export class CategoryRepositoryImpl implements CategoryRepository {
       );
     }
 
-    return foundCategory;
+    return foundCategory as unknown as CategoryDocument;
   }
   public async findByTitle(
     title: CategoryTitle,
     owner: UserId,
   ): Promise<CategoryDocument | null> {
-    return await this.categoryModel
+    return (await this.categoryModel
       .findOne({
         title: title.raw,
         owner: owner.raw,
       })
-      .exec();
+      .lean()
+      .exec()) as unknown as CategoryDocument | null;
   }
 
   public async updateTitle(
@@ -95,7 +93,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
           title: categoryUpdateEntitySchema.getTitle.raw,
         },
       },
-      { session: session },
+      { session },
     );
   }
 
@@ -103,7 +101,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     const session = MongoSessionContext.getSession();
     await this.categoryModel.deleteOne(
       { _id: categoryId.raw, owner: owner.raw },
-      { session: session },
+      { session },
     );
   }
 }

@@ -4,6 +4,7 @@ export class UserNickname {
   }
 
   public static fromString(nickname: string): UserNickname {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (nickname == null || nickname.trim().length === 0) {
       throw new Error("닉네임이 정의되지 않았어요.");
     }

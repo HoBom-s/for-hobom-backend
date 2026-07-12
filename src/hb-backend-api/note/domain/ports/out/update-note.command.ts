@@ -6,7 +6,7 @@ import { NoteReminder } from "../../model/note-reminder";
 
 export class UpdateNoteCommand {
   constructor(
-    private readonly owner: UserId,
+    private readonly userId: UserId,
     private readonly title: string | null | undefined,
     private readonly content: string | null | undefined,
     private readonly checklistItems: ChecklistItem[] | undefined,
@@ -16,7 +16,7 @@ export class UpdateNoteCommand {
   ) {}
 
   public static of(
-    owner: UserId,
+    userId: UserId,
     title?: string | null,
     content?: string | null,
     checklistItems?: ChecklistItem[],
@@ -25,7 +25,7 @@ export class UpdateNoteCommand {
     reminder?: NoteReminder | null,
   ): UpdateNoteCommand {
     return new UpdateNoteCommand(
-      owner,
+      userId,
       title,
       content,
       checklistItems,
@@ -35,8 +35,8 @@ export class UpdateNoteCommand {
     );
   }
 
-  get getOwner(): UserId {
-    return this.owner;
+  get getUserId(): UserId {
+    return this.userId;
   }
   get getTitle(): string | null | undefined {
     return this.title;

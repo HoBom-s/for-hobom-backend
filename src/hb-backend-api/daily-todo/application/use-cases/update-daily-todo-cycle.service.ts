@@ -12,9 +12,7 @@ import { DailyTodoQueryPort } from "../ports/out/daily-todo-query.port";
 import { DailyTodoCycle } from "../../domain/enums/daily-todo-cycle.enum";
 
 @Injectable()
-export class UpdateDailyTodoCycleService
-  implements UpdateDailyTodoCycleUseCase
-{
+export class UpdateDailyTodoCycleService implements UpdateDailyTodoCycleUseCase {
   constructor(
     @Inject(DIToken.DailyTodoModule.DailyTodoPersistencePort)
     private readonly dailyTodoPersistencePort: DailyTodoPersistencePort,
@@ -41,7 +39,7 @@ export class UpdateDailyTodoCycleService
     id: DailyTodoId,
     owner: UserId,
   ): Promise<DailyTodoWithRelationEntity> {
-    return await this.dailyTodoQueryPort.findById(id, owner);
+    return this.dailyTodoQueryPort.findById(id, owner);
   }
 
   private async changeCycle(

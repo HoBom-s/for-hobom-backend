@@ -7,9 +7,7 @@ import { FutureMessageQueryPort } from "../../domain/ports/out/future-message-qu
 import { UserId } from "../../../user/domain/model/user-id.vo";
 
 @Injectable()
-export class FindAllFutureMessageByStatusService
-  implements FindAllFutureMessageByStatusUseCase
-{
+export class FindAllFutureMessageByStatusService implements FindAllFutureMessageByStatusUseCase {
   constructor(
     @Inject(DIToken.FutureMessageModule.FutureMessageQueryPort)
     private readonly futureMessageQueryPort: FutureMessageQueryPort,
@@ -19,16 +17,13 @@ export class FindAllFutureMessageByStatusService
     status: SendStatus,
     senderId: UserId,
   ): Promise<FutureMessageQueryResult[]> {
-    return await this.findAll(status, senderId);
+    return this.findAll(status, senderId);
   }
 
   private async findAll(
     status: SendStatus,
     senderId: UserId,
   ): Promise<FutureMessageQueryResult[]> {
-    return await this.futureMessageQueryPort.findAllBySendStatus(
-      status,
-      senderId,
-    );
+    return this.futureMessageQueryPort.findAllBySendStatus(status, senderId);
   }
 }
