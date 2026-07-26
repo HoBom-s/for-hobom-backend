@@ -226,9 +226,6 @@ export class DIToken {
     public static ProcessExpiredOutboxCleanupUseCase = this.register(
       "ProcessExpiredOutboxCleanupUseCase",
     );
-    public static FindLawOutboxByEventTypeAndStatusUseCase = this.register(
-      "FindLawOutboxByEventTypeAndStatusUseCase",
-    );
   };
 
   public static readonly DashboardModule = class extends DITokenRegister {
@@ -447,77 +444,5 @@ export class DIToken {
     public static GetDlqListUseCase = this.register("GetDlqListUseCase");
     public static GetDlqDetailUseCase = this.register("GetDlqDetailUseCase");
     public static RetryDlqUseCase = this.register("RetryDlqUseCase");
-  };
-
-  public static readonly PrivacyLawModule = class extends DITokenRegister {
-    public static LawVersionRepository = this.register("LawVersionRepository");
-    public static LawDiffRepository = this.register("LawDiffRepository");
-    public static StudyMaterialRepository = this.register(
-      "StudyMaterialRepository",
-    );
-
-    public static LawApiPort = this.register("LawApiPort");
-    public static LlmPort = this.register("LlmPort");
-
-    public static LawVersionPersistencePort = this.register(
-      "LawVersionPersistencePort",
-    );
-    public static LawVersionQueryPort = this.register("LawVersionQueryPort");
-    public static LawDiffPersistencePort = this.register(
-      "LawDiffPersistencePort",
-    );
-    public static LawDiffQueryPort = this.register("LawDiffQueryPort");
-    public static StudyMaterialPersistencePort = this.register(
-      "StudyMaterialPersistencePort",
-    );
-    public static StudyMaterialQueryPort = this.register(
-      "StudyMaterialQueryPort",
-    );
-
-    public static FetchLawVersionUseCase = this.register(
-      "FetchLawVersionUseCase",
-    );
-    public static GetLawVersionsUseCase = this.register(
-      "GetLawVersionsUseCase",
-    );
-    public static GetLawVersionByIdUseCase = this.register(
-      "GetLawVersionByIdUseCase",
-    );
-    public static GetLawDiffsUseCase = this.register("GetLawDiffsUseCase");
-    public static GetLawDiffByIdUseCase = this.register(
-      "GetLawDiffByIdUseCase",
-    );
-    public static GetStudyMaterialsUseCase = this.register(
-      "GetStudyMaterialsUseCase",
-    );
-    public static GetStudyMaterialByIdUseCase = this.register(
-      "GetStudyMaterialByIdUseCase",
-    );
-    public static AskQuestionUseCase = this.register("AskQuestionUseCase");
-
-    public static QuestionHistoryRepository = this.register(
-      "QuestionHistoryRepository",
-    );
-    public static QuestionHistoryPersistencePort = this.register(
-      "QuestionHistoryPersistencePort",
-    );
-    public static QuestionHistoryQueryPort = this.register(
-      "QuestionHistoryQueryPort",
-    );
-    public static GetQuestionHistoriesUseCase = this.register(
-      "GetQuestionHistoriesUseCase",
-    );
-
-    public static ExamSetRepository = this.register("ExamSetRepository");
-    public static LlmExamPort = this.register("LlmExamPort");
-    public static ExamSetPersistencePort = this.register(
-      "ExamSetPersistencePort",
-    );
-    public static ExamSetQueryPort = this.register("ExamSetQueryPort");
-    public static GenerateExamUseCase = this.register("GenerateExamUseCase");
-    public static GetExamSetsUseCase = this.register("GetExamSetsUseCase");
-    public static GetExamSetByIdUseCase = this.register(
-      "GetExamSetByIdUseCase",
-    );
   };
 }
