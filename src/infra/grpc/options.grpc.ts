@@ -66,7 +66,7 @@ export const grpcOptions: MicroserviceOptions = {
   transport: Transport.GRPC,
   options: {
     url: `${process.env.HOBOM_GRPC_HOST ?? "0.0.0.0"}:50051`,
-    package: ["outbox.message", "outbox.log", "outbox.law", "law"],
+    package: ["outbox.message", "outbox.log"],
     protoPath: [
       join(
         __dirname,
@@ -77,11 +77,6 @@ export const grpcOptions: MicroserviceOptions = {
         "../../../proto/message/outbox/v1/patch-hobom-message-outbox.proto",
       ),
       join(__dirname, "../../../proto/log/outbox/v1/hobom-log-outbox.proto"),
-      join(
-        __dirname,
-        "../../../proto/law/outbox/v1/find-hobom-law-outbox.proto",
-      ),
-      join(__dirname, "../../../proto/law/v1/save-study-material.proto"),
     ],
     credentials: buildGrpcCredentials(),
   },
